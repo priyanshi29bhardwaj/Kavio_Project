@@ -15,27 +15,66 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
   const subRef     = useRef<HTMLDivElement>(null);
   const ctaRef     = useRef<HTMLDivElement>(null);
 
+  // Individual word refs for "matched by AI."
+  const w1 = useRef<HTMLSpanElement>(null); // "matched"
+  const w2 = useRef<HTMLSpanElement>(null); // "by"
+  const w3 = useRef<HTMLSpanElement>(null); // "AI."
+
+  // Subtitle ref
+  const sublineRef = useRef<HTMLSpanElement>(null);
+
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const items = [taglineRef.current, headRef.current, subRef.current, ctaRef.current];
 
-      // Each element fades + rises in staggered as section enters viewport
+      // ── Phase 1: whole block fades + rises in — text starts neutral white ──
       gsap.fromTo(
-        items,
-        { opacity: 0, y: 48, filter: "blur(8px)" },
+        [taglineRef.current, headRef.current, subRef.current, ctaRef.current],
+        { opacity: 0, y: 52, filter: "blur(10px)" },
         {
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
-          duration: 1.1,
+          duration: 1.15,
           ease: "power3.out",
-          stagger: 0.18,
+          stagger: 0.2,
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 68%",
           },
         }
       );
+
+      // ── Phase 2: colour lights up word-by-word once section is centred ────
+      // Words start dim; GSAP transitions each one to its colour.
+      gsap.set([w1.current, w2.current, w3.current], {
+        color: "rgba(255,255,255,0.45)",
+      });
+      gsap.set(sublineRef.current, {
+        color: "rgba(255,255,255,0.45)",
+      });
+
+      const hl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 40%",
+        },
+      });
+
+      // "matched" → "by" → "AI." stagger into teal
+      hl.to([w1.current, w2.current, w3.current], {
+        color: "#7ECECA",
+        duration: 0.55,
+        stagger: 0.14,
+        ease: "power2.out",
+      }, 0);
+
+      // subtitle fades to lime slightly after
+      hl.to(sublineRef.current, {
+        color: "#C8E44A",
+        duration: 0.7,
+        ease: "power2.out",
+      }, 0.42);
+
     }, sectionRef);
 
     return () => ctx.revert();
@@ -51,52 +90,39 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
-        // Transparent — global fixed sky (App.tsx) shows through.
-        // No sky image needed here; HeroScene ends on the same sky, so
-        // scrolling into this section creates zero visible transition.
         background: "transparent",
         zIndex: 1,
       }}
     >
-      {/* Soft overlay for text legibility — NOT the sky itself */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(180deg, rgba(5,8,16,0.28) 0%, rgba(5,8,16,0.10) 35%, rgba(5,8,16,0.08) 65%, rgba(5,8,16,0.45) 100%)",
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* Content */}
+      {/* ── Content ── */}
       <div
         style={{
           position: "relative",
           zIndex: 10,
           textAlign: "center",
           padding: "120px 28px",
-          maxWidth: "780px",
+          maxWidth: "800px",
           margin: "0 auto",
         }}
       >
-        {/* Eyebrow tag */}
+        {/* Eyebrow */}
         <div
           ref={taglineRef}
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
             fontWeight: 700,
             fontSize: "9px",
-            letterSpacing: "0.42em",
+            letterSpacing: "0.44em",
             color: "#C8E44A",
             textTransform: "uppercase",
-            marginBottom: "28px",
+            marginBottom: "32px",
+            textShadow: "0 2px 12px rgba(0,0,0,0.7)",
           }}
         >
           Stop Doing. Start Delegating.
         </div>
 
-        {/* Hero headline */}
+        {/* Headline */}
         <div ref={headRef}>
           <h1
             style={{
@@ -105,24 +131,31 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
               fontSize: "clamp(32px, 5.5vw, 76px)",
               lineHeight: 1.06,
               color: "white",
-              margin: "0 0 16px",
-              textShadow: "0 4px 32px rgba(0,0,0,0.45)",
+              margin: "0 0 18px",
+              textShadow: "0 2px 20px rgba(0,0,0,0.75), 0 4px 48px rgba(0,0,0,0.45)",
             }}
           >
             Your perfect flight,{" "}
-            <span style={{ color: "#7ECECA" }}>matched by AI.</span>
+            {/* Each word lights up individually */}
+            <span ref={w1}>matched</span>
+            {" "}
+            <span ref={w2}>by</span>
+            {" "}
+            <span ref={w3}>AI.</span>
           </h1>
+
           <p
             style={{
               fontFamily: "'Urbanist', sans-serif",
               fontWeight: 600,
               fontSize: "clamp(15px, 2vw, 22px)",
-              color: "#C8E44A",
               margin: "0 0 10px",
-              textShadow: "0 2px 16px rgba(0,0,0,0.35)",
+              textShadow: "0 2px 14px rgba(0,0,0,0.75)",
             }}
           >
-            Found and booked in under 60 seconds.
+            <span ref={sublineRef}>
+              Found and booked in under 60 seconds.
+            </span>
           </p>
         </div>
 
@@ -133,11 +166,11 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
               fontFamily: "'Urbanist', sans-serif",
               fontWeight: 400,
               fontSize: "clamp(13px, 1.4vw, 17px)",
-              color: "rgba(255,255,255,0.72)",
+              color: "rgba(255,255,255,0.90)",
               lineHeight: 1.8,
-              margin: "18px auto 10px",
+              margin: "22px auto 10px",
               maxWidth: "520px",
-              textShadow: "0 1px 8px rgba(0,0,0,0.4)",
+              textShadow: "0 1px 12px rgba(0,0,0,0.8), 0 2px 24px rgba(0,0,0,0.5)",
             }}
           >
             No endless searching. No second-guessing. No admin overload.
@@ -147,11 +180,11 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
               fontFamily: "'Urbanist', sans-serif",
               fontWeight: 400,
               fontSize: "clamp(13px, 1.4vw, 17px)",
-              color: "rgba(255,255,255,0.60)",
+              color: "rgba(255,255,255,0.80)",
               lineHeight: 1.8,
-              margin: "0 auto 36px",
+              margin: "0 auto 40px",
               maxWidth: "520px",
-              textShadow: "0 1px 8px rgba(0,0,0,0.4)",
+              textShadow: "0 1px 12px rgba(0,0,0,0.8), 0 2px 24px rgba(0,0,0,0.5)",
             }}
           >
             Just better travel decisions — handled for you.
@@ -166,7 +199,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
               background: "#C8E44A",
               color: "#1B4A5A",
               border: "none",
-              padding: "15px 36px",
+              padding: "15px 38px",
               fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 700,
               fontSize: "11px",
@@ -178,7 +211,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
             }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-2px)";
-              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 8px 32px rgba(200,228,74,0.5)";
+              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 8px 32px rgba(200,228,74,0.55)";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
