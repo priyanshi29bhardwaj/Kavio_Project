@@ -208,8 +208,8 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
     gsap.set(rightRef.current, { opacity: 0, y: 44, filter: "blur(7px)" });
     gsap.set(ctaRef.current,   { opacity: 0, y: 30, filter: "blur(5px)" });
 
-    // Shutter takes 2.2s + 0.2s delay; stagger texts in after it opens
-    const tl = gsap.timeline({ delay: 2.5 });
+    // Shutter takes 2.2s + 0.2s delay; start texts slightly before it fully clears
+    const tl = gsap.timeline({ delay: 1.7 });
 
     tl.to(logoRef.current, {
       opacity: 1, scale: 1,
