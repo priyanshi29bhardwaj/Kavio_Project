@@ -110,13 +110,13 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
           ref={taglineRef}
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 700,
-            fontSize: "9px",
-            letterSpacing: "0.44em",
+            fontWeight: 800,
+            fontSize: "clamp(12px, 1.1vw, 15px)",
+            letterSpacing: "0.32em",
             color: "#C8E44A",
             textTransform: "uppercase",
             marginBottom: "32px",
-            textShadow: "0 2px 12px rgba(0,0,0,0.7)",
+            textShadow: "0 2px 16px rgba(0,0,0,0.85), 0 0 32px rgba(0,0,0,0.6)",
           }}
         >
           Stop Doing. Start Delegating.
@@ -164,13 +164,13 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
           <p
             style={{
               fontFamily: "'Urbanist', sans-serif",
-              fontWeight: 400,
-              fontSize: "clamp(13px, 1.4vw, 17px)",
-              color: "rgba(255,255,255,0.90)",
+              fontWeight: 600,
+              fontSize: "clamp(15px, 1.6vw, 19px)",
+              color: "rgba(255,255,255,0.96)",
               lineHeight: 1.8,
               margin: "22px auto 10px",
               maxWidth: "520px",
-              textShadow: "0 1px 12px rgba(0,0,0,0.8), 0 2px 24px rgba(0,0,0,0.5)",
+              textShadow: "0 1px 14px rgba(0,0,0,0.9), 0 2px 28px rgba(0,0,0,0.65)",
             }}
           >
             No endless searching. No second-guessing. No admin overload.
@@ -178,13 +178,13 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
           <p
             style={{
               fontFamily: "'Urbanist', sans-serif",
-              fontWeight: 400,
-              fontSize: "clamp(13px, 1.4vw, 17px)",
-              color: "rgba(255,255,255,0.80)",
+              fontWeight: 600,
+              fontSize: "clamp(15px, 1.6vw, 19px)",
+              color: "rgba(255,255,255,0.90)",
               lineHeight: 1.8,
               margin: "0 auto 40px",
               maxWidth: "520px",
-              textShadow: "0 1px 12px rgba(0,0,0,0.8), 0 2px 24px rgba(0,0,0,0.5)",
+              textShadow: "0 1px 14px rgba(0,0,0,0.9), 0 2px 28px rgba(0,0,0,0.65)",
             }}
           >
             Just better travel decisions — handled for you.
