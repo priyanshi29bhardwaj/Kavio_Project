@@ -1,18 +1,20 @@
 import { useRef, useLayoutEffect, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { KaivoMark, KaivoWordmark } from "./KaivoLogo";
 
 gsap.registerPlugin(ScrollTrigger);
 
 // ─── Shutter ──────────────────────────────────────────────────────────────────
-// Full-viewport cinematic curtain — slides up to reveal the entire cabin scene.
-// No longer clipped to a window oval; the whole screen opens like a blind.
+// Dark blind sitting inside the oval window — slides up to reveal the sky.
+// Sizing/position lives in .shutter-clip (index.css) so media queries apply.
 function Shutter({ open }: { open: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const shadeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open || !ref.current) return;
-    gsap.to(ref.current, {
+    if (!open || !shadeRef.current) return;
+
+    gsap.to(shadeRef.current, {
       yPercent: -101,
       duration: 2.2,
       ease: "power2.inOut",
@@ -21,103 +23,134 @@ function Shutter({ open }: { open: boolean }) {
   }, [open]);
 
   return (
-    <div
-      ref={ref}
-      style={{
-        position: "absolute",
-        inset: 0,
-        zIndex: 50,          // above everything — covers full viewport
-        pointerEvents: "none",
-        overflow: "hidden",
-      }}
-    >
-      {/* ── Main shade ── */}
+    <div className="shutter-clip">
       <div
+        ref={shadeRef}
         style={{
           position: "absolute",
           inset: 0,
-          background:
-            "linear-gradient(180deg," +
-            " rgba(252,246,236,0.98) 0%," +
-            " #f0e8da 12%," +
-            " #e2d5c0 35%," +
-            " #cfc1a8 62%," +
-            " #bfb094 82%," +
-            " #afa080 100%)",
-          boxShadow:
-            "inset 0 4px 20px rgba(255,220,160,0.30)," +
-            " inset 0 -6px 18px rgba(0,0,0,0.15)",
-        }}
-      />
-
-      {/* ── Fabric ribs ── */}
-      {Array.from({ length: 20 }).map((_, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            left: 0, right: 0,
-            top: `${(i / 20) * 100}%`,
-            height: "1px",
-            background:
-              i % 2 === 0
-                ? "rgba(255,255,255,0.09)"
-                : "rgba(0,0,0,0.04)",
-          }}
-        />
-      ))}
-
-      {/* ── Sunrise glow at top ── */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0, left: 0, right: 0,
-          height: "10%",
-          background:
-            "linear-gradient(180deg, rgba(255,210,130,0.18) 0%, transparent 100%)",
-        }}
-      />
-
-      {/* ── Pull handle at bottom — centred ── */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "72px",
-          height: "20px",
-          background:
-            "linear-gradient(180deg, #e8dcc8 0%, #c8b898 40%, #b0a080 100%)",
-          borderRadius: "12px 12px 0 0",
-          boxShadow:
-            "0 -4px 14px rgba(0,0,0,0.22)," +
-            " inset 0 1px 4px rgba(255,255,255,0.5)," +
-            " inset 0 -2px 4px rgba(0,0,0,0.18)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "6px",
         }}
       >
-        {[0, 1, 2, 3].map((i) => (
+        {/* MAIN SHADE */}
+        <div
+         style={{
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(
+              90deg,
+              #a8875d 0%,
+              #b39267 18%,
+              #bc9b6f 42%,
+              #b28f64 68%,
+              #98754f 100%
+            )
+          `,
+          boxShadow: `
+            inset 8px 0 12px rgba(255,240,210,0.05),
+            inset -22px 0 26px rgba(25,12,4,0.22),
+            inset 0 4px 10px rgba(255,255,255,0.015),
+            inset 0 -10px 14px rgba(20,10,4,0.08)
+          `,
+        }}
+        />
+
+        {/* SOFT FABRIC TEXTURE */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: 0.012,
+            backgroundImage:
+              "radial-gradient(rgba(255,255,255,0.2) 0.7px, transparent 0.7px)",
+            backgroundSize: "6px 6px",
+            mixBlendMode: "soft-light",
+          }}
+        />
+
+        {/* RIBS */}
+        {Array.from({ length: 20 }).map((_, i) => (
           <div
             key={i}
             style={{
-              width: "3px",
-              height: "9px",
-              borderRadius: "2px",
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: `${(i / 20) * 100}%`,
+              height: "1px",
               background:
-                "linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(160,140,110,0.8) 100%)",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.25)",
+                i % 2 === 0
+                  ? "rgba(255,245,220,0.035)"
+                  : "rgba(40,22,10,0.05)",
             }}
           />
         ))}
+
+        {/* TOP SHADOW */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "26px",
+            background:
+              "linear-gradient(to bottom, rgba(20,10,2,0.22), transparent)",
+          }}
+        />
+
+        {/* BOTTOM DEPTH */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "16px",
+            background:
+              "linear-gradient(to top, rgba(20,10,4,0.08), transparent)",
+          }}
+        />
+
+        {/* HANDLE */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "72px",
+            height: "20px",
+            background:
+              "linear-gradient(180deg, #8a6a42 0%, #72542d 45%, #5a401f 100%)",
+            borderRadius: "12px 12px 0 0",
+            boxShadow: `
+              0 -2px 6px rgba(0,0,0,0.12),
+              inset 0 1px 2px rgba(255,255,255,0.15)
+            `,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "6px",
+          }}
+        >
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              style={{
+                width: "3px",
+                height: "8px",
+                borderRadius: "2px",
+                background:
+                  "linear-gradient(180deg, rgba(255,255,255,0.28), rgba(70,50,25,0.7))",
+              }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 interface HeroSceneProps {
   onJoinWaitlist: () => void;
@@ -153,13 +186,14 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
       gsap.set(skyBrandRef.current, { opacity: 0, scale: 0.88 });
 
       // ── 0-22%: text + CTA fade out — give the zoom full screen
-      tl.to(
+      tl.fromTo(
         [leftRef.current, rightRef.current, ctaRef.current],
+        { opacity: 1 },
         { opacity: 0, duration: 0.22 },
         0
       );
       // ── logo persists a little longer (fades out at 0-38%)
-      tl.to(logoRef.current, { opacity: 0, duration: 0.38 }, 0);
+      tl.fromTo(logoRef.current, { opacity: 1 }, { opacity: 0, duration: 0.38 }, 0);
 
       // ── 0-68%: cabin zooms in
       tl.to(cabinRef.current, {
@@ -254,7 +288,6 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
           backgroundImage: "url(/clouds.png)",
           backgroundSize: "cover",
           backgroundPosition: "center 35%",
-          animation: "skyDrift 28s ease-in-out infinite",
           zIndex: 1,
           willChange: "transform",
           opacity: 0,    // hidden until scroll — sky appears with the window
@@ -296,32 +329,35 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         }}
       />
 
-      {/* ── KAIVO logo — floats inside the real window opening ── */}
+      {/* ── KAIVO logo — centred exactly in the oval window opening ── */}
       <div
         ref={logoRef}
+        className="hero-window-logo"
         style={{
           position: "absolute",
-          left: "50%",
-          top: "48%",
+          left: "49.2%",
+          top: "52%",
           transform: "translate(-50%, -50%)",
           zIndex: 20,
-          display: "flex", alignItems: "center", gap: "12px",
-          pointerEvents: "none", color: "white",
-          textShadow: "0 2px 20px rgba(0,0,0,0.55)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          pointerEvents: "none",
         }}
       >
-        <svg viewBox="0 0 100 100" width="38" height="38" fill="none">
-          <circle cx="50" cy="50" r="42" stroke="white" strokeWidth="2" strokeOpacity="0.90" />
-          <circle cx="50" cy="50" r="27" stroke="white" strokeWidth="1.5" strokeOpacity="0.90" />
-          <polygon points="50,36 64,50 50,64 36,50" fill="rgba(255,255,255,0.18)" stroke="white" strokeWidth="1.5" />
-          <polygon points="50,43 57,50 50,57 43,50" fill="white" />
-        </svg>
+        <KaivoMark
+          size={54}
+          color="white"
+          style={{ filter: "drop-shadow(0 2px 28px rgba(0,0,0,0.6))" }}
+        />
         <span
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 700,
-            fontSize: "clamp(15px, 1.6vw, 22px)",
-            letterSpacing: "0.36em",
+            fontWeight: 800,
+            letterSpacing: "0.44em",
+            color: "white",
+            textShadow: "0 2px 20px rgba(0,0,0,0.6)",
+            textIndent: "0.44em",
           }}
         >
           KAIVO
@@ -450,7 +486,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         ref={ctaRef}
         style={{
           position: "absolute",
-          bottom: "4%",
+          bottom: "2%",
           left: 0, right: 0,
           display: "flex",
           justifyContent: "center",
@@ -498,47 +534,27 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
           zIndex: 22,
           textAlign: "center",
           pointerEvents: "none",
-          color: "white",
           opacity: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "18px",
         }}
       >
-        <svg
-          viewBox="0 0 100 100"
-          width="72"
-          height="72"
-          fill="none"
-          style={{ display: "block", margin: "0 auto 16px" }}
-        >
-          <circle cx="50" cy="50" r="42" stroke="white" strokeWidth="2.2" strokeOpacity="0.9" />
-          <circle cx="50" cy="50" r="27" stroke="white" strokeWidth="1.6" strokeOpacity="0.9" />
-          <polygon
-            points="50,36 64,50 50,64 36,50"
-            fill="rgba(255,255,255,0.18)"
-            stroke="white"
-            strokeWidth="1.6"
-          />
-          <polygon points="50,43 57,50 50,57 43,50" fill="white" />
-        </svg>
-        <div
-          style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(34px, 4.8vw, 68px)",
-            letterSpacing: "0.44em",
-            textShadow: "0 4px 40px rgba(0,0,0,0.55), 0 0 80px rgba(255,255,255,0.08)",
-          }}
-        >
-          KAIVO
-        </div>
+        {/* Full wordmark — mark + KAIVO letters */}
+        <KaivoWordmark
+          height={54}
+          color="white"
+          style={{ filter: "drop-shadow(0 4px 32px rgba(0,0,0,0.5))" }}
+        />
         <div
           style={{
             fontFamily: "'Urbanist', sans-serif",
             fontWeight: 300,
             fontSize: "clamp(10px, 1vw, 13px)",
-            letterSpacing: "0.34em",
-            color: "rgba(255,255,255,0.60)",
+            letterSpacing: "0.38em",
+            color: "rgba(255,255,255,0.55)",
             textTransform: "uppercase",
-            marginTop: "12px",
           }}
         >
           Conversational Travel Booking
@@ -550,7 +566,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
 
       {/* ── Scroll indicator ── */}
       <div style={{
-        position: "absolute", bottom: "1.2%", left: 0, right: 0,
+        position: "absolute", bottom: "0.6%", left: 0, right: 0,
         textAlign: "center",
         color: "rgba(255,255,255,0.28)",
         fontFamily: "'Space Grotesk', sans-serif",

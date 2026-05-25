@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { KaivoWordmark } from "./KaivoLogo";
 
 interface PreloaderProps {
   onComplete: () => void;
@@ -7,14 +8,14 @@ interface PreloaderProps {
 
 export function Preloader({ onComplete }: PreloaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
-  const taglineRef = useRef<HTMLParagraphElement>(null);
-  const barFillRef = useRef<HTMLDivElement>(null);
+  const logoRef      = useRef<HTMLDivElement>(null);
+  const taglineRef   = useRef<HTMLParagraphElement>(null);
+  const barFillRef   = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    gsap.set(logoRef.current, { opacity: 0, y: 28 });
+    gsap.set(logoRef.current,    { opacity: 0, y: 28 });
     gsap.set(taglineRef.current, { opacity: 0, y: 14 });
     gsap.set(barFillRef.current, { scaleX: 0, transformOrigin: "left center" });
 
@@ -44,47 +45,21 @@ export function Preloader({ onComplete }: PreloaderProps) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: "26px",
+        gap: "28px",
       }}
     >
+      {/* Full horizontal wordmark */}
       <div ref={logoRef} style={{ textAlign: "center" }}>
-        <svg
-          viewBox="0 0 100 100"
-          width="54"
-          height="54"
-          fill="none"
-          style={{ display: "block", margin: "0 auto 14px" }}
-        >
-          <circle cx="50" cy="50" r="42" stroke="white" strokeWidth="1.8" />
-          <circle cx="50" cy="50" r="27" stroke="white" strokeWidth="1.3" />
-          <polygon
-            points="50,37 63,50 50,63 37,50"
-            fill="rgba(255,255,255,0.15)"
-            stroke="white"
-            strokeWidth="1.3"
-          />
-          <polygon points="50,44 56,50 50,56 44,50" fill="white" />
-        </svg>
-        <div
-          style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            color: "white",
-            fontSize: "20px",
-            fontWeight: 800,
-            letterSpacing: "0.38em",
-          }}
-        >
-          KAIVO
-        </div>
+        <KaivoWordmark height={44} color="white" />
       </div>
 
       <p
         ref={taglineRef}
         style={{
           fontFamily: "'Urbanist', sans-serif",
-          color: "rgba(255,255,255,0.38)",
+          color: "rgba(255,255,255,0.35)",
           fontSize: "10px",
-          letterSpacing: "0.28em",
+          letterSpacing: "0.30em",
           textTransform: "uppercase",
           margin: 0,
         }}
@@ -94,7 +69,7 @@ export function Preloader({ onComplete }: PreloaderProps) {
 
       <div
         style={{
-          width: "90px",
+          width: "100px",
           height: "1px",
           background: "rgba(255,255,255,0.07)",
           overflow: "hidden",
