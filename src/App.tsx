@@ -9,7 +9,7 @@ import { CloudTextSection } from "./components/CloudTextSection";
 import { DemoSection }      from "./components/DemoSection";
 import { ProblemSection }   from "./components/ProblemSection";
 import { JoinWaitlistModal } from "./components/JoinWaitlistModal";
-import { KaivoWordmark, KaivoMark } from "./components/KaivoLogo";
+import { KaivoWordmark } from "./components/KaivoLogo";
 
 gsap.registerPlugin(ScrollTrigger);
 
