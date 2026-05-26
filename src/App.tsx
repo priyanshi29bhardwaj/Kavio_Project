@@ -8,6 +8,13 @@ import { HeroScene }        from "./components/HeroScene";
 import { CloudTextSection } from "./components/CloudTextSection";
 import { DemoSection }      from "./components/DemoSection";
 import { ProblemSection }   from "./components/ProblemSection";
+import { ShiftSection }     from "./components/ShiftSection";
+import { ProductSection }        from "./components/ProductSection";
+import { ConversationalSection } from "./components/ConversationalSection";
+import { TrustSection }          from "./components/TrustSection";
+import { WhyLoveSection }        from "./components/WhyLoveSection";
+import { PurposeSection }        from "./components/PurposeSection";
+import { BusinessModelSection }  from "./components/BusinessModelSection";
 import { JoinWaitlistModal } from "./components/JoinWaitlistModal";
 import { KaivoWordmark } from "./components/KaivoLogo";
 
@@ -260,6 +267,13 @@ function App() {
       <div style={{ position: "relative", zIndex: 2 }}>
         <DemoSection />
         <ProblemSection />
+        <ShiftSection />
+        <ProductSection />
+        <ConversationalSection />
+        <TrustSection />
+        <WhyLoveSection />
+        <PurposeSection />
+        <BusinessModelSection />
 
       {/* ─── Footer ─────────────────────────────────────────────────────────── */}
       <footer

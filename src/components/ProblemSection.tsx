@@ -149,10 +149,10 @@ export function ProblemSection() {
   return (
     <section
       ref={sectionRef}
+      className="problem-section"
       style={{
         minHeight: "100vh",
         background: "white",
-        padding: "120px 40px",
         display: "flex",
         alignItems: "center",
       }}
@@ -162,7 +162,8 @@ export function ProblemSection() {
         {/* ── Animated flight path ──────────────────────────────────────────── */}
         <div
           ref={lineContRef}
-          style={{ position: "relative", height: "32px", marginBottom: "56px" }}
+          className="problem-flight-path"
+          style={{ position: "relative", height: "32px" }}
         >
           <div
             ref={lineRef}
@@ -197,16 +198,25 @@ export function ProblemSection() {
             <div
               ref={badgeRef}
               style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700,
-                fontSize: "9px",
-                letterSpacing: "0.44em",
-                color: "#E8622A",
-                textTransform: "uppercase",
+                display: "inline-flex", alignItems: "center", gap: "8px",
+                border: "1.5px solid rgba(27,74,90,0.15)",
+                borderRadius: "100px",
+                padding: "7px 18px",
                 marginBottom: "34px",
               }}
             >
-              The Problem
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+                <circle cx="6" cy="6" r="4.8" stroke="rgba(27,74,90,0.4)" strokeWidth="1.2"/>
+                <path d="M6 3.8V6.2" stroke="rgba(27,74,90,0.4)" strokeWidth="1.2" strokeLinecap="round"/>
+                <circle cx="6" cy="8.2" r="0.55" fill="rgba(27,74,90,0.4)"/>
+              </svg>
+              <span style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700, fontSize: "10px", letterSpacing: "0.32em",
+                color: "rgba(27,74,90,0.55)", textTransform: "uppercase",
+              }}>
+                The Problem
+              </span>
             </div>
 
             {/* Clip-reveal headlines — each h2 sits inside overflow:hidden */}
@@ -293,6 +303,7 @@ export function ProblemSection() {
           {/* ── Right: comparison card ──────────────────────────────────────── */}
           <div>
             <div
+              className="problem-card"
               style={{
                 border: "1px solid rgba(27,74,90,0.1)",
                 borderRadius: "6px",
@@ -303,10 +314,10 @@ export function ProblemSection() {
                 <div
                   key={tool}
                   ref={(el) => { rowRefs.current[i] = el; }}
+                  className="problem-row"
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    padding: "20px 26px",
                     background: isKaivo ? "#1B4A5A" : "white",
                     borderBottom: i < rows.length - 1 ? "1px solid rgba(27,74,90,0.07)" : "none",
                     gap: "20px",
@@ -315,12 +326,12 @@ export function ProblemSection() {
                 >
                   {/* Tool name */}
                   <div
+                    className="problem-row-tool"
                     style={{
-                      minWidth: "clamp(110px, 15vw, 175px)",
                       flexShrink: 0,
                       fontFamily: "'Urbanist', sans-serif",
                       fontWeight: 700,
-                      fontSize: "clamp(11px, 1.1vw, 13px)",
+                      fontSize: "clamp(10px, 1.1vw, 13px)",
                       letterSpacing: "0.06em",
                       textTransform: "uppercase",
                       color: isKaivo ? "#C8E44A" : "#1B4A5A",

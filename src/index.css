@@ -343,7 +343,11 @@ h6 {
   }
 }
 
-/* ── ProblemSection two-column grid ───────────────────────────────────────── */
+/* ── ProblemSection ────────────────────────────────────────────────────────── */
+.problem-section {
+  padding: 120px 40px;
+}
+
 .problem-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -351,17 +355,73 @@ h6 {
   align-items: start;
 }
 
+.problem-flight-path {
+  margin-bottom: 56px;
+}
+
+.problem-row {
+  padding: 20px 26px;
+}
+
+.problem-row-tool {
+  min-width: 160px;
+}
+
+/* ── Tablet (≤ 900px) — single column ─────────────────────────────────────── */
 @media (max-width: 900px) {
+  .problem-section {
+    padding: 100px 32px;
+  }
   .problem-grid {
     grid-template-columns: 1fr;
-    gap: 52px;
+    gap: 48px;
+  }
+  .problem-flight-path {
+    margin-bottom: 40px;
+  }
+  .problem-row-tool {
+    min-width: 140px;
   }
 }
 
+/* ── Mobile (≤ 767px) ─────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
-  /* Tighter padding on mobile */
+  .problem-section {
+    padding: 80px 20px;
+  }
   .problem-grid {
-    gap: 40px;
+    gap: 36px;
+  }
+  .problem-flight-path {
+    margin-bottom: 32px;
+  }
+  .problem-row {
+    padding: 16px 18px;
+    gap: 12px;
+  }
+  .problem-row-tool {
+    min-width: 100px;
+    font-size: 10px !important;
+  }
+  /* Let description text wrap gracefully */
+  .problem-card {
+    font-size: 12px;
+  }
+}
+
+/* ── Small mobile (≤ 479px) ──────────────────────────────────────────────── */
+@media (max-width: 479px) {
+  .problem-section {
+    padding: 64px 16px;
+  }
+  .problem-row {
+    padding: 14px 14px;
+    gap: 10px;
+  }
+  .problem-row-tool {
+    min-width: 82px;
+    font-size: 9px !important;
+    letter-spacing: 0.04em !important;
   }
 }
 
