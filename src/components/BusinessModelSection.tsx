@@ -117,6 +117,15 @@ export function BusinessModelSection() {
         background: "radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(27,74,90,0.07) 100%)",
       }} />
 
+      {/* Bottom gradient bridge to DelegationSection (dark) */}
+      <div aria-hidden style={{
+        position: "absolute", bottom: 0, left: 0, right: 0,
+        height: "220px",
+        background: "linear-gradient(to bottom, transparent 0%, rgba(6,12,20,0.55) 70%, #070f16 100%)",
+        pointerEvents: "none",
+        zIndex: 0,
+      }} />
+
       {/* Watermark */}
       <div aria-hidden style={{
         position: "absolute", right: "-1%", top: "50%",
@@ -249,7 +258,7 @@ export function BusinessModelSection() {
                 color: "rgba(255,255,255,0.2)", textTransform: "uppercase",
               }}>{row.label}</div>
 
-              <div style={{
+              <div className="board-row-area" style={{
                 display: "grid", gridTemplateColumns: "1fr auto",
                 alignItems: "center",
                 height: `${ROW_H}px`,
@@ -272,7 +281,7 @@ export function BusinessModelSection() {
                 </div>
 
                 {/* STATUS flip cell */}
-                <div style={{ position: "relative", height: `${ROW_H}px`, overflow: "hidden", minWidth: "110px", display: "flex", justifyContent: "flex-end" }}>
+                <div className="board-status-cell" style={{ position: "relative", height: `${ROW_H}px`, overflow: "hidden", minWidth: "110px", display: "flex", justifyContent: "flex-end" }}>
                   <div ref={(el) => { oldStatusRefs.current[i] = el; }} style={{
                     position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "flex-end",
                   }}>
@@ -321,6 +330,7 @@ export function BusinessModelSection() {
         {/* ── Two-column breakdown ─────────────────────────────────────────── */}
         <div
           ref={bottomRef}
+          className="biz-cols"
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
@@ -341,29 +351,29 @@ export function BusinessModelSection() {
           }}>
             <div style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700, fontSize: "9px", letterSpacing: "0.3em",
+              fontWeight: 700, fontSize: "11px", letterSpacing: "0.3em",
               color: "#E8622A", textTransform: "uppercase",
             }}>Traditional Platforms</div>
 
             <div style={{
-              fontFamily: "'Urbanist', sans-serif", fontWeight: 600,
-              fontSize: "clamp(13px, 1.25vw, 15px)",
-              color: "rgba(27,74,90,0.85)", lineHeight: 1.5,
+              fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
+              fontSize: "clamp(15px, 1.4vw, 17px)",
+              color: "rgba(27,74,90,0.88)", lineHeight: 1.5,
             }}>
               Traditional travel platforms make money from:
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {["Ads", "Sponsored placements", "Click optimization"].map((item) => (
                 <div key={item} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <div style={{
-                    width: "6px", height: "6px", borderRadius: "50%",
+                    width: "7px", height: "7px", borderRadius: "50%",
                     background: "#E8622A", flexShrink: 0,
                   }} />
                   <span style={{
-                    fontFamily: "'Urbanist', sans-serif", fontWeight: 500,
-                    fontSize: "clamp(12px, 1.2vw, 14px)",
-                    color: "rgba(27,74,90,0.75)",
+                    fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
+                    fontSize: "clamp(14px, 1.3vw, 16px)",
+                    color: "rgba(27,74,90,0.82)",
                   }}>{item}</span>
                 </div>
               ))}
@@ -374,17 +384,17 @@ export function BusinessModelSection() {
               marginTop: "4px",
               background: "rgba(232,98,42,0.08)",
               borderRadius: "8px",
-              padding: "12px 14px",
+              padding: "14px 16px",
             }}>
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "9px", letterSpacing: "0.26em",
+                fontWeight: 700, fontSize: "11px", letterSpacing: "0.26em",
                 color: "#E8622A", textTransform: "uppercase",
-                marginBottom: "6px",
+                marginBottom: "8px",
               }}>Which creates a problem:</div>
               <div style={{
-                fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
-                fontSize: "clamp(13px, 1.3vw, 16px)",
+                fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
+                fontSize: "clamp(15px, 1.4vw, 18px)",
                 color: "#E8622A", lineHeight: 1.4,
               }}>
                 They win when you keep searching.
@@ -404,19 +414,19 @@ export function BusinessModelSection() {
           }}>
             <div style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700, fontSize: "9px", letterSpacing: "0.3em",
+              fontWeight: 700, fontSize: "11px", letterSpacing: "0.3em",
               color: "#1B4A5A", textTransform: "uppercase",
             }}>Kaivo</div>
 
             <div style={{
               fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
-              fontSize: "clamp(14px, 1.4vw, 18px)",
+              fontSize: "clamp(15px, 1.5vw, 20px)",
               color: "#1B4A5A", lineHeight: 1.2, letterSpacing: "-0.02em",
             }}>
               Kaivo is built differently.
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {[
                 { dot: "#5aaa44", text: "No ads" },
                 { dot: "#5aaa44", text: "No hidden incentives" },
@@ -425,13 +435,13 @@ export function BusinessModelSection() {
               ].map((item) => (
                 <div key={item.text} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <div style={{
-                    width: "6px", height: "6px", borderRadius: "50%",
+                    width: "7px", height: "7px", borderRadius: "50%",
                     background: item.dot, flexShrink: 0,
                   }} />
                   <span style={{
-                    fontFamily: "'Urbanist', sans-serif", fontWeight: 500,
-                    fontSize: "clamp(12px, 1.2vw, 14px)",
-                    color: "rgba(27,74,90,0.8)",
+                    fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
+                    fontSize: "clamp(14px, 1.3vw, 16px)",
+                    color: "rgba(27,74,90,0.85)",
                   }}>{item.text}</span>
                 </div>
               ))}
@@ -442,24 +452,24 @@ export function BusinessModelSection() {
               marginTop: "4px",
               background: "rgba(27,74,90,0.07)",
               borderRadius: "8px",
-              padding: "12px 14px",
+              padding: "14px 16px",
             }}>
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "9px", letterSpacing: "0.26em",
-                color: "rgba(27,74,90,0.6)", textTransform: "uppercase",
-                marginBottom: "8px",
+                fontWeight: 700, fontSize: "11px", letterSpacing: "0.26em",
+                color: "rgba(27,74,90,0.85)", textTransform: "uppercase",
+                marginBottom: "10px",
               }}>Our incentives align with yours:</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {["Help you choose well.", "Handle the work."].map((item) => (
                   <div key={item} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                     <div style={{
-                      width: "6px", height: "6px", borderRadius: "50%",
+                      width: "7px", height: "7px", borderRadius: "50%",
                       background: "#E8622A", flexShrink: 0,
                     }} />
                     <span style={{
-                      fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
-                      fontSize: "clamp(12px, 1.2vw, 14px)",
+                      fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
+                      fontSize: "clamp(14px, 1.3vw, 17px)",
                       color: "#1B4A5A",
                     }}>{item}</span>
                   </div>

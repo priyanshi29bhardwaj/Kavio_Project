@@ -100,8 +100,8 @@ export function ProductSection() {
         .to(cardRef.current,   { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: "power3.out" }, 0.42)
         .to(oldRefs.current.filter(Boolean), { opacity: 1, x: 0, stagger: 0.12, duration: 0.6,  ease: "power2.out" }, 0.80)
         .to(newRefs.current.filter(Boolean), { opacity: 1, x: 0, stagger: 0.12, duration: 0.6,  ease: "power2.out" }, 0.80)
-        .to(perfRef.current,   { scaleX: 1,          duration: 0.75, ease: "power2.inOut" }, 1.10)
-        .to(stubRef.current,   { opacity: 1, y: 0,  duration: 0.6,  ease: "power2.out" }, 1.22);
+        .to(perfRef.current,   { scaleX: 1,          duration: 2.0,  ease: "power1.inOut" }, 1.10)
+        .to(stubRef.current,   { opacity: 1, y: 0,  duration: 0.7,  ease: "power2.out" }, 2.60);
 
       ScrollTrigger.create({
         trigger: sectionRef.current,
@@ -201,8 +201,8 @@ export function ProductSection() {
         {/* Body */}
         <p ref={bodyRef} style={{
           fontFamily: "'Urbanist', sans-serif",
-          fontWeight: 400, fontSize: "clamp(12px, 1.05vw, 14px)",
-          color: "rgba(27,74,90,0.48)", lineHeight: 1.7,
+          fontWeight: 600, fontSize: "clamp(14px, 1.2vw, 16px)",
+          color: "rgba(27,74,90,0.80)", lineHeight: 1.7,
           margin: "0 0 24px", maxWidth: "540px", opacity: 0,
         }}>
           Instead of forcing you through endless search flows, Kaivo prepares a shortlist
@@ -234,14 +234,14 @@ export function ProductSection() {
               <span style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontWeight: 700, fontSize: "10px", letterSpacing: "0.2em",
-                color: "rgba(255,255,255,0.45)", textTransform: "uppercase",
+                color: "rgba(255,255,255,0.80)", textTransform: "uppercase",
               }}>
                 Kaivo Travel
               </span>
               <span style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontWeight: 600, fontSize: "9px", letterSpacing: "0.32em",
-                color: "rgba(255,255,255,0.28)", textTransform: "uppercase",
+                color: "rgba(255,255,255,0.65)", textTransform: "uppercase",
               }}>
                 Boarding Pass
               </span>
@@ -262,19 +262,19 @@ export function ProductSection() {
                 <div style={{
                   fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "7px", letterSpacing: "0.26em",
-                  color: "rgba(255,255,255,0.3)", textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.65)", textTransform: "uppercase",
                   marginBottom: "2px",
                 }}>From</div>
                 <div style={{
                   fontFamily: "'Space Grotesk', sans-serif",
                   fontWeight: 900, fontSize: "clamp(22px, 3.2vw, 44px)",
-                  color: "rgba(255,255,255,0.48)",
+                  color: "rgba(255,255,255,0.75)",
                   lineHeight: 1, letterSpacing: "-0.02em",
                 }}>TWS</div>
                 <div style={{
                   fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 500, fontSize: "10px",
-                  color: "rgba(255,255,255,0.3)", marginTop: "2px",
+                  fontWeight: 600, fontSize: "10px",
+                  color: "rgba(255,255,255,0.65)", marginTop: "2px",
                 }}>The Old Way</div>
               </div>
 
@@ -326,13 +326,13 @@ export function ProductSection() {
                   <div style={{
                     fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: "6.5px", letterSpacing: "0.24em",
-                    color: "rgba(255,255,255,0.28)", textTransform: "uppercase",
+                    color: "rgba(255,255,255,0.60)", textTransform: "uppercase",
                     marginBottom: "3px",
                   }}>{label}</div>
                   <div style={{
                     fontFamily: "'Space Grotesk', sans-serif",
-                    fontWeight: 600, fontSize: "12px",
-                    color: "rgba(255,255,255,0.72)", letterSpacing: "0.04em",
+                    fontWeight: 700, fontSize: "13px",
+                    color: "rgba(255,255,255,0.92)", letterSpacing: "0.04em",
                   }}>{value}</div>
                 </div>
               ))}
@@ -340,7 +340,7 @@ export function ProductSection() {
           </div>
 
           {/* ── BODY — two-column comparison ───────────────────────────────── */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+          <div className="product-card-body" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
 
             {/* Left: old way */}
             <div style={{
@@ -351,7 +351,7 @@ export function ProductSection() {
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontWeight: 700, fontSize: "7.5px", letterSpacing: "0.3em",
-                color: "rgba(27,74,90,0.32)", textTransform: "uppercase",
+                color: "rgba(27,74,90,0.70)", textTransform: "uppercase",
                 marginBottom: "14px",
               }}>The Old Way</div>
 
@@ -366,13 +366,13 @@ export function ProductSection() {
                   }}
                 >
                   <span style={{
-                    color: "rgba(27,74,90,0.2)", fontSize: "13px",
+                    color: "rgba(27,74,90,0.55)", fontSize: "13px",
                     lineHeight: "1.4", flexShrink: 0, fontWeight: 700,
                   }}>×</span>
                   <span style={{
                     fontFamily: "'Urbanist', sans-serif",
-                    fontWeight: 500, fontSize: "clamp(11px, 1.0vw, 13px)",
-                    color: "rgba(27,74,90,0.42)", lineHeight: 1.45,
+                    fontWeight: 700, fontSize: "clamp(12px, 1.05vw, 14px)",
+                    color: "rgba(27,74,90,0.78)", lineHeight: 1.45,
                   }}>{item}</span>
                 </div>
               ))}
@@ -403,8 +403,8 @@ export function ProductSection() {
                   }}>✓</span>
                   <span style={{
                     fontFamily: "'Urbanist', sans-serif",
-                    fontWeight: 500, fontSize: "clamp(11px, 1.0vw, 13px)",
-                    color: "rgba(255,255,255,0.78)", lineHeight: 1.45,
+                    fontWeight: 700, fontSize: "clamp(12px, 1.05vw, 14px)",
+                    color: "rgba(255,255,255,0.95)", lineHeight: 1.45,
                   }}>{item}</span>
                 </div>
               ))}
@@ -432,7 +432,7 @@ export function ProductSection() {
               style={{
                 flex: 1,
                 height: 0,
-                borderTop: "1.5px dashed rgba(27,74,90,0.16)",
+                borderTop: "2px dashed rgba(27,74,90,0.40)",
                 transform: "scaleX(0)",
                 transformOrigin: "left center",
                 margin: "0 4px",
@@ -441,15 +441,16 @@ export function ProductSection() {
             {/* Scissors label */}
             <span style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: "7px", letterSpacing: "0.2em",
-              color: "rgba(27,74,90,0.22)", textTransform: "uppercase",
-              flexShrink: 0, padding: "0 8px",
+              fontSize: "9px", letterSpacing: "0.22em",
+              color: "rgba(27,74,90,0.65)", textTransform: "uppercase",
+              flexShrink: 0, padding: "0 10px",
+              fontWeight: 700,
             }}>
               ✂ Tear Here
             </span>
             <div style={{
               flex: 1, height: 0,
-              borderTop: "1.5px dashed rgba(27,74,90,0.16)",
+              borderTop: "2px dashed rgba(27,74,90,0.40)",
             }} />
             {/* Right semicircle notch */}
             <div style={{
@@ -484,8 +485,8 @@ export function ProductSection() {
               </div>
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 500, fontSize: "9px", letterSpacing: "0.14em",
-                color: "rgba(255,255,255,0.38)",
+                fontWeight: 600, fontSize: "9px", letterSpacing: "0.14em",
+                color: "rgba(255,255,255,0.72)",
               }}>
                 Natural-language booking&nbsp;&nbsp;·&nbsp;&nbsp;One review&nbsp;&nbsp;·&nbsp;&nbsp;One approval
               </div>

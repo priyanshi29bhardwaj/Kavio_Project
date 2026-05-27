@@ -61,16 +61,20 @@ export function ProblemSection() {
         gsap.set(line,  { clipPath: "inset(0 100% 0 0)" });
         gsap.set(plane, { x: 0 });
 
+        // End x = full container width minus the plane icon's own width (28px)
+        // so the plane's right tip lands exactly at the line's right edge
+        const endX = cont.offsetWidth - (plane.offsetWidth || 28);
+
         gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 75%",
-            end:   "top 35%",
+            start: "top 88%",
+            end:   "top 25%",
             scrub: 1,
           },
         })
           .to(line,  { clipPath: "inset(0 0% 0 0)", ease: "none" })
-          .to(plane, { x: cont.offsetWidth - 20,    ease: "none" }, 0);
+          .to(plane, { x: endX,                      ease: "none" }, 0);
       }
 
       const trigger = { trigger: sectionRef.current, start: "top 65%" };
@@ -152,42 +156,42 @@ export function ProblemSection() {
       className="problem-section"
       style={{
         minHeight: "100vh",
-        background: "white",
+        background: "linear-gradient(to bottom, #D6EEEE 0%, #f0f9f9 12%, white 28%)",
         display: "flex",
-        alignItems: "center",
+        flexDirection: "column",
+        justifyContent: "center",
       }}
     >
-      <div style={{ maxWidth: "1160px", margin: "0 auto", width: "100%" }}>
-
-        {/* ── Animated flight path ──────────────────────────────────────────── */}
+      {/* ── Full-width animated flight path ───────────────────────────────── */}
+      <div
+        ref={lineContRef}
+        className="problem-flight-path"
+        style={{ position: "relative", height: "32px", width: "100%" }}
+      >
         <div
-          ref={lineContRef}
-          className="problem-flight-path"
-          style={{ position: "relative", height: "32px" }}
+          ref={lineRef}
+          style={{
+            position: "absolute",
+            top: "50%", left: 0, right: 0,
+            height: 0,
+            borderTop: "1.5px dashed #7ECECA",
+            transform: "translateY(-50%)",
+          }}
+        />
+        <div
+          ref={planeRef}
+          style={{
+            position: "absolute",
+            top: "50%", left: 0,
+            transform: "translateY(-50%)",
+            lineHeight: 0,
+          }}
         >
-          <div
-            ref={lineRef}
-            style={{
-              position: "absolute",
-              top: "50%", left: 0, right: 0,
-              height: 0,
-              borderTop: "1.5px dashed #7ECECA",
-              transform: "translateY(-50%)",
-            }}
-          />
-          <div
-            ref={planeRef}
-            style={{
-              position: "absolute",
-              top: "50%", left: 0,
-              transform: "translateY(-50%)",
-              lineHeight: 0,
-            }}
-          >
-            <PlaneRight color="#7ECECA" size={28} />
-          </div>
+          <PlaneRight color="#7ECECA" size={28} />
         </div>
+      </div>
 
+      <div className="problem-inner" style={{ maxWidth: "1160px", margin: "0 auto", width: "100%" }}>
         {/* ── Two-column grid ───────────────────────────────────────────────── */}
         <div className="problem-grid">
 
@@ -281,9 +285,9 @@ export function ProblemSection() {
               ref={bodyRef}
               style={{
                 fontFamily: "'Urbanist', sans-serif",
-                fontWeight: 400,
-                fontSize: "clamp(13px, 1.3vw, 16px)",
-                color: "rgba(27,74,90,0.55)",
+                fontWeight: 600,
+                fontSize: "clamp(14px, 1.35vw, 17px)",
+                color: "rgba(27,74,90,0.82)",
                 lineHeight: 1.85,
                 margin: 0,
                 maxWidth: "420px",
@@ -360,11 +364,11 @@ export function ProblemSection() {
                   <div
                     style={{
                       fontFamily: "'Urbanist', sans-serif",
-                      fontSize: "clamp(12px, 1.1vw, 14px)",
-                      fontWeight: isKaivo ? 600 : 400,
+                      fontSize: "clamp(13px, 1.15vw, 15px)",
+                      fontWeight: 600,
                       color: isKaivo
-                        ? "rgba(255,255,255,0.88)"
-                        : "rgba(27,74,90,0.48)",
+                        ? "rgba(255,255,255,0.92)"
+                        : "rgba(27,74,90,0.78)",
                       lineHeight: 1.5,
                     }}
                   >

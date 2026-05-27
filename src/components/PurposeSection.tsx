@@ -48,14 +48,15 @@ export function PurposeSection() {
         .to(p2l2.current,     { y: "0%",          duration: 0.8,  ease: "power3.out" }, 0.96)
         .to(subRef.current,   { opacity: 1, y: 0, duration: 0.6,  ease: "power2.out" }, 1.10)
 
-      // ── 2. Dim old-paradigm words ────────────────────────────────────────
-        .to([dim1.current, dim2.current],
-          { color: "rgba(27,74,90,0.18)", duration: 0.55, ease: "power1.inOut" }, 1.35)
+      // ── 2. "search better." → yellow; "browsing." dims to grey ──────────
+        .to(dim1.current,
+          { color: "#E8E840", duration: 0.55, ease: "power1.inOut" }, 1.35)
+        .to(dim2.current,
+          { color: "#E8622A", duration: 0.55, ease: "power1.inOut" }, 1.35)
 
-      // ── 3. Colour-shift key phrases ──────────────────────────────────────
-      //       hl1 + hl2 → aqua (#7ECECA), hl3 → orange (#E8622A)
+      // ── 3. "get things done." → yellow; "outcomes." → aqua; hl3 → orange ──
         .to(hl1.current,
-          { color: "#7ECECA", fontWeight: 900, duration: 0.5, ease: "power2.out" }, 1.55)
+          { color: "#E8E840", fontWeight: 900, duration: 0.5, ease: "power2.out" }, 1.55)
         .to(hl2.current,
           { color: "#7ECECA", fontWeight: 700, duration: 0.5, ease: "power2.out" }, 1.90)
         .to(hl3.current,
@@ -87,6 +88,15 @@ export function PurposeSection() {
         padding: "clamp(60px, 8vh, 90px) 0 clamp(40px, 5vh, 60px)",
       }}
     >
+
+      {/* Top gradient seam from WhyLoveSection */}
+      <div aria-hidden style={{
+        position: "absolute", top: 0, left: 0, right: 0,
+        height: "160px",
+        background: "linear-gradient(to bottom, #D6EEEE 0%, #f0f9f9 50%, transparent 100%)",
+        pointerEvents: "none",
+        zIndex: 0,
+      }} />
 
       {/* Watermark */}
       <div aria-hidden style={{
@@ -159,9 +169,9 @@ export function PurposeSection() {
 
         {/* ── Para 2 — 2 clip lines ───────────────────────────────────────── */}
         <div style={{
-          fontFamily: "'Urbanist', sans-serif", fontWeight: 400,
+          fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
           fontSize: "clamp(15px, 1.8vw, 22px)",
-          color: "rgba(27,74,90,0.6)", letterSpacing: "-0.01em",
+          color: "rgba(27,74,90,0.85)", letterSpacing: "-0.01em",
           lineHeight: 1.55,
           marginBottom: "clamp(22px, 3.2vh, 36px)",
           width: "100%",
@@ -197,15 +207,15 @@ export function PurposeSection() {
         >
           {(["Less browsing.", "Less admin."] as const).map((item) => (
             <span key={item} style={{
-              fontFamily: "'Urbanist', sans-serif", fontWeight: 400,
+              fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
               fontSize: "clamp(13px, 1.4vw, 18px)",
-              color: "rgba(27,74,90,0.35)",
+              color: "rgba(27,74,90,0.78)",
             }}>
               {item}
             </span>
           ))}
           <span ref={hl3} style={{
-            fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
+            fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
             fontSize: "clamp(13px, 1.4vw, 18px)",
             color: "#1B4A5A",
             display: "inline",

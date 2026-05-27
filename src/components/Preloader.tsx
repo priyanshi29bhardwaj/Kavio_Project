@@ -57,9 +57,10 @@ export function Preloader({ onComplete }: PreloaderProps) {
         ref={taglineRef}
         style={{
           fontFamily: "'Urbanist', sans-serif",
-          color: "rgba(255,255,255,0.35)",
-          fontSize: "10px",
-          letterSpacing: "0.30em",
+          fontWeight: 600,
+          color: "rgba(255,255,255,0.75)",
+          fontSize: "14px",
+          letterSpacing: "0.22em",
           textTransform: "uppercase",
           margin: 0,
         }}

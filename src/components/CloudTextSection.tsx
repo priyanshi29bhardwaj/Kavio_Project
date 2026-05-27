@@ -60,17 +60,17 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
         },
       });
 
-      // "matched" → "by" → "AI." stagger into teal
+      // "matched" → "by" → "AI." stagger into dark teal
       hl.to([w1.current, w2.current, w3.current], {
-        color: "#7ECECA",
+        color: "#1B4A5A",
         duration: 0.55,
         stagger: 0.14,
         ease: "power2.out",
       }, 0);
 
-      // subtitle fades to lime slightly after
+      // subtitle fades to dark teal slightly after
       hl.to(sublineRef.current, {
-        color: "#C8E44A",
+        color: "#1B4A5A",
         duration: 0.7,
         ease: "power2.out",
       }, 0.42);
@@ -113,7 +113,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
             fontWeight: 800,
             fontSize: "clamp(12px, 1.1vw, 15px)",
             letterSpacing: "0.32em",
-            color: "#C8E44A",
+            color: "#1B4A5A",
             textTransform: "uppercase",
             marginBottom: "32px",
             textShadow: "0 2px 16px rgba(0,0,0,0.85), 0 0 32px rgba(0,0,0,0.6)",
@@ -196,7 +196,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
           <button
             onClick={onJoinWaitlist}
             style={{
-              background: "#C8E44A",
+              background: "#E8E840",
               color: "#1B4A5A",
               border: "none",
               padding: "15px 38px",
@@ -207,15 +207,15 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
               textTransform: "uppercase",
               cursor: "pointer",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              boxShadow: "0 4px 24px rgba(200,228,74,0.35)",
+              boxShadow: "0 4px 24px rgba(232,232,64,0.38)",
             }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-2px)";
-              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 8px 32px rgba(200,228,74,0.55)";
+              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 8px 32px rgba(232,232,64,0.58)";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
-              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 24px rgba(200,228,74,0.35)";
+              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 24px rgba(232,232,64,0.38)";
             }}
           >
             Join Waitlist →

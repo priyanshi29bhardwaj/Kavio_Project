@@ -32,15 +32,34 @@ function screenRect(cW: number, cH: number) {
   };
 }
 
+function ExpandIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1 5V1H5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9 1H13V5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M13 9V13H9" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M5 13H1V9" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+function CompressIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 1V5H1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M13 5H9V1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9 13V9H13" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M1 9H5V13" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
 export function DemoSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [rect, setRect] = useState({
-    left: 0,
-    top: 0,
-    width: 0,
-    height: 0,
-  });
+  const sectionRef  = useRef<HTMLDivElement>(null);
+  const videoRef    = useRef<HTMLVideoElement>(null);
+  const [rect, setRect] = useState({ left: 0, top: 0, width: 0, height: 0 });
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [videoVisible, setVideoVisible] = useState(false);
 
   const reposition = useCallback(() => {
     const el = sectionRef.current;
@@ -58,7 +77,6 @@ export function DemoSection() {
     const el = sectionRef.current;
     if (!el) return;
 
-    // Initial mask: top is transparent so Frame 1's sky bleeds through
     el.style.webkitMaskImage = "linear-gradient(180deg, transparent 0%, black 32%)";
     el.style.maskImage        = "linear-gradient(180deg, transparent 0%, black 32%)";
 
@@ -94,12 +112,14 @@ export function DemoSection() {
             video.style.transition = "opacity 0.8s ease";
             video.style.opacity = "1";
             video.play().catch(() => {});
+            setVideoVisible(true);
           }, 1200);
         } else {
           clearTimeout(fadeTimer);
           video.pause();
           video.currentTime = 0;
           video.style.opacity = "0";
+          setVideoVisible(false);
         }
       },
       { threshold: 0.3 }
@@ -112,6 +132,20 @@ export function DemoSection() {
       clearTimeout(fadeTimer);
     };
   }, []);
+
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      videoRef.current?.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
 
   return (
     <section
@@ -126,6 +160,7 @@ export function DemoSection() {
         backgroundPosition: "center center",
       }}
     >
+      {/* Video inside IFE screen */}
       <video
         ref={videoRef}
         src="/kavio_ui_ux.mp4"
@@ -139,10 +174,60 @@ export function DemoSection() {
           top: rect.top,
           width: rect.width,
           height: rect.height,
-          objectFit: "fill",   // IMPORTANT
+          objectFit: "fill",
           borderRadius: "10px",
           zIndex: 2,
           opacity: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Fullscreen toggle button — top-right of IFE screen */}
+      {videoVisible && (
+        <button
+          onClick={toggleFullscreen}
+          title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+          style={{
+            position: "absolute",
+            left: rect.left + rect.width - 38,
+            top: rect.top + 8,
+            zIndex: 10,
+            width: "28px",
+            height: "28px",
+            borderRadius: "6px",
+            background: "rgba(0,0,0,0.45)",
+            border: "1px solid rgba(255,255,255,0.18)",
+            backdropFilter: "blur(6px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            transition: "background 0.2s ease, transform 0.15s ease",
+            padding: 0,
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.7)";
+            (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.45)";
+            (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
+          }}
+        >
+          {isFullscreen ? <CompressIcon /> : <ExpandIcon />}
+        </button>
+      )}
+
+      {/* Smooth bottom fade — cabin dissolves into a light sky teal wash */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: "260px",
+          background: "linear-gradient(to bottom, transparent 0%, rgba(210,238,238,0.5) 48%, #D6EEEE 100%)",
+          zIndex: 6,
           pointerEvents: "none",
         }}
       />

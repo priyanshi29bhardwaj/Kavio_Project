@@ -345,7 +345,12 @@ h6 {
 
 /* ── ProblemSection ────────────────────────────────────────────────────────── */
 .problem-section {
-  padding: 120px 40px;
+  padding: 120px 0;
+}
+
+/* Content wrapper inside problem-section — carries responsive horizontal padding */
+.problem-inner {
+  padding: 0 40px;
 }
 
 .problem-grid {
@@ -370,7 +375,10 @@ h6 {
 /* ── Tablet (≤ 900px) — single column ─────────────────────────────────────── */
 @media (max-width: 900px) {
   .problem-section {
-    padding: 100px 32px;
+    padding: 100px 0;
+  }
+  .problem-inner {
+    padding: 0 32px;
   }
   .problem-grid {
     grid-template-columns: 1fr;
@@ -387,7 +395,10 @@ h6 {
 /* ── Mobile (≤ 767px) ─────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
   .problem-section {
-    padding: 80px 20px;
+    padding: 80px 0;
+  }
+  .problem-inner {
+    padding: 0 20px;
   }
   .problem-grid {
     gap: 36px;
@@ -412,7 +423,10 @@ h6 {
 /* ── Small mobile (≤ 479px) ──────────────────────────────────────────────── */
 @media (max-width: 479px) {
   .problem-section {
-    padding: 64px 16px;
+    padding: 64px 0;
+  }
+  .problem-inner {
+    padding: 0 16px;
   }
   .problem-row {
     padding: 14px 14px;
@@ -422,6 +436,111 @@ h6 {
     min-width: 82px;
     font-size: 9px !important;
     letter-spacing: 0.04em !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION RESPONSIVE FIXES
+   All layout columns collapse to single-column on smaller screens.
+   !important is required to beat React inline-style specificity.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── ConversationalSection (conv-inner / conv-text / conv-passport) ─────── */
+@media (max-width: 900px) {
+  .conv-inner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 36px !important;
+  }
+  .conv-text {
+    flex: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .conv-passport {
+    flex: none !important;
+    width: 100% !important;
+  }
+}
+
+/* Hide passport on very small phones to avoid cramping */
+@media (max-width: 480px) {
+  .conv-passport {
+    display: none !important;
+  }
+}
+
+/* ── TrustSection (trust-inner / trust-text) ────────────────────────────── */
+@media (max-width: 900px) {
+  .trust-inner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 40px !important;
+    padding: clamp(40px, 6vh, 72px) clamp(20px, 5vw, 48px) !important;
+  }
+  .trust-text {
+    flex: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  /* Let the card take full width when stacked */
+  .trust-inner > div:last-child {
+    width: 100% !important;
+    flex: none !important;
+  }
+}
+
+/* ── WhyLoveSection feature cards ───────────────────────────────────────── */
+@media (max-width: 900px) {
+  .why-cards {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+@media (max-width: 560px) {
+  .why-cards {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── ProductSection boarding-pass body ──────────────────────────────────── */
+@media (max-width: 580px) {
+  .product-card-body {
+    grid-template-columns: 1fr !important;
+  }
+  /* Restore border-right → border-bottom when stacked */
+  .product-card-body > div:first-child {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(27,74,90,0.07) !important;
+  }
+}
+
+/* ── BusinessModelSection two-column breakdown ──────────────────────────── */
+@media (max-width: 680px) {
+  .biz-cols {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Departure board — tighten padding on small screens ─────────────────── */
+@media (max-width: 580px) {
+  .board-row-area {
+    padding: 0 14px !important;
+  }
+  .board-status-cell {
+    min-width: 82px !important;
+  }
+}
+
+/* ── General: prevent horizontal overflow inside any section ────────────── */
+@media (max-width: 767px) {
+  section {
+    overflow-x: hidden;
+  }
+  /* WhyLoveSection bottom bar: stack on narrow */
+  .why-bottom {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
   }
 }
 

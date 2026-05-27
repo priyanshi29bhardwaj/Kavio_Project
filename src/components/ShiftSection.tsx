@@ -64,6 +64,7 @@ export function ShiftSection() {
   const stepsRowRef   = useRef<HTMLDivElement>(null);
   const wordRefs      = useRef<(HTMLSpanElement | null)[]>([]);
   const connRefs      = useRef<(HTMLDivElement | null)[]>([]);
+  const arrowRefs     = useRef<(SVGPolygonElement | null)[]>([]);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -105,7 +106,7 @@ export function ShiftSection() {
 
       ScrollTrigger.create({
         trigger: sectionRef.current,
-        start:   "top 70%",
+        start:   "top 82%",
         once:    true,
         onEnter: () => entryTl.play(),
       });
@@ -142,39 +143,58 @@ export function ShiftSection() {
       // Word highlights — 1 s each
       STEPS.forEach((_, i) => {
         const t = i;
+
+        // Step box → join-waitlist yellow highlight
         tl.to(wordRefs.current[i], {
-          backgroundColor: "#F0E040",
-          borderColor: "#E8D800",
+          backgroundColor: "#E8E840",
+          borderColor: "#E8E840",
           color: "#1B4A5A",
-          scale: 1.08,
-          boxShadow: "0 4px 18px rgba(240,224,64,0.35)",
-          duration: 0.1, ease: "power2.out",
+          scale: 1.1,
+          boxShadow: "0 4px 20px rgba(232,232,64,0.50)",
+          duration: 0.12, ease: "power2.out",
         }, t);
 
+        // Connector + arrowhead → animate to black
         if (i < STEPS.length - 1 && connRefs.current[i]) {
           tl.fromTo(connRefs.current[i],
             { scaleX: 0, transformOrigin: "left center" },
-            { scaleX: 1, duration: 0.6, ease: "power2.inOut" },
-            t + 0.16
+            { scaleX: 1, duration: 0.55, ease: "power2.inOut" },
+            t + 0.18
+          );
+          // Arrowhead fills black as line draws in
+          tl.to(arrowRefs.current[i],
+            { attr: { fill: "#000000" }, duration: 0.18, ease: "power2.out" },
+            t + 0.18
           );
         }
 
+        // Reset step box
         tl.to(wordRefs.current[i], {
           backgroundColor: "transparent",
-          borderColor: "rgba(27,74,90,0.12)",
-          color: "rgba(27,74,90,0.35)",
+          borderColor: "rgba(27,74,90,0.28)",
+          color: "#1B4A5A",
           scale: 1,
           boxShadow: "none",
           duration: 0.14, ease: "power2.in",
-        }, t + 0.83);
+        }, t + 0.85);
+
+        // Reset arrowhead
+        if (i < STEPS.length - 1) {
+          tl.to(arrowRefs.current[i],
+            { attr: { fill: "rgba(27,74,90,0.30)" }, duration: 0.14, ease: "power2.in" },
+            t + 0.83
+          );
+        }
       });
 
       tl.set(connRefs.current.filter(Boolean), { scaleX: 0 });
+      tl.set(arrowRefs.current.filter(Boolean), { attr: { fill: "rgba(27,74,90,0.30)" } });
 
+      // Master loop fires when the section is visible — tied to section, not steps row
       ScrollTrigger.create({
-        trigger: stepsRowRef.current,
-        start: "top 70%",
-        end:   "bottom 10%",
+        trigger: sectionRef.current,
+        start:   "top 60%",
+        end:     "bottom 15%",
         onEnter:     () => tl.play(0),
         onLeave:     () => tl.pause(),
         onEnterBack: () => tl.play(),
@@ -231,11 +251,10 @@ export function ShiftSection() {
 
       {/* ── Main content ────────────────────────────────────────────────────── */}
       <div style={{
-        minHeight: "calc(100vh - 56px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "clamp(24px, 4vh, 52px) clamp(20px, 5vw, 60px)",
+        padding: "clamp(36px, 5vh, 60px) clamp(20px, 5vw, 60px) clamp(44px, 6vh, 72px)",
         position: "relative",
       }}>
 
@@ -306,19 +325,19 @@ export function ShiftSection() {
           {/* ── Body — blur reveal ─────────────────────────────────────────────── */}
           <p ref={bodyRef} style={{
             fontFamily: "'Urbanist', sans-serif",
-            fontWeight: 400, fontSize: "clamp(12px, 1.1vw, 15px)",
-            color: "rgba(27,74,90,0.50)", lineHeight: 1.7,
-            margin: "14px auto 0", maxWidth: "500px", opacity: 0,
+            fontWeight: 600, fontSize: "clamp(14px, 1.3vw, 17px)",
+            color: "rgba(27,74,90,0.78)", lineHeight: 1.75,
+            margin: "14px auto 0", maxWidth: "520px", opacity: 0,
           }}>
             You tell Kaivo what you need. It finds, compares, and prepares the best option.
             You review it. You approve it.{" "}
             <strong style={{
-              color: "#1B4A5A", fontWeight: 700,
-              background: "linear-gradient(120deg, rgba(200,228,74,0.28) 0%, rgba(200,228,74,0.28) 100%)",
-              padding: "1px 5px",
-              borderRadius: "2px",
+              color: "#1B4A5A", fontWeight: 800,
+              background: "linear-gradient(120deg, rgba(232,232,64,0.38) 0%, rgba(232,232,64,0.38) 100%)",
+              padding: "2px 7px",
+              borderRadius: "3px",
             }}>
-              It's done.
+              In 60 seconds — it's done.
             </strong>
           </p>
 
@@ -446,9 +465,9 @@ export function ShiftSection() {
                     fontSize: "clamp(9px, 1.1vw, 13px)",
                     letterSpacing: "0.11em",
                     textTransform: "uppercase",
-                    color: "rgba(27,74,90,0.35)",
+                    color: "#1B4A5A",
                     padding: "7px 13px",
-                    border: "1px solid rgba(27,74,90,0.12)",
+                    border: "1.5px solid rgba(27,74,90,0.28)",
                     borderRadius: "3px",
                     whiteSpace: "nowrap",
                     backgroundColor: "transparent",
@@ -460,20 +479,49 @@ export function ShiftSection() {
                 {i < STEPS.length - 1 && (
                   <div style={{
                     position: "relative",
-                    width: "clamp(14px, 2.2vw, 36px)",
-                    height: "1px",
+                    width: "clamp(32px, 3.8vw, 58px)",
+                    height: "24px",
                     flexShrink: 0,
                   }}>
-                    <div style={{ position: "absolute", inset: 0, background: "rgba(27,74,90,0.09)" }} />
+                    {/* Background track */}
+                    <div style={{
+                      position: "absolute",
+                      left: 0, right: 16,
+                      top: "50%", marginTop: "-1.5px",
+                      height: "3px",
+                      background: "rgba(27,74,90,0.13)",
+                      borderRadius: "2px",
+                    }} />
+                    {/* GSAP-animated fill — turns black during animation */}
                     <div
                       ref={(el) => { connRefs.current[i] = el; }}
                       style={{
-                        position: "absolute", inset: 0,
-                        background: "#1B4A5A",
+                        position: "absolute",
+                        left: 0, right: 16,
+                        top: "50%", marginTop: "-1.5px",
+                        height: "3px",
+                        background: "#000000",
                         transform: "scaleX(0)",
                         transformOrigin: "left center",
+                        borderRadius: "2px",
                       }}
                     />
+                    {/* Solid filled arrowhead — animates to black via GSAP */}
+                    <svg
+                      style={{
+                        position: "absolute",
+                        right: 0, top: "50%",
+                        transform: "translateY(-50%)",
+                      }}
+                      width="16" height="14" viewBox="0 0 16 14"
+                      aria-hidden
+                    >
+                      <polygon
+                        ref={(el) => { arrowRefs.current[i] = el; }}
+                        points="0,0 16,7 0,14"
+                        fill="rgba(27,74,90,0.30)"
+                      />
+                    </svg>
                   </div>
                 )}
               </div>
@@ -483,9 +531,9 @@ export function ShiftSection() {
           {/* ── Tagline ─────────────────────────────────────────────────────────── */}
           <div ref={taglineRef} style={{
             fontFamily: "'Urbanist', sans-serif",
-            fontWeight: 500,
-            fontSize: "clamp(14px, 1.5vw, 20px)",
-            color: "rgba(27,74,90,0.42)",
+            fontWeight: 700,
+            fontSize: "clamp(15px, 1.6vw, 22px)",
+            color: "#1B4A5A",
             letterSpacing: "0.01em",
             marginTop: "24px",
             opacity: 0,

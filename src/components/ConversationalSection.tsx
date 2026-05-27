@@ -1,33 +1,9 @@
 import { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { KaivoMark } from "./KaivoLogo";
 
 gsap.registerPlugin(ScrollTrigger);
-
-// ── Passport cover crest ──────────────────────────────────────────────────────
-function PassportCrest() {
-  return (
-    <svg width="80" height="92" viewBox="0 0 76 88" aria-hidden>
-      <ellipse cx="38" cy="44" rx="36" ry="42" fill="none"
-        stroke="rgba(126,206,202,0.45)" strokeWidth="1.2" />
-      <ellipse cx="38" cy="44" rx="26" ry="30" fill="none"
-        stroke="rgba(126,206,202,0.22)" strokeWidth="0.8" />
-      <path
-        d="M38 25 L40.6 32.3 L48.3 32.3 L42.2 37.1 L44.8 44.4 L38 39.5 L31.2 44.4 L33.8 37.1 L27.7 32.3 L35.4 32.3 Z"
-        fill="rgba(200,228,74,0.75)"
-      />
-      {Array.from({ length: 8 }, (_, i) => {
-        const a = (i * 45 - 90) * (Math.PI / 180);
-        return (
-          <circle key={i}
-            cx={38 + 19 * Math.cos(a)} cy={44 + 19 * Math.sin(a)}
-            r={1.6} fill="rgba(126,206,202,0.55)"
-          />
-        );
-      })}
-    </svg>
-  );
-}
 
 // ── Biometric chip icon ───────────────────────────────────────────────────────
 function ChipIcon() {
@@ -215,8 +191,8 @@ export function ConversationalSection() {
           {/* Body */}
           <p ref={bodyRef} style={{
             fontFamily: "'Urbanist', sans-serif",
-            fontWeight: 400, fontSize: "clamp(13px, 1.2vw, 16px)",
-            color: "rgba(255,255,255,0.45)",
+            fontWeight: 600, fontSize: "clamp(15px, 1.35vw, 18px)",
+            color: "rgba(255,255,255,0.88)",
             lineHeight: 1.75, margin: "0 0 clamp(24px, 4vh, 44px)",
             maxWidth: "380px",
           }}>
@@ -227,12 +203,12 @@ export function ConversationalSection() {
           {/* Tagline */}
           <div ref={taglineRef} style={{
             fontFamily: "'Urbanist', sans-serif",
-            fontWeight: 500, fontSize: "clamp(14px, 1.4vw, 18px)",
-            color: "rgba(255,255,255,0.42)",
+            fontWeight: 700, fontSize: "clamp(15px, 1.5vw, 20px)",
+            color: "rgba(255,255,255,0.82)",
           }}>
             Natural language in.{" "}
             <strong style={{
-              color: "white", fontWeight: 800,
+              color: "white", fontWeight: 900,
               position: "relative",
               display: "inline-block",
             }}>
@@ -240,9 +216,9 @@ export function ConversationalSection() {
               <span aria-hidden style={{
                 position: "absolute",
                 bottom: "-2px", left: 0, right: 0,
-                height: "4px",
+                height: "5px",
                 background: "#C8E44A",
-                opacity: 0.55,
+                opacity: 0.70,
                 borderRadius: "2px",
                 zIndex: -1,
               }} />
@@ -287,7 +263,7 @@ export function ConversationalSection() {
                 pointerEvents: "none",
               }} />
 
-              <PassportCrest />
+              <KaivoMark size={64} color="rgba(200,228,74,0.90)" />
               <div style={{ height: "10px" }} />
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",

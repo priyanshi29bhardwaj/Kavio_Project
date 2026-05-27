@@ -1,7 +1,7 @@
 import { useRef, useLayoutEffect, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { KaivoMark, KaivoWordmark } from "./KaivoLogo";
+import { KaivoWordmark } from "./KaivoLogo";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -162,7 +162,6 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
   const heroSkyRef  = useRef<HTMLDivElement>(null);  // live sky — zooms during scroll
   const cabinRef    = useRef<HTMLDivElement>(null);
   const vigRef      = useRef<HTMLDivElement>(null);
-  const logoRef     = useRef<HTMLDivElement>(null);
   const leftRef     = useRef<HTMLDivElement>(null);
   const rightRef    = useRef<HTMLDivElement>(null);
   const ctaRef      = useRef<HTMLDivElement>(null);
@@ -192,10 +191,8 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         { opacity: 0, duration: 0.22 },
         0
       );
-      // ── logo persists a little longer (fades out at 0-38%)
-      tl.fromTo(logoRef.current, { opacity: 1 }, { opacity: 0, duration: 0.38 }, 0);
 
-      // ── 0-68%: cabin zooms in
+      // ── 0-68%: cabin zooms in — stays fully opaque the whole time
       tl.to(cabinRef.current, {
         scale: 2.6,
         transformOrigin: "50% 47%",
@@ -203,30 +200,28 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         duration: 0.68,
       }, 0);
 
-      // ── 48-76%: cabin fades — passed through the glass
-      tl.to(cabinRef.current, { opacity: 0, duration: 0.28 }, 0.48);
+      // ── 80-95%: cabin fades only in the final stretch of the scroll pin
+      // Window frame stays solid during the entire zoom — no see-through effect
+      tl.to(cabinRef.current, { opacity: 0, duration: 0.15 }, 0.80);
 
-      // ── 22-72%: sky fades in as window fills viewport
-      tl.to(heroSkyRef.current, { opacity: 1, duration: 0.50 }, 0.22);
+      // ── 75-90%: sky fades in as cabin is leaving (not before)
+      tl.to(heroSkyRef.current, { opacity: 1, duration: 0.15 }, 0.75);
 
       // ── 0-100%: sky zooms with same momentum
       tl.to(heroSkyRef.current, { scale: 1.38, ease: "none", duration: 1 }, 0);
 
-      // ── 42-98%: vignette clears
-      tl.to(vigRef.current, { opacity: 0, duration: 0.56 }, 0.42);
+      // ── 65-90%: vignette clears
+      tl.to(vigRef.current, { opacity: 0, duration: 0.25 }, 0.65);
 
-      // ── 36-60%: KAIVO brand rises INTO the open clouds
+      // ── 81-92%: KAIVO sky brand appears only after cabin fades
       tl.to(
         skyBrandRef.current,
-        { opacity: 1, scale: 1, ease: "power2.out", duration: 0.24 },
-        0.36
+        { opacity: 1, scale: 1, ease: "power2.out", duration: 0.11 },
+        0.81
       );
 
-      // ── 80-100%: heroSkyRef fades OUT before pin ends.
-      // This makes HeroScene fully transparent at pin release so the global
-      // fixed sky behind it shows through — zero visible seam when scrolling
-      // into CloudTextSection (which also shows the same global sky).
-      tl.to(heroSkyRef.current, { opacity: 0, duration: 0.20 }, 0.80);
+      // ── 91-100%: sky fades OUT — seamless handoff to global fixed sky
+      tl.to(heroSkyRef.current, { opacity: 0, duration: 0.09 }, 0.91);
     }, sectionRef);
 
     return () => ctx.revert();
@@ -237,7 +232,6 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
     if (!shutterOpen) return;
 
     // Set everything to hidden immediately (shutter still covers them)
-    gsap.set(logoRef.current,  { opacity: 0, scale: 0.82 });
     gsap.set(leftRef.current,  { opacity: 0, y: 44, filter: "blur(7px)" });
     gsap.set(rightRef.current, { opacity: 0, y: 44, filter: "blur(7px)" });
     gsap.set(ctaRef.current,   { opacity: 0, y: 30, filter: "blur(5px)" });
@@ -245,14 +239,10 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
     // Shutter takes 2.2s + 0.2s delay; start texts slightly before it fully clears
     const tl = gsap.timeline({ delay: 1.7 });
 
-    tl.to(logoRef.current, {
-      opacity: 1, scale: 1,
-      duration: 0.9, ease: "back.out(1.5)",
-    })
-    .to(leftRef.current, {
+    tl.to(leftRef.current, {
       opacity: 1, y: 0, filter: "blur(0px)",
       duration: 0.75, ease: "power3.out",
-    }, "-=0.55")
+    })
     .to(rightRef.current, {
       opacity: 1, y: 0, filter: "blur(0px)",
       duration: 0.75, ease: "power3.out",
@@ -308,7 +298,6 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
           backgroundImage: "url(/cabin.png)",
           backgroundSize: "cover",
           backgroundPosition: "center center",
-          mixBlendMode: "multiply" as const,
           willChange: "transform",
         }}
       />
@@ -328,41 +317,6 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
           pointerEvents: "none",
         }}
       />
-
-      {/* ── KAIVO logo — centred exactly in the oval window opening ── */}
-      <div
-        ref={logoRef}
-        className="hero-window-logo"
-        style={{
-          position: "absolute",
-          left: "49.2%",
-          top: "52%",
-          transform: "translate(-50%, -50%)",
-          zIndex: 20,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          pointerEvents: "none",
-        }}
-      >
-        <KaivoMark
-          size={54}
-          color="white"
-          style={{ filter: "drop-shadow(0 2px 28px rgba(0,0,0,0.6))" }}
-        />
-        <span
-          style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 800,
-            letterSpacing: "0.44em",
-            color: "white",
-            textShadow: "0 2px 20px rgba(0,0,0,0.6)",
-            textIndent: "0.44em",
-          }}
-        >
-          KAIVO
-        </span>
-      </div>
 
       {/* ── Left text — desktop/tablet ── */}
       <div
@@ -550,11 +504,12 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         <div
           style={{
             fontFamily: "'Urbanist', sans-serif",
-            fontWeight: 300,
-            fontSize: "clamp(10px, 1vw, 13px)",
+            fontWeight: 600,
+            fontSize: "clamp(11px, 1.1vw, 14px)",
             letterSpacing: "0.38em",
-            color: "rgba(255,255,255,0.55)",
+            color: "rgba(255,255,255,0.90)",
             textTransform: "uppercase",
+            textShadow: "0 2px 16px rgba(0,0,0,0.70), 0 1px 6px rgba(0,0,0,0.50)",
           }}
         >
           Conversational Travel Booking

@@ -192,8 +192,8 @@ export function TrustSection() {
           {/* Sub-headline */}
           <p ref={subRef} style={{
             fontFamily: "'Urbanist', sans-serif",
-            fontWeight: 500, fontSize: "clamp(15px, 1.5vw, 19px)",
-            color: "rgba(27,74,90,0.62)",
+            fontWeight: 700, fontSize: "clamp(16px, 1.6vw, 21px)",
+            color: "rgba(27,74,90,0.88)",
             lineHeight: 1.55, margin: "0 0 clamp(24px, 3.5vh, 38px)",
             maxWidth: "360px",
           }}>
@@ -238,9 +238,9 @@ export function TrustSection() {
           {/* Tagline */}
           <div ref={taglineRef} style={{
             fontFamily: "'Urbanist', sans-serif",
-            fontStyle: "italic", fontWeight: 500,
-            fontSize: "clamp(13px, 1.3vw, 16px)",
-            color: "rgba(27,74,90,0.45)",
+            fontStyle: "italic", fontWeight: 700,
+            fontSize: "clamp(15px, 1.4vw, 18px)",
+            color: "rgba(27,74,90,0.82)",
             borderLeft: "3px solid #C8E44A",
             paddingLeft: "14px",
             lineHeight: 1.6,
@@ -282,16 +282,16 @@ export function TrustSection() {
               <div>
                 <div style={{
                   fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 700, fontSize: "10px", letterSpacing: "0.36em",
+                  fontWeight: 700, fontSize: "13px", letterSpacing: "0.28em",
                   color: "#E8622A", textTransform: "uppercase",
-                  marginBottom: "2px",
+                  marginBottom: "4px",
                 }}>
                   Awaiting Your Approval
                 </div>
                 <div style={{
                   fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 400, fontSize: "12px",
-                  color: "rgba(255,255,255,0.5)",
+                  fontWeight: 600, fontSize: "15px",
+                  color: "rgba(255,255,255,0.92)",
                 }}>
                   Kaivo has made a selection for you to review
                 </div>
@@ -316,8 +316,8 @@ export function TrustSection() {
               >
                 <div style={{
                   fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 600, fontSize: "8px", letterSpacing: "0.32em",
-                  color: "rgba(27,74,90,0.38)", textTransform: "uppercase",
+                  fontWeight: 700, fontSize: "8px", letterSpacing: "0.32em",
+                  color: "rgba(27,74,90,0.68)", textTransform: "uppercase",
                 }}>
                   {row.label}
                 </div>
@@ -330,8 +330,8 @@ export function TrustSection() {
                 </div>
                 <div style={{
                   fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 400, fontSize: "clamp(11px, 1vw, 13px)",
-                  color: "rgba(27,74,90,0.45)",
+                  fontWeight: 600, fontSize: "clamp(12px, 1.05vw, 14px)",
+                  color: "rgba(27,74,90,0.72)",
                 }}>
                   {row.detail}
                 </div>

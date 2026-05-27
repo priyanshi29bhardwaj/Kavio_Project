@@ -15,16 +15,18 @@ import { TrustSection }          from "./components/TrustSection";
 import { WhyLoveSection }        from "./components/WhyLoveSection";
 import { PurposeSection }        from "./components/PurposeSection";
 import { BusinessModelSection }  from "./components/BusinessModelSection";
+import { DelegationSection }     from "./components/DelegationSection";
 import { JoinWaitlistModal } from "./components/JoinWaitlistModal";
 import { KaivoWordmark } from "./components/KaivoLogo";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const NAV_LINKS = ["About", "How It Works", "Pricing"] as const;
+const NAV_LINKS = ["About", "How It Works"] as const;
 
 function App() {
   const [isModalOpen,     setIsModalOpen]     = useState(false);
   const [navDark,         setNavDark]         = useState(false);
+  const [navVisible,      setNavVisible]      = useState(false);
   const [shutterOpen,     setShutterOpen]     = useState(false);
   const [mobileMenuOpen,  setMobileMenuOpen]  = useState(false);
 
@@ -50,6 +52,13 @@ function App() {
     return () => { lenis.destroy(); gsap.ticker.remove(rafFn); };
   }, [mobileMenuOpen]);
 
+  // Show navbar after shutter animation finishes (~2.4 s after open)
+  useEffect(() => {
+    if (!shutterOpen) return;
+    const t = setTimeout(() => setNavVisible(true), 2400);
+    return () => clearTimeout(t);
+  }, [shutterOpen]);
+
   const logoColor  = navDark ? "#1B4A5A" : "white";
   const linkColor  = navDark ? "#1B4A5A" : "rgba(255,255,255,0.80)";
 
@@ -71,7 +80,8 @@ function App() {
           background: navDark ? "rgba(255,255,255,0.94)" : "transparent",
           backdropFilter: navDark ? "blur(14px)" : "none",
           borderBottom: navDark ? "1px solid rgba(27,74,90,0.08)" : "none",
-          transition: "background 0.4s ease, border-color 0.4s ease",
+          opacity: navVisible ? 1 : 0,
+          transition: "background 0.4s ease, border-color 0.4s ease, opacity 0.7s ease",
         }}
       >
         {/* Logo — left */}
@@ -274,6 +284,7 @@ function App() {
         <WhyLoveSection />
         <PurposeSection />
         <BusinessModelSection />
+        <DelegationSection />
 
       {/* ─── Footer ─────────────────────────────────────────────────────────── */}
       <footer
@@ -292,10 +303,10 @@ function App() {
         <p
           style={{
             fontFamily: "'Urbanist', sans-serif",
-            fontWeight: 300,
-            fontSize: "11px",
-            letterSpacing: "0.22em",
-            color: "rgba(255,255,255,0.25)",
+            fontWeight: 700,
+            fontSize: "15px",
+            letterSpacing: "0.18em",
+            color: "rgba(255,255,255,0.72)",
             textTransform: "uppercase",
             margin: 0,
           }}
