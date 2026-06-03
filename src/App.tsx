@@ -71,6 +71,7 @@ function App() {
     gsap.ticker.lagSmoothing(0);
 
     const onScroll = ({ scroll }: { scroll: number }) => {
+      setNavVisible(scroll > 80);
       setNavDark(scroll > window.innerHeight * 3.2);
       if (mobileMenuOpen) setMobileMenuOpen(false);
     };
@@ -101,12 +102,7 @@ function App() {
     skyVideoRef.current?.play().catch(() => {});
   }, [shutterOpen]);
 
-  // Show navbar after shutter animation finishes (~1.2 s after open)
-  useEffect(() => {
-    if (!shutterOpen) return;
-    const t = setTimeout(() => setNavVisible(true), 1300);
-    return () => clearTimeout(t);
-  }, [shutterOpen]);
+  // Show navbar only after scrolling past the hero pin (~220% vh)
 
   const logoColor  = navDark ? "#1B4A5A" : "white";
   const linkColor  = navDark ? "#1B4A5A" : "rgba(255,255,255,0.80)";
@@ -130,7 +126,8 @@ function App() {
           backdropFilter: navDark ? "blur(14px)" : "none",
           borderBottom: navDark ? "1px solid rgba(27,74,90,0.08)" : "none",
           opacity: navVisible ? 1 : 0,
-          transition: "background 0.4s ease, border-color 0.4s ease, opacity 0.7s ease",
+          pointerEvents: navVisible ? "auto" : "none",
+          transition: "background 0.4s ease, border-color 0.4s ease, opacity 0.6s ease",
         }}
       >
         {/* Logo — left */}
