@@ -17,7 +17,7 @@ function Shutter({ open }: { open: boolean }) {
     // Slide the shade UP off the top of the oval — natural blind opening direction.
     gsap.to(shadeRef.current, {
       yPercent: -101,
-      duration: 1.1,
+      duration: 2.1,
       ease: "power2.inOut",
       delay: 0.1,
     });
@@ -311,8 +311,8 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
     gsap.set(rightRef.current, { opacity: 0, y: 44, filter: "blur(7px)" });
     gsap.set(ctaRef.current,   { opacity: 0, y: 30, filter: "blur(5px)" });
 
-    // Shutter takes 1.1s + 0.1s delay; start texts just before it fully clears
-    const tl = gsap.timeline({ delay: 0.8 });
+    // Shutter takes 2.1s + 0.1s delay; start texts just before it fully clears
+    const tl = gsap.timeline({ delay: 1.8 });
 
     tl.to(leftRef.current, {
       opacity: 1, y: 0, filter: "blur(0px)",
