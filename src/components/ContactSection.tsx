@@ -385,10 +385,10 @@ export function ContactSection() {
         { top: 20, right: 20, rotate: 90 },
         { bottom: 20, right: 20, rotate: 180 },
         { bottom: 20, left: 20, rotate: 270 },
-      ].map((pos, i) => (
+      ].map(({ rotate, ...pos }, i) => (
         <svg key={i} width="20" height="20" viewBox="0 0 20 20" fill="none"
           aria-hidden
-          style={{ position: "absolute", ...pos, transform: `rotate(${pos.rotate}deg)`, opacity: 0.35, zIndex: 2 }}>
+          style={{ position: "absolute", ...pos, transform: `rotate(${rotate}deg)`, opacity: 0.35, zIndex: 2 }}>
           <path d="M0 12V0H12" stroke="#7ECECA" strokeWidth="1.5" />
         </svg>
       ))}
