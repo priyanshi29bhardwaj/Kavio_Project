@@ -108,7 +108,7 @@ function App() {
   const linkColor  = navDark ? "#1B4A5A" : "rgba(255,255,255,0.80)";
 
   return (
-    <div style={{ fontFamily: "'Urbanist', sans-serif", position: "relative", zIndex: 1 }}>
+    <div className="app-root" style={{ fontFamily: "'Urbanist', sans-serif", position: "relative", zIndex: 1 }}>
       {/* ─── Preloader ──────────────────────────────────────────────────────── */}
       <Preloader onComplete={() => setShutterOpen(true)} />
 
@@ -385,6 +385,7 @@ function App() {
 
       {/* ─── Footer ─────────────────────────────────────────────────────────── */}
       <footer
+        className="app-footer"
         style={{
           background: "#04060c",
           padding: "52px 40px 44px",
@@ -398,6 +399,7 @@ function App() {
         <KaivoWordmark height={20} color="rgba(255,255,255,0.75)" />
 
         <p
+          className="footer-tagline"
           style={{
             fontFamily: "'Urbanist', sans-serif",
             fontWeight: 700,
@@ -406,12 +408,14 @@ function App() {
             color: "rgba(255,255,255,0.72)",
             textTransform: "uppercase",
             margin: 0,
+            textAlign: "center",
           }}
         >
           Stop Doing. Start Delegating.
         </p>
 
         <div
+          className="footer-links"
           style={{
             display: "flex",
             gap: "24px",

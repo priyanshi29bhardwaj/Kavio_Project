@@ -107,6 +107,7 @@ export function DelegationSection() {
         justifyContent: "center",
         position:       "relative",
         overflow:       "hidden",
+        overflowX:      "hidden",
         padding:        "clamp(56px, 8vh, 88px) 0",
       }}
     >
@@ -151,14 +152,17 @@ export function DelegationSection() {
       }}>
 
         {/* ── Top two-column ──────────────────────────────────────────── */}
-        <div style={{
-          display:    "flex",
-          gap:        "clamp(40px, 6vw, 88px)",
-          alignItems: "flex-start",
-        }}>
+        <div
+          className="deleg-top"
+          style={{
+            display:    "flex",
+            gap:        "clamp(40px, 6vw, 88px)",
+            alignItems: "flex-start",
+          }}
+        >
 
           {/* ── LEFT: Manifesto ─────────────────────────────────────── */}
-          <div style={{ flex: "0 0 46%", display: "flex", flexDirection: "column", gap: "clamp(18px, 2.5vh, 28px)" }}>
+          <div className="deleg-left" style={{ flex: "0 0 46%", display: "flex", flexDirection: "column", gap: "clamp(18px, 2.5vh, 28px)" }}>
 
             {/* Badge */}
             <div ref={badgeRef} style={{
@@ -237,7 +241,7 @@ export function DelegationSection() {
           </div>
 
           {/* ── RIGHT: Pain points ──────────────────────────────────── */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div className="deleg-right" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
 
             <div style={{
               fontFamily: "'Space Grotesk', sans-serif",
@@ -309,7 +313,8 @@ export function DelegationSection() {
             Starting with flights. Then everything that should feel effortless:
           </div>
 
-          <div ref={trackRef} style={{
+          <div className="deleg-track" style={{ overflowX: "auto" }}>
+          <div ref={trackRef} className="deleg-track-inner" style={{
             position: "relative",
             display: "flex", alignItems: "flex-start",
             padding: "0 0 8px",
@@ -349,16 +354,18 @@ export function DelegationSection() {
                 }} />
 
                 {/* Label */}
-                <div style={{
-                  fontFamily:    "'Space Grotesk', sans-serif",
-                  fontWeight:    stop.active ? 700 : 600,
-                  fontSize:      "clamp(10px, 0.9vw, 13px)",
-                  letterSpacing: "0.16em",
-                  color:         stop.active ? "#C8E44A" : "rgba(255,255,255,0.78)",
-                  textTransform: "uppercase",
-                  textAlign:     "center",
-                  whiteSpace:    "nowrap",
-                }}>{stop.label}</div>
+                <div
+                  className="deleg-node-label"
+                  style={{
+                    fontFamily:    "'Space Grotesk', sans-serif",
+                    fontWeight:    stop.active ? 700 : 600,
+                    fontSize:      "clamp(10px, 0.9vw, 13px)",
+                    letterSpacing: "0.16em",
+                    color:         stop.active ? "#C8E44A" : "rgba(255,255,255,0.78)",
+                    textTransform: "uppercase",
+                    textAlign:     "center",
+                    whiteSpace:    "nowrap",
+                  }}>{stop.label}</div>
 
                 {/* "NOW" tag under Flights */}
                 {stop.active && (
@@ -372,6 +379,7 @@ export function DelegationSection() {
               </div>
             ))}
           </div>
+          </div>{/* end deleg-track scroll wrapper */}
         </div>
 
       </div>

@@ -160,17 +160,17 @@ export function ConversationalSection() {
           </div>
 
           {/* Headline */}
-          <div ref={head0} style={{
+          <div ref={head0} className="conv-headline" style={{
             fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-            fontSize: "clamp(44px, 6.0vw, 80px)",
+            fontSize: "clamp(36px, 6.0vw, 80px)",
             color: "white", lineHeight: 0.98, letterSpacing: "-0.03em",
             marginBottom: "4px",
           }}>
             It doesn't feel
           </div>
-          <div ref={head1} style={{
+          <div ref={head1} className="conv-headline" style={{
             fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-            fontSize: "clamp(44px, 6.0vw, 80px)",
+            fontSize: "clamp(36px, 6.0vw, 80px)",
             color: "#7ECECA", lineHeight: 0.98, letterSpacing: "-0.03em",
             marginBottom: "clamp(22px, 3.5vh, 40px)",
           }}>

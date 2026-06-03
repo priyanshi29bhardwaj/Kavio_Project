@@ -455,7 +455,7 @@ export function ContactSection() {
         }}>
 
           {/* ── Radar ──────────────────────────────────────────────────── */}
-          <div ref={radarRef} style={{
+          <div ref={radarRef} className="contact-radar-wrap" style={{
             flexShrink: 0,
             display: "flex", flexDirection: "column", alignItems: "center", gap: "14px",
           }}>

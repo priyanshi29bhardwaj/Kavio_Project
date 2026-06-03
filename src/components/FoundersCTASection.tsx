@@ -82,7 +82,7 @@ export function FoundersCTASection({ onJoinWaitlist }: Props) {
         position: "relative",
         background: "#ffffff",
         overflow: "hidden",
-        padding: "clamp(100px, 14vh, 160px) clamp(24px, 5vw, 60px)",
+        padding: "clamp(64px, 14vh, 160px) clamp(20px, 5vw, 60px)",
         textAlign: "center",
         borderTop: "1px solid rgba(27,74,90,0.07)",
       }}
@@ -117,7 +117,7 @@ export function FoundersCTASection({ onJoinWaitlist }: Props) {
         <h2 style={{
           fontFamily: "'Urbanist', sans-serif",
           fontWeight: 800,
-          fontSize: "clamp(40px, 6.5vw, 86px)",
+          fontSize: "clamp(32px, 6.5vw, 86px)",
           lineHeight: 1.05,
           margin: "0 0 12px",
           letterSpacing: "-0.01em",

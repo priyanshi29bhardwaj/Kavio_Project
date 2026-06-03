@@ -338,10 +338,13 @@ export function WhyLoveSection() {
               </span>
             ))}
           </div>
-          <div style={{
-            fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
-            fontSize: "clamp(13px, 1.2vw, 16px)", color: "#1B4A5A", whiteSpace: "nowrap",
-          }}>
+          <div
+            className="why-bottom-text"
+            style={{
+              fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
+              fontSize: "clamp(13px, 1.2vw, 16px)", color: "#1B4A5A", whiteSpace: "nowrap",
+            }}
+          >
             Just say what you need.{" "}
             <span style={{ color: "rgba(27,74,90,0.72)", fontWeight: 700 }}>Kaivo handles the rest.</span>
           </div>

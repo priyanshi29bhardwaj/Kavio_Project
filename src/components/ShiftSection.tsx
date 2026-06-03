@@ -449,7 +449,7 @@ export function ShiftSection() {
           </div>
 
           {/* ── Steps row ──────────────────────────────────────────────────────── */}
-          <div ref={stepsRowRef} style={{
+          <div ref={stepsRowRef} className="shift-steps-row" style={{
             display: "flex", alignItems: "center", justifyContent: "center",
             flexWrap: "wrap", rowGap: "10px",
             opacity: 0,
@@ -458,6 +458,7 @@ export function ShiftSection() {
               <div key={step} style={{ display: "flex", alignItems: "center" }}>
                 <span
                   ref={(el) => { wordRefs.current[i] = el; }}
+                  className="shift-step-box"
                   style={{
                     display: "inline-block",
                     fontFamily: "'Space Grotesk', sans-serif",
@@ -477,7 +478,7 @@ export function ShiftSection() {
                 </span>
 
                 {i < STEPS.length - 1 && (
-                  <div style={{
+                  <div className="shift-connector" style={{
                     position: "relative",
                     width: "clamp(32px, 3.8vw, 58px)",
                     height: "24px",

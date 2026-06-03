@@ -651,3 +651,115 @@ h6 {
     max-width: 100%;
   }
 }
+
+/* ── DelegationSection two-column + roadmap ───────────────────────────────── */
+/* Stack the manifesto + pain-points columns on tablet/mobile */
+@media (max-width: 860px) {
+  .deleg-top {
+    flex-direction: column !important;
+    gap: clamp(28px, 4vh, 44px) !important;
+  }
+  .deleg-left {
+    flex: none !important;
+    width: 100% !important;
+  }
+  .deleg-right {
+    flex: none !important;
+    width: 100% !important;
+  }
+}
+
+/* Roadmap track: allow horizontal scroll on very small screens so nodes
+   don't overlap; the connecting line still looks good. */
+.deleg-track-inner {
+  min-width: 360px; /* always wide enough for 6 nodes to be legible */
+}
+
+@media (max-width: 600px) {
+  .deleg-track {
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
+  }
+  /* Shrink node labels to keep them readable */
+  .deleg-node-label {
+    font-size: 9px !important;
+    letter-spacing: 0.10em !important;
+  }
+}
+
+/* ── ContactSection radar ─────────────────────────────────────────────────── */
+/* The radar SVG is 320×320; on narrow phones it overflows. Scale it down. */
+@media (max-width: 400px) {
+  .contact-radar-wrap svg {
+    width: 260px !important;
+    height: 260px !important;
+  }
+}
+@media (max-width: 320px) {
+  .contact-radar-wrap svg {
+    width: 220px !important;
+    height: 220px !important;
+  }
+}
+
+/* ── App footer ───────────────────────────────────────────────────────────── */
+/* Tighten footer padding on mobile */
+@media (max-width: 767px) {
+  .app-footer {
+    padding: 40px 20px 32px !important;
+  }
+  .footer-tagline {
+    font-size: 12px !important;
+    letter-spacing: 0.12em !important;
+  }
+  .footer-links {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 16px !important;
+  }
+}
+
+/* ── WhyLoveSection bottom bar — remove nowrap on mobile ─────────────────── */
+@media (max-width: 560px) {
+  .why-bottom-text {
+    white-space: normal !important;
+  }
+}
+
+/* ── ShiftSection steps — shrink spacing on mobile ──────────────────────── */
+@media (max-width: 480px) {
+  .shift-steps-row {
+    gap: 4px !important;
+  }
+  .shift-step-box {
+    padding: 6px 8px !important;
+    font-size: 8px !important;
+    letter-spacing: 0.08em !important;
+  }
+  .shift-connector {
+    width: clamp(16px, 4vw, 28px) !important;
+  }
+}
+
+/* ── ProductSection boarding-pass stub — wrap on small screens ───────────── */
+@media (max-width: 480px) {
+  .product-stub {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+  }
+}
+
+/* ── ConversationalSection headline — prevent overflow on narrow screens ─── */
+@media (max-width: 480px) {
+  .conv-headline {
+    font-size: clamp(36px, 9vw, 56px) !important;
+  }
+}
+
+/* ── Horizontal overflow guard for ALL sections on mobile ────────────────── */
+@media (max-width: 767px) {
+  .app-root {
+    overflow-x: hidden;
+  }
+}

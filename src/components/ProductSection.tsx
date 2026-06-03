@@ -466,6 +466,7 @@ export function ProductSection() {
           {/* ── STUB ─────────────────────────────────────────────────────────── */}
           <div
             ref={stubRef}
+            className="product-stub"
             style={{
               background: "#1B4A5A",
               padding: "16px 24px",

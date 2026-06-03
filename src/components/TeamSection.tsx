@@ -311,6 +311,7 @@ export function TeamSection() {
         position: "relative",
         background: "#edf2f4",
         paddingBottom: "clamp(80px, 10vh, 130px)",
+        overflowX: "hidden",
       }}
     >
       {/* ── Dark-to-light transition strip — blends with DelegationSection ── */}
