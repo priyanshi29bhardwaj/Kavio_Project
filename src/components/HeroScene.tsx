@@ -427,7 +427,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         <p style={{
           fontFamily: "'Urbanist', sans-serif",
           fontWeight: 900,
-          fontSize: "clamp(26px, 3.2vw, 48px)",
+          fontSize: "clamp(18px, 2.2vw, 34px)",
           lineHeight: 1.1,
           letterSpacing: "0.02em",
           color: "white",
