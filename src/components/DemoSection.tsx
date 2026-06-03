@@ -226,7 +226,7 @@ export function DemoSection() {
           left: 0,
           right: 0,
           height: "260px",
-          background: "linear-gradient(to bottom, transparent 0%, rgba(210,238,238,0.5) 48%, #D6EEEE 100%)",
+          background: "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.5) 48%, white 100%)",
           zIndex: 6,
           pointerEvents: "none",
         }}

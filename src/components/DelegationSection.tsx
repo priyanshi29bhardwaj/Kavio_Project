@@ -170,7 +170,7 @@ export function DelegationSection() {
               <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#C8E44A", boxShadow: "0 0 8px rgba(200,228,74,0.6)" }} />
               <span style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "10px", letterSpacing: "0.32em",
+                fontWeight: 800, fontSize: "11px", letterSpacing: "0.30em",
                 color: "#C8E44A", textTransform: "uppercase",
               }}>Delegation Thesis</span>
             </div>
@@ -241,7 +241,7 @@ export function DelegationSection() {
 
             <div style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700, fontSize: "10px", letterSpacing: "0.32em",
+              fontWeight: 800, fontSize: "11px", letterSpacing: "0.30em",
               color: "rgba(232,98,42,0.75)", textTransform: "uppercase",
               marginBottom: "6px",
             }}>The frustration with flights:</div>

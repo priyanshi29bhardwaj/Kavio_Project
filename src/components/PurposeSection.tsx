@@ -138,15 +138,15 @@ export function PurposeSection() {
           </svg>
           <span style={{
             fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 700, fontSize: "10px", letterSpacing: "0.32em",
-            color: "rgba(27,74,90,0.55)", textTransform: "uppercase",
+            fontWeight: 800, fontSize: "11px", letterSpacing: "0.30em",
+            color: "#1B4A5A", textTransform: "uppercase",
           }}>Our Purpose</span>
         </div>
 
         {/* ── Main headline — 5 clip lines ────────────────────────────────── */}
         <div style={{
           fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-          fontSize: "clamp(28px, 4.4vw, 58px)",
+          fontSize: "clamp(30px, 4.0vw, 56px)",
           color: "#1B4A5A", letterSpacing: "-0.03em",
           marginBottom: "clamp(20px, 3vh, 32px)",
           width: "100%",

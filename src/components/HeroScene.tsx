@@ -14,11 +14,12 @@ function Shutter({ open }: { open: boolean }) {
   useEffect(() => {
     if (!open || !shadeRef.current) return;
 
+    // Slide the shade UP off the top of the oval — natural blind opening direction.
     gsap.to(shadeRef.current, {
       yPercent: -101,
-      duration: 2.2,
+      duration: 1.1,
       ease: "power2.inOut",
-      delay: 0.2,
+      delay: 0.1,
     });
   }, [open]);
 
@@ -159,7 +160,8 @@ interface HeroSceneProps {
 
 export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
   const sectionRef  = useRef<HTMLDivElement>(null);
-  const heroSkyRef  = useRef<HTMLDivElement>(null);  // live sky — zooms during scroll
+  const heroSkyRef  = useRef<HTMLVideoElement>(null); // live sky — zooms during scroll
+  const videoRef    = useRef<HTMLVideoElement>(null); // same element — seek control
   const cabinRef    = useRef<HTMLDivElement>(null);
   const vigRef      = useRef<HTMLDivElement>(null);
   const leftRef     = useRef<HTMLDivElement>(null);
@@ -177,11 +179,14 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
           pin: true,
           scrub: 1.4,
           anticipatePin: 1,
+          invalidateOnRefresh: true, // recalculate all positions after browser zoom / resize
         },
       });
 
-      // Initial states
-      gsap.set(heroSkyRef.current,  { scale: 1.08, opacity: 0 });
+      // Initial states — video opacity is set via inline CSS (opacity:0 on the
+      // element itself). Do NOT set opacity here — ScrollTrigger.refresh() can
+      // reset GSAP-owned values, which would re-hide the video after it's shown.
+      gsap.set(heroSkyRef.current,  { scale: 1.0 });
       gsap.set(skyBrandRef.current, { opacity: 0, scale: 0.88 });
 
       // ── 0-22%: text + CTA fade out — give the zoom full screen
@@ -204,12 +209,6 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
       // Window frame stays solid during the entire zoom — no see-through effect
       tl.to(cabinRef.current, { opacity: 0, duration: 0.15 }, 0.80);
 
-      // ── 75-90%: sky fades in as cabin is leaving (not before)
-      tl.to(heroSkyRef.current, { opacity: 1, duration: 0.15 }, 0.75);
-
-      // ── 0-100%: sky zooms with same momentum
-      tl.to(heroSkyRef.current, { scale: 1.38, ease: "none", duration: 1 }, 0);
-
       // ── 65-90%: vignette clears
       tl.to(vigRef.current, { opacity: 0, duration: 0.25 }, 0.65);
 
@@ -220,24 +219,100 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         0.81
       );
 
-      // ── 91-100%: sky fades OUT — seamless handoff to global fixed sky
-      tl.to(heroSkyRef.current, { opacity: 0, duration: 0.09 }, 0.91);
+      // ── 88-100%: fade hero sky video out, handing off to the fixed background.
+      // Both videos play the same source at the same objectPosition (50% 50%)
+      // and the same effective size, so the crossfade is completely invisible.
+      // After the pin releases, CloudTextSection (and beyond) show only the
+      // fixed sky video — no crop mismatch, no seam.
+      // NOTE: video opacity IS now in this timeline for the final 12% only.
+      // The initial opacity:0 → 1 reveal (onSeeked) is not affected because
+      // that fires well before the 88% scroll threshold is reached.
+      tl.to(heroSkyRef.current, { opacity: 0, duration: 0.12 }, 0.88);
     }, sectionRef);
 
+    // Zoom-reset is handled in App.tsx via lenis.scrollTo(0, { immediate: true })
+    // which correctly resets Lenis's virtual scroll position (window.scrollTo
+    // does not, since Lenis manages its own scroll state).
     return () => ctx.revert();
+  }, []);
+
+  // ── Park video at the golden sunrise frame — do NOT autoplay yet ─────────
+  // Video starts at opacity:0 (see GSAP initial set above). Once the browser
+  // confirms frame 3 is fully decoded via the "seeked" event, we reveal the
+  // video. This prevents any flash of frame 0 through the oval window.
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    const onSeeked = () => {
+      // Frame 3 is now decoded — make the video visible (was opacity:0 via inline CSS)
+      if (heroSkyRef.current) heroSkyRef.current.style.opacity = "1";
+    };
+
+    const seek = () => {
+      vid.addEventListener("seeked", onSeeked, { once: true });
+      vid.currentTime = 3; // 0:03 — golden sun burst + wing
+    };
+
+    // Loop from frame 3 BEFORE the video ends — never let it hit frame 0.
+    // timeupdate fires ~4× per second while playing; proactively jump 0.5 s early
+    // so there's no end-of-clip flash and no wrong-frame seek artifact.
+    let loopSeeking = false;
+    const onTimeUpdate = () => {
+      if (!vid.duration || loopSeeking) return;
+      if (vid.currentTime >= vid.duration - 0.5) {
+        loopSeeking = true;
+        vid.addEventListener("seeked", () => { loopSeeking = false; }, { once: true });
+        vid.currentTime = 3;
+      }
+    };
+    vid.addEventListener("timeupdate", onTimeUpdate);
+
+    // Safety fallback: reveal after 3 s even if seeked never fires
+    const fallback = setTimeout(() => {
+      if (heroSkyRef.current) heroSkyRef.current.style.opacity = "1";
+    }, 3000);
+
+    if (vid.readyState >= 1) {
+      seek(); // metadata already available (cached / fast load)
+    } else {
+      vid.addEventListener("loadedmetadata", seek, { once: true });
+    }
+
+    return () => {
+      clearTimeout(fallback);
+      vid.removeEventListener("loadedmetadata", seek);
+      vid.removeEventListener("seeked", onSeeked);
+      vid.removeEventListener("timeupdate", onTimeUpdate);
+    };
   }, []);
 
   // ── Text entrance: runs once after shutter opens ──────────────────────────
   useEffect(() => {
     if (!shutterOpen) return;
 
+    // The mount effect already parked the video at frame 3 and confirmed it
+    // via the "seeked" event. Just call play() directly — no re-seek needed,
+    // which was causing a second flash of frame 0.
+    const vid = videoRef.current;
+    if (vid) {
+      if (vid.currentTime < 0.5) {
+        // Edge case: metadata not loaded yet — seek first then play
+        const startPlay = () => vid.play().catch(() => {});
+        vid.addEventListener("seeked", startPlay, { once: true });
+        vid.currentTime = 3;
+      } else {
+        vid.play().catch(() => {});
+      }
+    }
+
     // Set everything to hidden immediately (shutter still covers them)
     gsap.set(leftRef.current,  { opacity: 0, y: 44, filter: "blur(7px)" });
     gsap.set(rightRef.current, { opacity: 0, y: 44, filter: "blur(7px)" });
     gsap.set(ctaRef.current,   { opacity: 0, y: 30, filter: "blur(5px)" });
 
-    // Shutter takes 2.2s + 0.2s delay; start texts slightly before it fully clears
-    const tl = gsap.timeline({ delay: 1.7 });
+    // Shutter takes 1.1s + 0.1s delay; start texts just before it fully clears
+    const tl = gsap.timeline({ delay: 0.8 });
 
     tl.to(leftRef.current, {
       opacity: 1, y: 0, filter: "blur(0px)",
@@ -265,24 +340,34 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         zIndex: 1,
       }}
     >
-      {/* ── Live sky — fills behind cabin, zooms during scroll ──────────────
-          Oversize by 6% so the zoom animation never shows blank edges.
-          Same clouds.png + skyDrift animation as the global background,
-          so the final full-screen sky is perfectly seamless. */}
-      <div
-        ref={heroSkyRef}
+      {/* ── Window video — shows through the oval cabin window during the hero pin.
+          Sized identically to the fixed sky video in App.tsx (110 % × 110 %, same
+          objectPosition) so the two videos show the exact same crop. At 88–100 %
+          of the scroll pin it fades to opacity:0, handing off seamlessly to the
+          fixed sky video. CloudTextSection and beyond use only the fixed video —
+          no crop mismatch, no seam at the section boundary.
+          No autoPlay: video is parked at 3s and starts only when shutter opens. */}
+      <video
+        ref={(el) => {
+          (heroSkyRef as React.MutableRefObject<HTMLVideoElement | null>).current = el;
+          (videoRef   as React.MutableRefObject<HTMLVideoElement | null>).current = el;
+        }}
+        muted
+        playsInline
+        preload="auto"
         style={{
           position: "absolute",
-          top: "-6%", left: "-6%",
-          width: "112%", height: "112%",
-          backgroundImage: "url(/clouds.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "center 35%",
+          top: 0, left: 0, right: 0, bottom: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          objectPosition: "50% 50%", // centred — golden sky fills full canvas
           zIndex: 1,
           willChange: "transform",
-          opacity: 0,    // hidden until scroll — sky appears with the window
+          opacity: 0, // hidden until frame 3 is decoded; revealed via .style.opacity in onSeeked
         }}
-      />
+      >
+        <source src="/window_behind.mp4" type="video/mp4" />
+      </video>
 
       {/* ── Cabin interior ──────────────────────────────────────────────────
           mix-blend-mode: multiply  →  the dark leather walls stay dark;
@@ -293,11 +378,11 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         ref={cabinRef}
         style={{
           position: "absolute",
-          inset: 0,
+          top: 0, bottom: 0, left: 0, right: "-2%",
           zIndex: 2,
           backgroundImage: "url(/cabin.png)",
           backgroundSize: "cover",
-          backgroundPosition: "center center",
+          backgroundPosition: "50% 50%",
           willChange: "transform",
         }}
       />
@@ -332,22 +417,23 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         <p style={{
           fontFamily: "'Space Grotesk', sans-serif",
           fontWeight: 700,
-          fontSize: "clamp(8px, 0.8vw, 11px)",
-          letterSpacing: "0.24em",
-          color: "#E8622A",
+          fontSize: "clamp(13px, 1.4vw, 18px)",
+          letterSpacing: "0.22em",
+          color: "white",
           textTransform: "uppercase",
-          margin: "0 0 10px",
+          margin: "0 0 14px",
+          textShadow: "0 1px 12px rgba(0,0,0,0.9), 0 2px 24px rgba(0,0,0,0.6)",
         }}>AI-Powered</p>
         <p style={{
           fontFamily: "'Urbanist', sans-serif",
-          fontWeight: 800,
-          fontSize: "clamp(16px, 1.9vw, 28px)",
+          fontWeight: 900,
+          fontSize: "clamp(26px, 3.2vw, 48px)",
           lineHeight: 1.1,
           letterSpacing: "0.02em",
           color: "white",
           textTransform: "uppercase",
           margin: 0,
-          textShadow: "0 2px 18px rgba(0,0,0,0.65)",
+          textShadow: "0 2px 24px rgba(0,0,0,0.75)",
           whiteSpace: "nowrap",
         }}>
           Conversational<br />
@@ -397,7 +483,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
           fontSize: "clamp(22px, 2.8vw, 42px)",
           lineHeight: 1,
           letterSpacing: "0.03em",
-          color: "#E8622A",
+          color: "white",
           textTransform: "uppercase",
           margin: 0,
           textShadow: "0 2px 20px rgba(0,0,0,0.45)",
@@ -420,7 +506,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         <p style={{
           fontFamily: "'Space Grotesk', sans-serif",
           fontWeight: 700, fontSize: "8px",
-          letterSpacing: "0.22em", color: "#E8622A",
+          letterSpacing: "0.22em", color: "white",
           textTransform: "uppercase", margin: "0 0 6px",
         }}>AI-Powered Travel Booking</p>
         <p style={{
@@ -431,7 +517,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
           textShadow: "0 2px 16px rgba(0,0,0,0.65)",
         }}>
           Book a Flight in{" "}
-          <span style={{ color: "#E8622A" }}>60 Seconds</span>
+          <span style={{ color: "white" }}>60 Seconds</span>
         </p>
       </div>
 

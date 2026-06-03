@@ -283,8 +283,8 @@ export function ShiftSection() {
             </svg>
             <span style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700, fontSize: "10px", letterSpacing: "0.32em",
-              color: "rgba(27,74,90,0.55)", textTransform: "uppercase",
+              fontWeight: 800, fontSize: "11px", letterSpacing: "0.30em",
+              color: "#1B4A5A", textTransform: "uppercase",
             }}>The Shift</span>
           </div>
 
@@ -292,7 +292,7 @@ export function ShiftSection() {
           <div style={{ overflow: "hidden", lineHeight: 1, marginBottom: "4px" }}>
             <div ref={head0} style={{
               fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-              fontSize: "clamp(28px, 4.2vw, 64px)",
+              fontSize: "clamp(32px, 4.6vw, 68px)",
               color: "#1B4A5A",
               lineHeight: 1.0, letterSpacing: "-0.028em",
             }}>
@@ -302,7 +302,7 @@ export function ShiftSection() {
           <div style={{ overflow: "hidden", lineHeight: 1 }}>
             <div ref={head1} style={{
               fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-              fontSize: "clamp(28px, 4.2vw, 64px)",
+              fontSize: "clamp(32px, 4.6vw, 68px)",
               color: "#7ECECA",
               lineHeight: 1.0, letterSpacing: "-0.028em",
             }}>
@@ -325,8 +325,8 @@ export function ShiftSection() {
           {/* ── Body — blur reveal ─────────────────────────────────────────────── */}
           <p ref={bodyRef} style={{
             fontFamily: "'Urbanist', sans-serif",
-            fontWeight: 600, fontSize: "clamp(14px, 1.3vw, 17px)",
-            color: "rgba(27,74,90,0.78)", lineHeight: 1.75,
+            fontWeight: 800, fontSize: "clamp(14px, 1.3vw, 17px)",
+            color: "rgba(27,74,90,0.90)", lineHeight: 1.75,
             margin: "14px auto 0", maxWidth: "520px", opacity: 0,
           }}>
             You tell Kaivo what you need. It finds, compares, and prepares the best option.
@@ -411,11 +411,11 @@ export function ShiftSection() {
 
               {/* Seconds counter (lower half, clear of hands) */}
               <text ref={clockSecRef}
-                x={cx} y={cy + 20}
+                x={cx} y={cy + 22}
                 textAnchor="middle"
                 fontFamily="'Space Grotesk', sans-serif"
-                fontSize="12" fontWeight="700"
-                fill="rgba(27,74,90,0.42)"
+                fontSize="18" fontWeight="800"
+                fill="rgba(27,74,90,0.75)"
               >
                 0
               </text>

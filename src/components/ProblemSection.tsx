@@ -156,7 +156,7 @@ export function ProblemSection() {
       className="problem-section"
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(to bottom, #D6EEEE 0%, #f0f9f9 12%, white 28%)",
+        background: "white",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -216,8 +216,8 @@ export function ProblemSection() {
               </svg>
               <span style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "10px", letterSpacing: "0.32em",
-                color: "rgba(27,74,90,0.55)", textTransform: "uppercase",
+                fontWeight: 800, fontSize: "11px", letterSpacing: "0.30em",
+                color: "#1B4A5A", textTransform: "uppercase",
               }}>
                 The Problem
               </span>
@@ -238,7 +238,7 @@ export function ProblemSection() {
                   style={{
                     fontFamily: "'Urbanist', sans-serif",
                     fontWeight: 900,
-                    fontSize: "clamp(46px, 5.5vw, 88px)",
+                    fontSize: "clamp(40px, 4.8vw, 74px)",
                     color: i === 2 ? "#C8E44A" : "#1B4A5A",
                     lineHeight: 1.0,
                     margin: 0,
@@ -293,12 +293,16 @@ export function ProblemSection() {
                 maxWidth: "420px",
               }}
             >
-              Tabs. Filters. Re-entering details. Comparing policies.
-              Checking baggage rules. Wondering if there's a better option.
+              <strong style={{ fontWeight: 800, color: "rgba(27,74,90,0.90)" }}>
+                Tabs. Filters. Re-entering details. Comparing policies.
+                Checking baggage rules. Wondering if there's a better option.
+              </strong>
               <br /><br />
-              Search gave access. Comparison sites multiplied decisions.
-              AI sped up answers.{" "}
-              <strong style={{ color: "#1B4A5A", fontWeight: 700 }}>
+              <strong style={{ fontWeight: 800, color: "rgba(27,74,90,0.90)" }}>
+                Search gave access. Comparison sites multiplied decisions.
+                AI sped up answers.
+              </strong>{" "}
+              <strong style={{ color: "#1B4A5A", fontWeight: 900 }}>
                 But you still do the work.
               </strong>
             </p>
@@ -364,11 +368,11 @@ export function ProblemSection() {
                   <div
                     style={{
                       fontFamily: "'Urbanist', sans-serif",
-                      fontSize: "clamp(13px, 1.15vw, 15px)",
-                      fontWeight: 600,
+                      fontSize: "clamp(14px, 1.25vw, 16px)",
+                      fontWeight: 700,
                       color: isKaivo
-                        ? "rgba(255,255,255,0.92)"
-                        : "rgba(27,74,90,0.78)",
+                        ? "white"
+                        : "rgba(27,74,90,0.90)",
                       lineHeight: 1.5,
                     }}
                   >

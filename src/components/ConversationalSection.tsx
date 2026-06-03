@@ -154,15 +154,15 @@ export function ConversationalSection() {
             </svg>
             <span style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700, fontSize: "10px", letterSpacing: "0.32em",
-              color: "rgba(255,255,255,0.5)", textTransform: "uppercase",
+              fontWeight: 800, fontSize: "11px", letterSpacing: "0.32em",
+              color: "rgba(255,255,255,0.92)", textTransform: "uppercase",
             }}>Conversational Control</span>
           </div>
 
           {/* Headline */}
           <div ref={head0} style={{
             fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-            fontSize: "clamp(42px, 5.8vw, 76px)",
+            fontSize: "clamp(44px, 6.0vw, 80px)",
             color: "white", lineHeight: 0.98, letterSpacing: "-0.03em",
             marginBottom: "4px",
           }}>
@@ -170,7 +170,7 @@ export function ConversationalSection() {
           </div>
           <div ref={head1} style={{
             fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-            fontSize: "clamp(42px, 5.8vw, 76px)",
+            fontSize: "clamp(44px, 6.0vw, 80px)",
             color: "#7ECECA", lineHeight: 0.98, letterSpacing: "-0.03em",
             marginBottom: "clamp(22px, 3.5vh, 40px)",
           }}>
@@ -272,15 +272,15 @@ export function ConversationalSection() {
               }}>KAIVO</div>
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 500, fontSize: "7px", letterSpacing: "0.44em",
-                color: "rgba(255,255,255,0.32)", marginTop: "3px",
+                fontWeight: 800, fontSize: "11px", letterSpacing: "0.44em",
+                color: "rgba(255,255,255,0.80)", marginTop: "3px",
               }}>TRAVEL</div>
               <div style={{ height: "10px" }} />
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "8px", letterSpacing: "0.28em",
-                color: "rgba(126,206,202,0.65)",
-                borderTop: "1px solid rgba(126,206,202,0.18)",
+                fontWeight: 800, fontSize: "12px", letterSpacing: "0.28em",
+                color: "rgba(126,206,202,0.95)",
+                borderTop: "1px solid rgba(126,206,202,0.35)",
                 paddingTop: "8px",
               }}>PASSPORT</div>
 

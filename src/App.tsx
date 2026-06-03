@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -16,12 +16,20 @@ import { WhyLoveSection }        from "./components/WhyLoveSection";
 import { PurposeSection }        from "./components/PurposeSection";
 import { BusinessModelSection }  from "./components/BusinessModelSection";
 import { DelegationSection }     from "./components/DelegationSection";
+import { TeamSection }           from "./components/TeamSection";
+import { FoundersCTASection }   from "./components/FoundersCTASection";
+import { ContactSection }       from "./components/ContactSection";
 import { JoinWaitlistModal } from "./components/JoinWaitlistModal";
 import { KaivoWordmark } from "./components/KaivoLogo";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const NAV_LINKS = ["About", "How It Works"] as const;
+const NAV_LINKS = [
+  { label: "Home",    action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
+  { label: "Waitlist", action: null }, // handled by setIsModalOpen — injected at render
+  { label: "About",   action: () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }) },
+  { label: "Contact", action: () => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }) },
+] as const;
 
 function App() {
   const [isModalOpen,     setIsModalOpen]     = useState(false);
@@ -29,6 +37,25 @@ function App() {
   const [navVisible,      setNavVisible]      = useState(false);
   const [shutterOpen,     setShutterOpen]     = useState(false);
   const [mobileMenuOpen,  setMobileMenuOpen]  = useState(false);
+
+  // Fixed sky video — replaces clouds.png; provides the golden-sunset background
+  // for HeroScene (the oval shows the HeroScene video on top) and for
+  // CloudTextSection (transparent bg, this fixed video shows through).
+  // DemoSection and below live in z-index 2 and cover this entirely.
+  const skyVideoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const vid = skyVideoRef.current;
+    if (!vid) return;
+    // Park at frame 3 but do NOT play yet — playback starts when the shutter opens
+    // (see shutterOpen effect below) so both sky videos start in sync.
+    const park = () => { vid.currentTime = 3; };
+    // Loop manually from frame 3 (loop attr restarts at frame 0)
+    const onEnded = () => { vid.currentTime = 3; vid.play().catch(() => {}); };
+    vid.addEventListener("ended", onEnded);
+    if (vid.readyState >= 1) park();
+    else vid.addEventListener("loadedmetadata", park, { once: true });
+    return () => vid.removeEventListener("ended", onEnded);
+  }, []);
 
   // Lenis + GSAP ScrollTrigger integration
   useEffect(() => {
@@ -49,13 +76,35 @@ function App() {
     };
     lenis.on("scroll", onScroll);
 
-    return () => { lenis.destroy(); gsap.ticker.remove(rafFn); };
+    // Browser-zoom guard: when viewport height changes (Ctrl+±), the pin range
+    // (end: "+=220%") shrinks while scroll position stays put, so the same
+    // pixels of scroll suddenly map to 80 %+ progress — making the cabin vanish.
+    // Fix: if we're still within the hero pin range, snap instantly to 0.
+    const onResize = () => {
+      if (lenis.scroll < window.innerHeight * 2.4) {
+        lenis.scrollTo(0, { immediate: true });
+      }
+    };
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      lenis.destroy();
+      gsap.ticker.remove(rafFn);
+      window.removeEventListener("resize", onResize);
+    };
   }, [mobileMenuOpen]);
 
-  // Show navbar after shutter animation finishes (~2.4 s after open)
+  // When shutter opens: start the fixed sky video in sync with the hero sky video
+  // (both parked at frame 3, both start playing here → zero frame-desync during crossfade)
   useEffect(() => {
     if (!shutterOpen) return;
-    const t = setTimeout(() => setNavVisible(true), 2400);
+    skyVideoRef.current?.play().catch(() => {});
+  }, [shutterOpen]);
+
+  // Show navbar after shutter animation finishes (~1.2 s after open)
+  useEffect(() => {
+    if (!shutterOpen) return;
+    const t = setTimeout(() => setNavVisible(true), 1300);
     return () => clearTimeout(t);
   }, [shutterOpen]);
 
@@ -105,16 +154,22 @@ function App() {
             color: linkColor,
           }}
         >
-          {NAV_LINKS.map((label) => (
-            <a
+          {NAV_LINKS.map(({ label, action }) => (
+            <button
               key={label}
-              href="#"
-              style={{ color: "inherit", textDecoration: "none", transition: "opacity 0.2s" }}
-              onMouseEnter={(e) => ((e.target as HTMLElement).style.opacity = "0.5")}
-              onMouseLeave={(e) => ((e.target as HTMLElement).style.opacity = "1")}
+              onClick={action ?? (() => setIsModalOpen(true))}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                color: "inherit", fontFamily: "inherit",
+                fontWeight: "inherit", fontSize: "inherit",
+                letterSpacing: "inherit", padding: 0,
+                transition: "opacity 0.2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
               {label}
-            </a>
+            </button>
           ))}
         </nav>
 
@@ -213,21 +268,26 @@ function App() {
               gap: "28px",
             }}
           >
-            {NAV_LINKS.map((label) => (
-              <a
+            {NAV_LINKS.map(({ label, action }) => (
+              <button
                 key={label}
-                href="#"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMobileMenuOpen(false);
+                  (action ?? (() => setIsModalOpen(true)))();
+                }}
                 style={{
+                  background: "none", border: "none", cursor: "pointer",
                   fontFamily: "'Urbanist', sans-serif",
                   fontWeight: 700,
                   fontSize: "22px",
                   letterSpacing: "0.04em",
                   color: "rgba(255,255,255,0.85)",
-                  textDecoration: "none",
+                  padding: 0,
                 }}
               >
                 {label}
-              </a>
+              </button>
             ))}
           </nav>
           <button
@@ -250,24 +310,31 @@ function App() {
         </div>
       )}
 
-      {/* ─── Global sky — fixed, drifts via translateX on an oversized element ── */}
-      <div
+      {/* ─── Fixed golden-sky video — same file as the hero oval video.
+           z-index 0 sits behind HeroScene (z-index 1), so the oval in cabin.png
+           shows the HeroScene video (foreground), not this one.  CloudTextSection
+           has a transparent background, so this fixed video shows through there,
+           giving a seamless golden sky from hero → cloud-text section.
+           DemoSection+ are in the z-index 2 wrapper and cover this completely. */}
+      <video
+        ref={skyVideoRef}
+        muted
+        playsInline
+        preload="auto"
         style={{
           position: "fixed",
-          top: "-5%",
-          left: "-8%",
-          width: "116%",
-          height: "110%",
+          top: 0, left: 0, right: 0, bottom: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          objectPosition: "50% 50%",
           zIndex: 0,
-          backgroundImage: "url(/clouds.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "center 35%",
-          animation: "skyDrift 30s ease-in-out infinite",
           willChange: "transform",
         }}
-      />
+      >
+        <source src="/window_behind.mp4" type="video/mp4" />
+      </video>
 
-      {/* ─── Sky sections (transparent — global sky shows through) ─────────── */}
+      {/* ─── Sky sections ────────────────────────────────────────────────────── */}
       <HeroScene onJoinWaitlist={() => setIsModalOpen(true)} shutterOpen={shutterOpen} />
       <CloudTextSection onJoinWaitlist={() => setIsModalOpen(true)} />
 
@@ -276,6 +343,7 @@ function App() {
           so the clouds never bleed through anything below this point.        */}
       <div style={{ position: "relative", zIndex: 2 }}>
         <DemoSection />
+        <div id="about" />
         <ProblemSection />
         <ShiftSection />
         <ProductSection />
@@ -285,6 +353,38 @@ function App() {
         <PurposeSection />
         <BusinessModelSection />
         <DelegationSection />
+        <TeamSection />
+        <FoundersCTASection onJoinWaitlist={() => setIsModalOpen(true)} />
+        <div id="contact" />
+        <ContactSection />
+
+      {/* ─── Contact / Footer divider ───────────────────────────────────────── */}
+      <div
+        style={{
+          background: "#04060c",
+          display: "flex",
+          alignItems: "center",
+          padding: "0",
+          gap: 0,
+        }}
+      >
+        {/* Left line */}
+        <div style={{ flex: 1, height: "1px", background: "rgba(126,206,202,0.18)" }} />
+
+        {/* Plane icon */}
+        <svg
+          width="22" height="22"
+          viewBox="0 0 24 24"
+          fill="#7ECECA"
+          style={{ margin: "0 16px", opacity: 0.7, flexShrink: 0 }}
+          aria-hidden
+        >
+          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+        </svg>
+
+        {/* Right line */}
+        <div style={{ flex: 1, height: "1px", background: "rgba(126,206,202,0.18)" }} />
+      </div>
 
       {/* ─── Footer ─────────────────────────────────────────────────────────── */}
       <footer
@@ -325,9 +425,26 @@ function App() {
             color: "rgba(255,255,255,0.22)",
           }}
         >
-          {["Privacy", "Terms", "Contact"].map((l, i, arr) => (
-            <span key={l} style={{ display: "flex", gap: "24px", alignItems: "center" }}>
-              <a href="#" style={{ color: "inherit", textDecoration: "none" }}>{l}</a>
+          {[
+            { label: "Home",     action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
+            { label: "Waitlist", action: () => setIsModalOpen(true) },
+            { label: "About",    action: () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }) },
+            { label: "Contact",  action: () => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }) },
+          ].map(({ label, action }, i, arr) => (
+            <span key={label} style={{ display: "flex", gap: "24px", alignItems: "center" }}>
+              <button
+                onClick={action}
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "inherit", fontFamily: "inherit",
+                  fontSize: "inherit", letterSpacing: "inherit",
+                  padding: 0,
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.6")}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+              >
+                {label}
+              </button>
               {i < arr.length - 1 && <span style={{ opacity: 0.4 }}>·</span>}
             </span>
           ))}

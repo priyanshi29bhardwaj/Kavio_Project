@@ -158,15 +158,15 @@ export function TrustSection() {
             </svg>
             <span style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700, fontSize: "10px", letterSpacing: "0.32em",
-              color: "rgba(27,74,90,0.55)", textTransform: "uppercase",
+              fontWeight: 800, fontSize: "11px", letterSpacing: "0.30em",
+              color: "#1B4A5A", textTransform: "uppercase",
             }}>Trust</span>
           </div>
 
           {/* Headline */}
           <div ref={head0} style={{
             fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-            fontSize: "clamp(36px, 5.2vw, 70px)",
+            fontSize: "clamp(30px, 4.0vw, 58px)",
             color: "#1B4A5A", lineHeight: 0.98, letterSpacing: "-0.03em",
             marginBottom: "4px",
           }}>
@@ -174,7 +174,7 @@ export function TrustSection() {
           </div>
           <div ref={head1} style={{
             fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-            fontSize: "clamp(36px, 5.2vw, 70px)",
+            fontSize: "clamp(30px, 4.0vw, 58px)",
             color: "#1B4A5A", lineHeight: 0.98, letterSpacing: "-0.03em",
             marginBottom: "4px",
           }}>
@@ -182,7 +182,7 @@ export function TrustSection() {
           </div>
           <div ref={head2} style={{
             fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-            fontSize: "clamp(36px, 5.2vw, 70px)",
+            fontSize: "clamp(30px, 4.0vw, 58px)",
             color: "#7ECECA", lineHeight: 0.98, letterSpacing: "-0.03em",
             marginBottom: "clamp(20px, 3vh, 34px)",
           }}>

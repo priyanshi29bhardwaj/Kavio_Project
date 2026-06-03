@@ -60,17 +60,17 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
         },
       });
 
-      // "matched" → "by" → "AI." stagger into dark teal
+      // "matched" → "by" → "AI." stagger into white
       hl.to([w1.current, w2.current, w3.current], {
-        color: "#1B4A5A",
+        color: "white",
         duration: 0.55,
         stagger: 0.14,
         ease: "power2.out",
       }, 0);
 
-      // subtitle fades to dark teal slightly after
+      // subtitle fades to white slightly after
       hl.to(sublineRef.current, {
-        color: "#1B4A5A",
+        color: "white",
         duration: 0.7,
         ease: "power2.out",
       }, 0.42);
@@ -111,8 +111,8 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
             fontWeight: 800,
-            fontSize: "clamp(12px, 1.1vw, 15px)",
-            letterSpacing: "0.32em",
+            fontSize: "clamp(14px, 1.4vw, 18px)",
+            letterSpacing: "0.28em",
             color: "#1B4A5A",
             textTransform: "uppercase",
             marginBottom: "32px",

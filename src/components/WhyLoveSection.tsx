@@ -209,14 +209,14 @@ export function WhyLoveSection() {
             </svg>
             <span style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700, fontSize: "10px", letterSpacing: "0.32em",
-              color: "rgba(27,74,90,0.55)", textTransform: "uppercase",
+              fontWeight: 800, fontSize: "11px", letterSpacing: "0.30em",
+              color: "#1B4A5A", textTransform: "uppercase",
             }}>Why People Will Love It</span>
           </div>
 
           <div ref={headRef} style={{
             fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-            fontSize: "clamp(26px, 2.8vw, 40px)",
+            fontSize: "clamp(30px, 3.6vw, 52px)",
             color: "#1B4A5A", lineHeight: 1.12, letterSpacing: "-0.03em",
           }}>
             The best travel product isn't the one with{" "}

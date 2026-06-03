@@ -173,8 +173,8 @@ export function ProductSection() {
           </svg>
           <span style={{
             fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 700, fontSize: "10px", letterSpacing: "0.32em",
-            color: "rgba(27,74,90,0.55)", textTransform: "uppercase",
+            fontWeight: 800, fontSize: "11px", letterSpacing: "0.30em",
+            color: "#1B4A5A", textTransform: "uppercase",
           }}>Product</span>
         </div>
 
@@ -182,7 +182,7 @@ export function ProductSection() {
         <div style={{ overflow: "hidden", lineHeight: 1, marginBottom: "3px" }}>
           <div ref={head0} style={{
             fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-            fontSize: "clamp(26px, 3.6vw, 54px)",
+            fontSize: "clamp(32px, 4.2vw, 62px)",
             color: "#1B4A5A", lineHeight: 1.0, letterSpacing: "-0.028em",
           }}>
             From tabs and forms
@@ -191,7 +191,7 @@ export function ProductSection() {
         <div style={{ overflow: "hidden", lineHeight: 1, marginBottom: "16px" }}>
           <div ref={head1} style={{
             fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-            fontSize: "clamp(26px, 3.6vw, 54px)",
+            fontSize: "clamp(32px, 4.2vw, 62px)",
             color: "#7ECECA", lineHeight: 1.0, letterSpacing: "-0.028em",
           }}>
             to one clear decision.
@@ -201,8 +201,8 @@ export function ProductSection() {
         {/* Body */}
         <p ref={bodyRef} style={{
           fontFamily: "'Urbanist', sans-serif",
-          fontWeight: 600, fontSize: "clamp(14px, 1.2vw, 16px)",
-          color: "rgba(27,74,90,0.80)", lineHeight: 1.7,
+          fontWeight: 800, fontSize: "clamp(14px, 1.2vw, 16px)",
+          color: "rgba(27,74,90,0.90)", lineHeight: 1.7,
           margin: "0 0 24px", maxWidth: "540px", opacity: 0,
         }}>
           Instead of forcing you through endless search flows, Kaivo prepares a shortlist
@@ -273,8 +273,8 @@ export function ProductSection() {
                 }}>TWS</div>
                 <div style={{
                   fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 600, fontSize: "10px",
-                  color: "rgba(255,255,255,0.65)", marginTop: "2px",
+                  fontWeight: 800, fontSize: "12px",
+                  color: "rgba(255,255,255,0.90)", marginTop: "2px",
                 }}>The Old Way</div>
               </div>
 
@@ -292,8 +292,9 @@ export function ProductSection() {
               <div style={{ textAlign: "right", minWidth: 0 }}>
                 <div style={{
                   fontFamily: "'Space Grotesk', sans-serif",
-                  fontSize: "7px", letterSpacing: "0.26em",
-                  color: "rgba(255,255,255,0.3)", textTransform: "uppercase",
+                  fontSize: "9px", letterSpacing: "0.26em",
+                  fontWeight: 700,
+                  color: "rgba(255,255,255,0.75)", textTransform: "uppercase",
                   marginBottom: "2px",
                 }}>To</div>
                 <div style={{
@@ -304,8 +305,8 @@ export function ProductSection() {
                 }}>KVO</div>
                 <div style={{
                   fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 500, fontSize: "10px",
-                  color: "rgba(255,255,255,0.55)", marginTop: "2px",
+                  fontWeight: 800, fontSize: "12px",
+                  color: "rgba(255,255,255,0.90)", marginTop: "2px",
                 }}>Better Outcomes</div>
               </div>
             </div>
@@ -350,8 +351,8 @@ export function ProductSection() {
             }}>
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "7.5px", letterSpacing: "0.3em",
-                color: "rgba(27,74,90,0.70)", textTransform: "uppercase",
+                fontWeight: 800, fontSize: "11px", letterSpacing: "0.25em",
+                color: "rgba(27,74,90,0.88)", textTransform: "uppercase",
                 marginBottom: "14px",
               }}>The Old Way</div>
 
@@ -382,8 +383,8 @@ export function ProductSection() {
             <div style={{ padding: "20px 22px", background: "#1B4A5A" }}>
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "7.5px", letterSpacing: "0.3em",
-                color: "rgba(200,228,74,0.65)", textTransform: "uppercase",
+                fontWeight: 800, fontSize: "11px", letterSpacing: "0.25em",
+                color: "#C8E44A", textTransform: "uppercase",
                 marginBottom: "14px",
               }}>With Kaivo</div>
 
@@ -485,8 +486,8 @@ export function ProductSection() {
               </div>
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 600, fontSize: "9px", letterSpacing: "0.14em",
-                color: "rgba(255,255,255,0.72)",
+                fontWeight: 700, fontSize: "12px", letterSpacing: "0.12em",
+                color: "rgba(255,255,255,0.92)",
               }}>
                 Natural-language booking&nbsp;&nbsp;·&nbsp;&nbsp;One review&nbsp;&nbsp;·&nbsp;&nbsp;One approval
               </div>
