@@ -23,6 +23,7 @@ import { JoinWaitlistModal } from "./components/JoinWaitlistModal";
 import { KaivoWordmark } from "./components/KaivoLogo";
 
 gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 const NAV_LINKS = [
   { label: "Home",    action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },

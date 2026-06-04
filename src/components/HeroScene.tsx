@@ -163,7 +163,12 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         position: "relative",
         height: "100vh",
         width: "100%",
+        // overflow:hidden clips the zoom animation on desktop but on mobile
+        // it causes iOS to swallow touch events — use clip instead which
+        // achieves the same visual result without affecting scroll propagation
         overflow: "hidden",
+        WebkitOverflowScrolling: "auto",
+        touchAction: "pan-y",
         isolation: "isolate",
         background: "transparent",
         zIndex: 1,

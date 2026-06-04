@@ -23,6 +23,10 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Allow vertical scroll on all touch devices — prevents iOS from
+     swallowing scroll events on overflow:hidden sections */
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
 }
 
 /* ── Cinematic film grain ─────────────────────────────────────────────────── */
