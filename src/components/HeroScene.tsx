@@ -76,13 +76,21 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const isMobile = window.innerWidth < 768;
+
+      // On mobile: no pin — users scroll freely, animation fires once on enter
+      if (isMobile) {
+        gsap.set([leftRef.current, rightRef.current, ctaRef.current], { opacity: 1 });
+        gsap.set(skyBrandRef.current, { opacity: 0 });
+        return;
+      }
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top top",
-          end: isMobile ? "+=120%" : "+=280%",
+          end: "+=280%",
           pin: true,
-          scrub: isMobile ? 0.6 : 1.4,
+          scrub: 1.4,
           anticipatePin: 1,
           invalidateOnRefresh: true,
         },
