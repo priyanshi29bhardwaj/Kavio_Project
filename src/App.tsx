@@ -344,6 +344,7 @@ function App() {
           objectPosition: "50% 50%",
           zIndex: 0,
           willChange: "transform",
+          pointerEvents: "none",
         }}
       >
         <source src="/window_behind_flipped.mp4" type="video/mp4" />
