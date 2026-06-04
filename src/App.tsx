@@ -59,6 +59,24 @@ function App() {
 
   // Lenis + GSAP ScrollTrigger integration
   useEffect(() => {
+    const isTouchDevice = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+    // On mobile/touch: skip Lenis entirely — native scroll is smoother and
+    // Lenis can interfere with iOS momentum scroll causing the page to shake.
+    // We still need to wire ScrollTrigger to native scroll events.
+    if (isTouchDevice) {
+      const onScroll = () => {
+        const scroll = window.scrollY;
+        ScrollTrigger.update();
+        setNavVisible(scroll > 80);
+        setNavDark(scroll > window.innerHeight * 3.2);
+        if (mobileMenuOpen) setMobileMenuOpen(false);
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      return () => window.removeEventListener("scroll", onScroll);
+    }
+
+    // Desktop: use Lenis for smooth wheel scrolling
     const lenis = new Lenis({
       duration: 1.3,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -77,13 +95,9 @@ function App() {
     };
     lenis.on("scroll", onScroll);
 
-    // Desktop-only browser-zoom guard: when the viewport height changes due to
-    // Ctrl+± zoom, the pin range shrinks while scroll stays put, making the cabin
-    // vanish. Snap to 0 only on desktop (touch devices resize constantly as the
-    // address bar shows/hides, which would snap the page back on every scroll).
+    // Browser-zoom guard (desktop only): snap to top if zoomed while in hero
     const onResize = () => {
-      const isTouchDevice = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-      if (!isTouchDevice && lenis.scroll < window.innerHeight * 2.4) {
+      if (lenis.scroll < window.innerHeight * 2.4) {
         lenis.scrollTo(0, { immediate: true });
       }
     };
