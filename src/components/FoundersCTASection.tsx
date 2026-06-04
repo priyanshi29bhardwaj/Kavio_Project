@@ -54,8 +54,8 @@ export function FoundersCTASection({ onJoinWaitlist }: Props) {
       // Subtext fades up
       .fromTo(subRef.current,
         { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" },
-        "-=0.3"
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" },
+        "-=0.65"
       )
 
       // Button springs in
@@ -138,7 +138,7 @@ export function FoundersCTASection({ onJoinWaitlist }: Props) {
               <span ref={word3Ref} style={{ display: "inline-block", color: "#C8E44A" }}>Start&nbsp;</span>
             </Clip>
             <Clip>
-              <span ref={word4Ref} style={{ display: "inline-block", color: "#E8622A" }}>travelling.</span>
+              <span ref={word4Ref} style={{ display: "inline-block", color: "#C8E44A" }}>travelling.</span>
             </Clip>
           </span>
         </h2>
@@ -159,7 +159,7 @@ export function FoundersCTASection({ onJoinWaitlist }: Props) {
           ref={subRef}
           style={{
             fontFamily: "'Urbanist', sans-serif",
-            fontWeight: 500,
+            fontWeight: 600,
             fontSize: "clamp(16px, 1.7vw, 20px)",
             lineHeight: 1.72,
             color: "rgba(27,74,90,0.65)",

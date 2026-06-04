@@ -77,16 +77,16 @@ export function DemoSection() {
     const el = sectionRef.current;
     if (!el) return;
 
-    el.style.webkitMaskImage = "linear-gradient(180deg, transparent 0%, black 32%)";
-    el.style.maskImage        = "linear-gradient(180deg, transparent 0%, black 32%)";
+    el.style.webkitMaskImage = "linear-gradient(180deg, transparent 0%, black 100%)";
+    el.style.maskImage        = "linear-gradient(180deg, transparent 0%, black 100%)";
 
     const st = ScrollTrigger.create({
       trigger: el,
       start: "top bottom",
-      end:   "top top",
+      end:   "top 20%",
       scrub: true,
       onUpdate: (self) => {
-        const stop = Math.round(32 - self.progress * 32);
+        const stop = Math.round(100 - self.progress * 100);
         const mask = stop > 0
           ? `linear-gradient(180deg, transparent 0%, black ${stop}%)`
           : "none";

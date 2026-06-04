@@ -66,9 +66,12 @@ const TEAM: Member[] = [
   {
     name: "Michael Clark",
     role: "CPO",
-    image: null,
-    logos: [],
-    linkedin: null,
+    image: "/michael.jpg",
+    logos: [
+      { src: "/Mastercard-Logo-PNG10.png", alt: "Mastercard" },
+      { src: "/jp.png",                    alt: "JP Morgan" },
+    ],
+    linkedin: "https://www.linkedin.com/in/mclarkglobal/",
     bio: "Michael brings deep product leadership from the world's most trusted financial platforms. At Mastercard, he led innovation across payment and loyalty products touching hundreds of millions of cardholders globally. At JP Morgan, he shaped platform product strategy at the intersection of fintech and enterprise software. At Kaivo, he's designing the AI-native product experience that makes delegation feel completely effortless.",
   },
 ];
@@ -185,9 +188,9 @@ function TeamCard({ member, delay }: { member: Member; delay: number }) {
                 src={logo.src}
                 alt={logo.alt}
                 style={{
-                  height: logo.alt === "THI Investments" ? "52px" : "36px",
+                  height: logo.alt === "THI Investments" ? "52px" : logo.alt === "JP Morgan" ? "52px" : logo.alt === "Uber" ? "24px" : logo.alt === "IBM" ? "38px" : "36px",
                   width: "auto",
-                  maxWidth: logo.alt === "THI Investments" ? "160px" : "120px",
+                  maxWidth: logo.alt === "THI Investments" ? "160px" : logo.alt === "JP Morgan" ? "160px" : logo.alt === "Uber" ? "80px" : logo.alt === "IBM" ? "140px" : "120px",
                   objectFit: "contain",
                   opacity: 1,
                   filter: logo.alt === "THI Investments" ? "brightness(0)" : "none",

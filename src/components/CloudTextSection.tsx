@@ -89,7 +89,6 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        overflow: "hidden",
         background: "transparent",
         zIndex: 1,
       }}
@@ -222,6 +221,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
           </button>
         </div>
       </div>
+
     </section>
   );
 }

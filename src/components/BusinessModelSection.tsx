@@ -97,6 +97,21 @@ export function BusinessModelSection() {
     return () => ctx.revert();
   }, []);
 
+  const handleBoardHover = () => {
+    gsap.set(oldRefs.current.filter(Boolean),       { rotateX: 0,   transformPerspective: 800, transformOrigin: "center bottom" });
+    gsap.set(newRefs.current.filter(Boolean),       { rotateX: -90, transformPerspective: 800, transformOrigin: "center top" });
+    gsap.set(oldStatusRefs.current.filter(Boolean), { rotateX: 0,   transformPerspective: 800, transformOrigin: "center bottom" });
+    gsap.set(newStatusRefs.current.filter(Boolean), { rotateX: -90, transformPerspective: 800, transformOrigin: "center top" });
+    const ht = gsap.timeline();
+    ROWS.forEach((_, i) => {
+      const at = i * 0.38;
+      ht.to(oldRefs.current[i],       { rotateX: 90, transformPerspective: 800, transformOrigin: "center bottom", duration: 0.22, ease: "power2.in"  }, at);
+      ht.to(oldStatusRefs.current[i], { rotateX: 90, transformPerspective: 800, transformOrigin: "center bottom", duration: 0.22, ease: "power2.in"  }, at);
+      ht.to(newRefs.current[i],       { rotateX: 0,  transformPerspective: 800, transformOrigin: "center top",    duration: 0.22, ease: "power2.out" }, at + 0.18);
+      ht.to(newStatusRefs.current[i], { rotateX: 0,  transformPerspective: 800, transformOrigin: "center top",    duration: 0.22, ease: "power2.out" }, at + 0.18);
+    });
+  };
+
   return (
     <section
       ref={sectionRef}
@@ -191,12 +206,14 @@ export function BusinessModelSection() {
         {/* ── Departure board ──────────────────────────────────────────────── */}
         <div
           ref={boardRef}
+          onMouseEnter={handleBoardHover}
           style={{
             background: "#0f2e3a",
             borderRadius: "12px",
             overflow: "hidden",
             boxShadow: "0 24px 64px rgba(15,46,58,0.22), 0 4px 16px rgba(15,46,58,0.14)",
             opacity: 0,
+            cursor: "default",
           }}
         >
           {/* Board header */}

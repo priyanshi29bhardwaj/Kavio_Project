@@ -109,6 +109,8 @@ function App() {
 
   return (
     <div className="app-root" style={{ fontFamily: "'Urbanist', sans-serif", position: "relative", zIndex: 1 }}>
+      {/* ─── Cinematic film grain ───────────────────────────────────────────── */}
+      <div className="film-grain" />
       {/* ─── Preloader ──────────────────────────────────────────────────────── */}
       <Preloader onComplete={() => setShutterOpen(true)} />
 
@@ -328,7 +330,7 @@ function App() {
           willChange: "transform",
         }}
       >
-        <source src="/window_behind.mp4" type="video/mp4" />
+        <source src="/window_behind_flipped.mp4" type="video/mp4" />
       </video>
 
       {/* ─── Sky sections ────────────────────────────────────────────────────── */}
