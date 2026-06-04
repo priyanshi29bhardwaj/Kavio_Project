@@ -60,11 +60,14 @@ export function DemoSection() {
   const [rect, setRect] = useState({ left: 0, top: 0, width: 0, height: 0 });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [videoVisible, setVideoVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const reposition = useCallback(() => {
     const el = sectionRef.current;
     if (!el) return;
-    setRect(screenRect(el.clientWidth, el.clientHeight));
+    const mobile = window.innerWidth < 768;
+    setIsMobile(mobile);
+    if (!mobile) setRect(screenRect(el.clientWidth, el.clientHeight));
   }, []);
 
   useEffect(() => {
@@ -147,6 +150,75 @@ export function DemoSection() {
     }
   };
 
+  /* ── Mobile layout ── */
+  if (isMobile) {
+    return (
+      <section
+        ref={sectionRef}
+        style={{
+          position: "relative",
+          width: "100%",
+          background: "linear-gradient(180deg, #0c1a24 0%, #1a2f3f 60%, #edf2f4 100%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "60px 20px 0",
+        }}
+      >
+        {/* Label */}
+        <p style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontWeight: 700,
+          fontSize: "10px",
+          letterSpacing: "0.26em",
+          textTransform: "uppercase",
+          color: "rgba(126,206,202,0.7)",
+          marginBottom: "20px",
+          textAlign: "center",
+        }}>
+          See it in action
+        </p>
+
+        {/* Video in a rounded device frame */}
+        <div style={{
+          width: "100%",
+          maxWidth: "380px",
+          borderRadius: "16px",
+          overflow: "hidden",
+          boxShadow: "0 24px 80px rgba(0,0,0,0.55)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          background: "#000",
+        }}>
+          <video
+            ref={videoRef}
+            src="/kavio_ui_ux.mp4"
+            muted
+            autoPlay
+            playsInline
+            loop
+            preload="auto"
+            style={{
+              width: "100%",
+              display: "block",
+              opacity: 1,
+            }}
+          />
+        </div>
+
+        {/* Bottom fade into next section */}
+        <div style={{
+          position: "absolute",
+          bottom: 0, left: 0, right: 0,
+          height: "80px",
+          background: "linear-gradient(to bottom, transparent, #edf2f4)",
+          pointerEvents: "none",
+        }} />
+      </section>
+    );
+  }
+
+  /* ── Desktop layout ── */
   return (
     <section
       ref={sectionRef}
