@@ -72,6 +72,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
   const rightRef    = useRef<HTMLDivElement>(null);
   const ctaRef      = useRef<HTMLDivElement>(null);
   const skyBrandRef = useRef<HTMLDivElement>(null);
+  const ambientRef  = useRef<HTMLAudioElement | null>(null);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -131,6 +132,57 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
     }, sectionRef);
 
     return () => ctx.revert();
+  }, []);
+
+  // ── Ambient airplane sound ────────────────────────────────────────────────
+  // Tries to autoplay immediately. If the browser blocks it (no prior gesture),
+  // starts on the first click or touch instead. Scroll fades it out and stops it.
+  useEffect(() => {
+    const audio = new Audio("/aeoplane_Sound.mp3");
+    audio.loop = true;
+    audio.volume = 0.35;
+    audio.preload = "auto";
+    ambientRef.current = audio;
+
+    const fadeOutAndStop = () => {
+      const step = audio.volume / 20;
+      const fade = setInterval(() => {
+        if (audio.volume > step) {
+          audio.volume = Math.max(0, audio.volume - step);
+        } else {
+          audio.volume = 0;
+          audio.pause();
+          clearInterval(fade);
+        }
+      }, 30);
+    };
+
+    const startAudio = () => {
+      audio.play().catch(() => {});
+      window.addEventListener("scroll", fadeOutAndStop, { passive: true, once: true });
+      ["click", "touchstart"].forEach(e =>
+        window.removeEventListener(e, startAudio)
+      );
+    };
+
+    // Try immediately — works on Firefox, Safari, and Chrome with high MEI
+    audio.play().then(() => {
+      window.addEventListener("scroll", fadeOutAndStop, { passive: true, once: true });
+    }).catch(() => {
+      // Blocked — start on first click or touch (not scroll, so scroll only stops)
+      ["click", "touchstart"].forEach(e =>
+        window.addEventListener(e, startAudio, { once: true, passive: true })
+      );
+    });
+
+    return () => {
+      ["click", "touchstart"].forEach(e =>
+        window.removeEventListener(e, startAudio)
+      );
+      window.removeEventListener("scroll", fadeOutAndStop);
+      audio.pause();
+      audio.src = "";
+    };
   }, []);
 
   // ── Text entrance: runs once after shutter opens ──────────────────────────
@@ -221,7 +273,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         <p style={{
           fontFamily: "'Space Grotesk', sans-serif",
           fontWeight: 700,
-          fontSize: "clamp(13px, 1.4vw, 18px)",
+          fontSize: "clamp(17px, 2vw, 26px)",
           letterSpacing: "0.22em",
           color: "white",
           textTransform: "uppercase",
@@ -254,13 +306,13 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
           position: "absolute",
           right: "4.5%", bottom: "13%",
           zIndex: 30,
-          textAlign: "right", pointerEvents: "none",
+          textAlign: "left", pointerEvents: "none",
         }}
       >
         <p style={{
           fontFamily: "'Urbanist', sans-serif",
           fontWeight: 700,
-          fontSize: "clamp(12px, 1.4vw, 20px)",
+          fontSize: "clamp(17px, 2vw, 28px)",
           lineHeight: 1.2,
           letterSpacing: "0.06em",
           color: "white",
@@ -418,6 +470,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
       }}>
         SCROLL DOWN
       </div>
+
     </section>
   );
 }

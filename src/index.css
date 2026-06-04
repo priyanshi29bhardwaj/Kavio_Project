@@ -213,7 +213,7 @@ h6 {
   }
 
   .hero-mob {
-    display: block;
+    display: flex;
   }
 }
 
