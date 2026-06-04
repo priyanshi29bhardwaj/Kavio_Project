@@ -77,12 +77,13 @@ function App() {
     };
     lenis.on("scroll", onScroll);
 
-    // Browser-zoom guard: when viewport height changes (Ctrl+±), the pin range
-    // (end: "+=220%") shrinks while scroll position stays put, so the same
-    // pixels of scroll suddenly map to 80 %+ progress — making the cabin vanish.
-    // Fix: if we're still within the hero pin range, snap instantly to 0.
+    // Desktop-only browser-zoom guard: when the viewport height changes due to
+    // Ctrl+± zoom, the pin range shrinks while scroll stays put, making the cabin
+    // vanish. Snap to 0 only on desktop (touch devices resize constantly as the
+    // address bar shows/hides, which would snap the page back on every scroll).
     const onResize = () => {
-      if (lenis.scroll < window.innerHeight * 2.4) {
+      const isTouchDevice = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+      if (!isTouchDevice && lenis.scroll < window.innerHeight * 2.4) {
         lenis.scrollTo(0, { immediate: true });
       }
     };
