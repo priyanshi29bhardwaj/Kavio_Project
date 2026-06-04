@@ -75,7 +75,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const isMobile = window.innerWidth < 768;
+      const isMobile = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
       // On mobile: no pin — users scroll freely, animation fires once on enter
       if (isMobile) {
@@ -166,8 +166,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         // overflow:hidden clips the zoom animation on desktop but on mobile
         // it causes iOS to swallow touch events — use clip instead which
         // achieves the same visual result without affecting scroll propagation
-        overflow: "hidden",
-        WebkitOverflowScrolling: "auto",
+        overflow: "clip",
         touchAction: "pan-y",
         isolation: "isolate",
         background: "transparent",
