@@ -11,6 +11,8 @@ interface PreloaderProps {
 // same dark colour as the hero's initial state so the transition is invisible.
 export function Preloader({ onComplete }: PreloaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -21,9 +23,9 @@ export function Preloader({ onComplete }: PreloaderProps) {
       duration: 0.6,
       delay: 0.4,
       ease: "power2.inOut",
-      onComplete,
+      onComplete: () => onCompleteRef.current(),
     });
-  }, [onComplete]);
+  }, []); // run once only — onComplete captured via ref to avoid re-triggering
 
   return (
     <div
