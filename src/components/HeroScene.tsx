@@ -346,7 +346,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         <p style={{
           fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700,
           fontSize: "clamp(17px, 2vw, 26px)", letterSpacing: "0.22em",
-          color: "white", textTransform: "uppercase", margin: "0 0 14px",
+          color: "#C8E44A", textTransform: "uppercase", margin: "0 0 14px",
           textShadow: "0 1px 12px rgba(0,0,0,0.9), 0 2px 24px rgba(0,0,0,0.6)",
         }}>AI-Powered</p>
         <p style={{
@@ -371,7 +371,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         <p style={{
           fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
           fontSize: "clamp(17px, 2vw, 28px)", lineHeight: 1.2,
-          letterSpacing: "0.06em", color: "white", textTransform: "uppercase",
+          letterSpacing: "0.06em", color: "#C8E44A", textTransform: "uppercase",
           margin: "0 0 3px", textShadow: "0 2px 18px rgba(0,0,0,0.65)", whiteSpace: "nowrap",
         }}>Delegate &amp; Approve:</p>
         <p style={{
