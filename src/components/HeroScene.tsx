@@ -230,46 +230,40 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
       }
     };
 
-    // iOS Safari requires new Audio() AND .play() in the same gesture handler
-    const onGesture = () => {
-      const a = new Audio("/aeoplane_Sound.mp3");
-      a.loop = true;
-      a.volume = 0.35;
-      ambientRef.current = a;
-      a.play().catch(() => {});
+    let played = false;
+    const tryPlay = (audio: HTMLAudioElement) => {
+      if (played) return;
+      played = true;
+      audio.play().catch(() => {});
       window.addEventListener("scroll", onScroll, { passive: true });
-      ["click", "touchstart", "touchend"].forEach(e =>
-        document.removeEventListener(e, onGesture)
-      );
+      window.removeEventListener("touchstart", gestureHandler);
+      window.removeEventListener("click",      gestureHandler);
     };
 
-    // Try autoplay first (works on desktop / Android)
+    // Android Chrome: pre-created audio + play in gesture works fine
     const audio = new Audio("/aeoplane_Sound.mp3");
-    audio.loop = true;
-    audio.volume = 0.35;
+    audio.loop    = true;
+    audio.volume  = 0.35;
     audio.preload = "auto";
     ambientRef.current = audio;
 
+    function gestureHandler() { tryPlay(audio); }
+
+    // Try autoplay (desktop / some Android); if blocked wait for tap
     audio.play().then(() => {
+      played = true;
       window.addEventListener("scroll", onScroll, { passive: true });
     }).catch(() => {
-      // Autoplay blocked — wait for first gesture, then create+play fresh instance
-      audio.src = "";
-      ambientRef.current = null;
-      ["click", "touchstart", "touchend"].forEach(e =>
-        document.addEventListener(e, onGesture, { once: true, passive: true })
-      );
+      window.addEventListener("touchstart", gestureHandler, { passive: true });
+      window.addEventListener("click",      gestureHandler, { passive: true });
     });
 
     return () => {
-      ["click", "touchstart", "touchend"].forEach(e =>
-        document.removeEventListener(e, onGesture)
-      );
-      window.removeEventListener("scroll", onScroll);
-      if (ambientRef.current) {
-        ambientRef.current.pause();
-        ambientRef.current.src = "";
-      }
+      window.removeEventListener("touchstart", gestureHandler);
+      window.removeEventListener("click",      gestureHandler);
+      window.removeEventListener("scroll",     onScroll);
+      audio.pause();
+      audio.src = "";
     };
   }, []);
 
