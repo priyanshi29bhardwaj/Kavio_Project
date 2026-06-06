@@ -208,14 +208,20 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
     const isMobile = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     const scrollThreshold = isMobile ? window.innerHeight * 0.8 : 40;
 
-    const fadeOutAndStop = (a: HTMLAudioElement) => {
-      const step = Math.max(a.volume / 20, 0.01);
+    const audio = new Audio("/aeoplane_Sound.mp3");
+    audio.loop    = true;
+    audio.volume  = 0.35;
+    audio.preload = "auto";
+    ambientRef.current = audio;
+
+    const fadeOutAndStop = () => {
+      const step = Math.max(audio.volume / 20, 0.01);
       const fade = setInterval(() => {
-        if (a.volume > step) {
-          a.volume = Math.max(0, a.volume - step);
+        if (audio.volume > step) {
+          audio.volume = Math.max(0, audio.volume - step);
         } else {
-          a.volume = 0;
-          a.pause();
+          audio.volume = 0;
+          audio.pause();
           clearInterval(fade);
         }
       }, 30);
@@ -225,43 +231,39 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
     const onScroll = () => {
       if (!stopped && window.scrollY > scrollThreshold) {
         stopped = true;
-        if (ambientRef.current) fadeOutAndStop(ambientRef.current);
+        fadeOutAndStop();
         window.removeEventListener("scroll", onScroll);
       }
     };
 
-    let played = false;
-    const tryPlay = (audio: HTMLAudioElement) => {
-      if (played) return;
-      played = true;
-      audio.play().catch(() => {});
-      window.addEventListener("scroll", onScroll, { passive: true });
-      window.removeEventListener("touchstart", gestureHandler);
-      window.removeEventListener("click",      gestureHandler);
+    const removeUnlockListeners = () => {
+      document.removeEventListener("touchstart", unlock);
+      document.removeEventListener("touchend",   unlock);
+      document.removeEventListener("click",      unlock);
     };
 
-    // Android Chrome: pre-created audio + play in gesture works fine
-    const audio = new Audio("/aeoplane_Sound.mp3");
-    audio.loop    = true;
-    audio.volume  = 0.35;
-    audio.preload = "auto";
-    ambientRef.current = audio;
+    // Audio unlock pattern: retry play() on every interaction until it resolves
+    const unlock = () => {
+      audio.play().then(() => {
+        removeUnlockListeners();
+        window.addEventListener("scroll", onScroll, { passive: true });
+      }).catch(() => {
+        // still blocked — will retry on next interaction
+      });
+    };
 
-    function gestureHandler() { tryPlay(audio); }
-
-    // Try autoplay (desktop / some Android); if blocked wait for tap
+    // Try autoplay first; if it fails register unlock listeners
     audio.play().then(() => {
-      played = true;
       window.addEventListener("scroll", onScroll, { passive: true });
     }).catch(() => {
-      window.addEventListener("touchstart", gestureHandler, { passive: true });
-      window.addEventListener("click",      gestureHandler, { passive: true });
+      document.addEventListener("touchstart", unlock, { passive: true });
+      document.addEventListener("touchend",   unlock, { passive: true });
+      document.addEventListener("click",      unlock, { passive: true });
     });
 
     return () => {
-      window.removeEventListener("touchstart", gestureHandler);
-      window.removeEventListener("click",      gestureHandler);
-      window.removeEventListener("scroll",     onScroll);
+      removeUnlockListeners();
+      window.removeEventListener("scroll", onScroll);
       audio.pause();
       audio.src = "";
     };
