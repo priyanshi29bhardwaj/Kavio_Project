@@ -206,23 +206,16 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
   // ── Ambient airplane sound (frames 0+1; fades out on scroll past frame 1) ─
   useEffect(() => {
     const isMobile = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-    // On mobile momentum scroll can overshoot 40px instantly; use a full viewport instead
     const scrollThreshold = isMobile ? window.innerHeight * 0.8 : 40;
 
-    const audio = new Audio("/aeoplane_Sound.mp3");
-    audio.loop = true;
-    audio.volume = 0.35;
-    audio.preload = "auto";
-    ambientRef.current = audio;
-
-    const fadeOutAndStop = () => {
-      const step = audio.volume / 20;
+    const fadeOutAndStop = (a: HTMLAudioElement) => {
+      const step = Math.max(a.volume / 20, 0.01);
       const fade = setInterval(() => {
-        if (audio.volume > step) {
-          audio.volume = Math.max(0, audio.volume - step);
+        if (a.volume > step) {
+          a.volume = Math.max(0, a.volume - step);
         } else {
-          audio.volume = 0;
-          audio.pause();
+          a.volume = 0;
+          a.pause();
           clearInterval(fade);
         }
       }, 30);
@@ -232,36 +225,51 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
     const onScroll = () => {
       if (!stopped && window.scrollY > scrollThreshold) {
         stopped = true;
-        fadeOutAndStop();
+        if (ambientRef.current) fadeOutAndStop(ambientRef.current);
         window.removeEventListener("scroll", onScroll);
       }
     };
 
-    const startAudio = () => {
-      audio.play().catch(() => {});
+    // iOS Safari requires new Audio() AND .play() in the same gesture handler
+    const onGesture = () => {
+      const a = new Audio("/aeoplane_Sound.mp3");
+      a.loop = true;
+      a.volume = 0.35;
+      ambientRef.current = a;
+      a.play().catch(() => {});
       window.addEventListener("scroll", onScroll, { passive: true });
       ["click", "touchstart", "touchend"].forEach(e =>
-        document.removeEventListener(e, startAudio)
+        document.removeEventListener(e, onGesture)
       );
     };
 
-    // Try autoplay; if blocked, start on first interaction
-    // Use document (not window) so iOS Safari treats the gesture as trusted
+    // Try autoplay first (works on desktop / Android)
+    const audio = new Audio("/aeoplane_Sound.mp3");
+    audio.loop = true;
+    audio.volume = 0.35;
+    audio.preload = "auto";
+    ambientRef.current = audio;
+
     audio.play().then(() => {
       window.addEventListener("scroll", onScroll, { passive: true });
     }).catch(() => {
+      // Autoplay blocked — wait for first gesture, then create+play fresh instance
+      audio.src = "";
+      ambientRef.current = null;
       ["click", "touchstart", "touchend"].forEach(e =>
-        document.addEventListener(e, startAudio, { once: true, passive: true })
+        document.addEventListener(e, onGesture, { once: true, passive: true })
       );
     });
 
     return () => {
       ["click", "touchstart", "touchend"].forEach(e =>
-        document.removeEventListener(e, startAudio)
+        document.removeEventListener(e, onGesture)
       );
       window.removeEventListener("scroll", onScroll);
-      audio.pause();
-      audio.src = "";
+      if (ambientRef.current) {
+        ambientRef.current.pause();
+        ambientRef.current.src = "";
+      }
     };
   }, []);
 
