@@ -206,7 +206,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
   // ── Ambient airplane sound (frames 0+1; fades out on scroll past frame 1) ─
   useEffect(() => {
     const isMobile = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-    const scrollThreshold = isMobile ? window.innerHeight * 0.8 : 40;
+    const scrollThreshold = isMobile ? window.innerHeight * 0.15 : 40;
 
     const audio = new Audio("/aeoplane_Sound.mp3");
     audio.loop    = true;
