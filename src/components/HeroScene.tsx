@@ -205,6 +205,10 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
 
   // ── Ambient airplane sound (frames 0+1; fades out on scroll past frame 1) ─
   useEffect(() => {
+    const isMobile = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    // On mobile momentum scroll can overshoot 40px instantly; use a full viewport instead
+    const scrollThreshold = isMobile ? window.innerHeight * 0.8 : 40;
+
     const audio = new Audio("/aeoplane_Sound.mp3");
     audio.loop = true;
     audio.volume = 0.35;
@@ -226,7 +230,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
 
     let stopped = false;
     const onScroll = () => {
-      if (!stopped && window.scrollY > 40) {
+      if (!stopped && window.scrollY > scrollThreshold) {
         stopped = true;
         fadeOutAndStop();
         window.removeEventListener("scroll", onScroll);
@@ -236,20 +240,25 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
     const startAudio = () => {
       audio.play().catch(() => {});
       window.addEventListener("scroll", onScroll, { passive: true });
-      ["click", "touchstart"].forEach(e => window.removeEventListener(e, startAudio));
+      ["click", "touchstart", "touchend"].forEach(e =>
+        document.removeEventListener(e, startAudio)
+      );
     };
 
-    // Try autoplay; if blocked, start on first tap/click anywhere
+    // Try autoplay; if blocked, start on first interaction
+    // Use document (not window) so iOS Safari treats the gesture as trusted
     audio.play().then(() => {
       window.addEventListener("scroll", onScroll, { passive: true });
     }).catch(() => {
-      ["click", "touchstart"].forEach(e =>
-        window.addEventListener(e, startAudio, { once: true, passive: true })
+      ["click", "touchstart", "touchend"].forEach(e =>
+        document.addEventListener(e, startAudio, { once: true, passive: true })
       );
     });
 
     return () => {
-      ["click", "touchstart"].forEach(e => window.removeEventListener(e, startAudio));
+      ["click", "touchstart", "touchend"].forEach(e =>
+        document.removeEventListener(e, startAudio)
+      );
       window.removeEventListener("scroll", onScroll);
       audio.pause();
       audio.src = "";
