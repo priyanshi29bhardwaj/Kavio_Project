@@ -207,6 +207,19 @@ h6 {
   display: none;
 }
 
+/* ── Cabin frame layers ─────────────────────────────────────────────────── */
+.cabin-frame-layer {
+  background-size: cover;
+  background-position: 50% 50%;
+}
+
+@media (max-width: 767px) {
+  .cabin-frame-layer {
+    background-size: auto 100%;
+    background-position: 50% 50%;
+  }
+}
+
 @media (max-width: 767px) {
   .hero-side {
     display: none;

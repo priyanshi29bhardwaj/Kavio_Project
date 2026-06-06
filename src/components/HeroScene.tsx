@@ -203,7 +203,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
     }
   }, [shadeComplete]);
 
-  // ── Ambient airplane sound ───────────────────────────────────────────────
+  // ── Ambient airplane sound (frames 0+1; fades out on scroll past frame 1) ─
   useEffect(() => {
     const audio = new Audio("/aeoplane_Sound.mp3");
     audio.loop = true;
@@ -226,7 +226,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
 
     let stopped = false;
     const onScroll = () => {
-      if (!stopped && window.scrollY > window.innerHeight * 2.6) {
+      if (!stopped && window.scrollY > 40) {
         stopped = true;
         fadeOutAndStop();
         window.removeEventListener("scroll", onScroll);
@@ -239,7 +239,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
       ["click", "touchstart"].forEach(e => window.removeEventListener(e, startAudio));
     };
 
-    // Try autoplay — if blocked, start on first interaction
+    // Try autoplay; if blocked, start on first tap/click anywhere
     audio.play().then(() => {
       window.addEventListener("scroll", onScroll, { passive: true });
     }).catch(() => {
@@ -297,12 +297,11 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
       {/* ── z:3 — no_logo_transparent.png — no handle, mask for closed shutter ── */}
       <div
         ref={withoutHandlerRef}
+        className="cabin-frame-layer"
         style={{
           position: "absolute", top: 0, bottom: 0, left: 0, right: 0,
           zIndex: 3,
           backgroundImage: "url(/no_logo_transparent.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "50% 50%",
           willChange: "transform",
         }}
       />
@@ -310,12 +309,11 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
       {/* ── z:4 — cabin.png — clean edges, fades in after shutter opens ── */}
       <div
         ref={cabinRef}
+        className="cabin-frame-layer"
         style={{
           position: "absolute", top: 0, bottom: 0, left: 0, right: 0,
           zIndex: 4,
           backgroundImage: "url(/cabin.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "50% 50%",
           willChange: "transform", opacity: 0,
         }}
       />
