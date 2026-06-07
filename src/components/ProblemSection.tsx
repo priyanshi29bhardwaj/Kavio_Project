@@ -5,14 +5,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 // ── Plane pointing right (flight path decoration) ────────────────────────────
-function PlaneRight({ color = "#7ECECA", size = 17 }: { color?: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true">
-      <g transform="rotate(90 12 12)">
-        <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
-      </g>
-    </svg>
-  );
+function PlaneRight({ size = 17 }: { color?: string; size?: number }) {
+  return <img src="/aeroplane.png" alt="plane" width={size} height={size} style={{ objectFit: "contain" }} />;
 }
 
 // ── Plane pointing up-right (takeoff, used in KAIVO row) ─────────────────────
@@ -187,7 +181,7 @@ export function ProblemSection() {
             lineHeight: 0,
           }}
         >
-          <PlaneRight color="#7ECECA" size={28} />
+          <PlaneRight color="#7ECECA" size={42} />
         </div>
       </div>
 
@@ -260,11 +254,7 @@ export function ProblemSection() {
                 margin: "36px 0 24px",
               }}
             >
-              {/* Animated orange line */}
-              <div
-                ref={dividerLineRef}
-                style={{ width: "36px", height: "1px", background: "#E8622A", flexShrink: 0 }}
-              />
+              <div ref={dividerLineRef} style={{ display: "none" }} />
               {/* Animated sub-headline */}
               <span
                 ref={subheadRef}

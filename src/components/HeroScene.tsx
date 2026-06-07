@@ -449,7 +449,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
             (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 24px rgba(0,0,0,0.35)";
           }}
         >
-          Join the Waitlist <span style={{ fontSize: "15px" }}>✈</span>
+          Join the Waitlist
         </button>
       </div>
 

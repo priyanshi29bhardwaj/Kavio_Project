@@ -204,12 +204,7 @@ export function DelegationSection() {
               }}>Delegation is the future.</div>
             </div>
 
-            {/* Lime divider */}
-            <div ref={divRef} style={{
-              width: "44px", height: "2px",
-              background: "linear-gradient(to right, #C8E44A, rgba(200,228,74,0.3))",
-              borderRadius: "1px",
-            }} />
+            <div ref={divRef} style={{ display: "none" }} />
 
             {/* Body */}
             <p ref={bodyRef} style={{
