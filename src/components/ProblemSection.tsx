@@ -181,7 +181,7 @@ export function ProblemSection() {
             lineHeight: 0,
           }}
         >
-          <PlaneRight color="#7ECECA" size={42} />
+          <PlaneRight color="#7ECECA" size={28} />
         </div>
       </div>
 

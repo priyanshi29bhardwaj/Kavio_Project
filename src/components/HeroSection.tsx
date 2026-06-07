@@ -132,7 +132,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ triggerReveal, onJoinW
           ref={(el) => { if (el) headingRefs.current[5] = el; }}
           className="text-lg md:text-xl font-light leading-relaxed text-brand-teal/80 opacity-0"
         >
-          Just better travel decisions –{" "}
+          Just better travel decisions{" "}
           <span className="text-brand-potato font-semibold">handled for you</span>.
         </p>
 

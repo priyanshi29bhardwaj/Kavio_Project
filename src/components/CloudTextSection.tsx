@@ -186,7 +186,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
               textShadow: "0 1px 14px rgba(0,0,0,0.9), 0 2px 28px rgba(0,0,0,0.65)",
             }}
           >
-            Just better travel decisions — handled for you.
+            Just better travel decisions handled for you.
           </p>
         </div>
 
