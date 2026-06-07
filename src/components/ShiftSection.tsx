@@ -331,7 +331,7 @@ export function ShiftSection() {
               padding: "2px 7px",
               borderRadius: "3px",
             }}>
-              In 60 seconds — it's done.
+              In 60 seconds it's done.
             </strong>
           </p>
 
