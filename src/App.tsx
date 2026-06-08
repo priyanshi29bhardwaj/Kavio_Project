@@ -210,9 +210,12 @@ function App() {
             onMouseEnter={(e) => {
               const btn = e.currentTarget;
               btn.style.background = navDark ? "#1B4A5A" : "rgba(255,255,255,0.14)";
+              if (navDark) btn.style.color = "white";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
+              const btn = e.currentTarget;
+              btn.style.background = "transparent";
+              btn.style.color = navDark ? "#1B4A5A" : "white";
             }}
           >
             Join Waitlist

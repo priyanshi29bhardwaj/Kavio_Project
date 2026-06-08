@@ -109,13 +109,13 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
           ref={taglineRef}
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 800,
-            fontSize: "clamp(14px, 1.4vw, 18px)",
+            fontWeight: 900,
+            fontSize: "clamp(15px, 1.6vw, 20px)",
             letterSpacing: "0.28em",
             color: "#1B4A5A",
             textTransform: "uppercase",
             marginBottom: "32px",
-            textShadow: "0 2px 16px rgba(0,0,0,0.85), 0 0 32px rgba(0,0,0,0.6)",
+            textShadow: "0 2px 24px rgba(0,0,0,0.30), 0 0 48px rgba(0,0,0,0.18)",
           }}
         >
           Stop Doing. Start Delegating.
@@ -131,7 +131,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
               lineHeight: 1.06,
               color: "white",
               margin: "0 0 18px",
-              textShadow: "0 2px 20px rgba(0,0,0,0.75), 0 4px 48px rgba(0,0,0,0.45)",
+              textShadow: "0 2px 28px rgba(0,0,0,0.28), 0 4px 56px rgba(0,0,0,0.18)",
             }}
           >
             Your perfect flight,{" "}
@@ -146,10 +146,10 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
           <p
             style={{
               fontFamily: "'Urbanist', sans-serif",
-              fontWeight: 600,
+              fontWeight: 800,
               fontSize: "clamp(15px, 2vw, 22px)",
               margin: "0 0 10px",
-              textShadow: "0 2px 14px rgba(0,0,0,0.75)",
+              textShadow: "0 2px 22px rgba(0,0,0,0.25)",
             }}
           >
             <span ref={sublineRef}>
@@ -163,13 +163,13 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
           <p
             style={{
               fontFamily: "'Urbanist', sans-serif",
-              fontWeight: 600,
+              fontWeight: 800,
               fontSize: "clamp(15px, 1.6vw, 19px)",
               color: "rgba(255,255,255,0.96)",
               lineHeight: 1.8,
               margin: "22px auto 10px",
               maxWidth: "520px",
-              textShadow: "0 1px 14px rgba(0,0,0,0.9), 0 2px 28px rgba(0,0,0,0.65)",
+              textShadow: "0 1px 20px rgba(0,0,0,0.22), 0 2px 36px rgba(0,0,0,0.14)",
             }}
           >
             No endless searching. No second-guessing. No admin overload.
@@ -177,13 +177,13 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
           <p
             style={{
               fontFamily: "'Urbanist', sans-serif",
-              fontWeight: 600,
+              fontWeight: 800,
               fontSize: "clamp(15px, 1.6vw, 19px)",
               color: "rgba(255,255,255,0.90)",
               lineHeight: 1.8,
               margin: "0 auto 40px",
               maxWidth: "520px",
-              textShadow: "0 1px 14px rgba(0,0,0,0.9), 0 2px 28px rgba(0,0,0,0.65)",
+              textShadow: "0 1px 20px rgba(0,0,0,0.22), 0 2px 36px rgba(0,0,0,0.14)",
             }}
           >
             Just better travel decisions handled for you.
