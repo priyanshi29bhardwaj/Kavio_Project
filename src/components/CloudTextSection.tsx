@@ -27,9 +27,13 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
     const ctx = gsap.context(() => {
 
       // ── Phase 1: whole block fades + rises in — text starts neutral white ──
-      gsap.fromTo(
+      // Use gsap.set first so elements are hidden before first paint, then animate in.
+      gsap.set(
         [taglineRef.current, headRef.current, subRef.current, ctaRef.current],
-        { opacity: 0, y: 52, filter: "blur(10px)" },
+        { opacity: 0, y: 52, filter: "blur(10px)" }
+      );
+      gsap.to(
+        [taglineRef.current, headRef.current, subRef.current, ctaRef.current],
         {
           opacity: 1,
           y: 0,
@@ -108,6 +112,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
         <div
           ref={taglineRef}
           style={{
+            opacity: 0,
             fontFamily: "'Space Grotesk', sans-serif",
             fontWeight: 900,
             fontSize: "clamp(15px, 1.6vw, 20px)",
@@ -122,7 +127,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
         </div>
 
         {/* Headline */}
-        <div ref={headRef}>
+        <div ref={headRef} style={{ opacity: 0 }}>
           <h1
             style={{
               fontFamily: "'Urbanist', sans-serif",
@@ -159,7 +164,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
         </div>
 
         {/* Supporting copy */}
-        <div ref={subRef}>
+        <div ref={subRef} style={{ opacity: 0 }}>
           <p
             style={{
               fontFamily: "'Urbanist', sans-serif",
@@ -191,7 +196,7 @@ export function CloudTextSection({ onJoinWaitlist }: CloudTextSectionProps) {
         </div>
 
         {/* CTA */}
-        <div ref={ctaRef}>
+        <div ref={ctaRef} style={{ opacity: 0 }}>
           <button
             onClick={onJoinWaitlist}
             style={{
