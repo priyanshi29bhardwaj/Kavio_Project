@@ -136,7 +136,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
   const skyBrandRef       = useRef<HTMLDivElement>(null);
   const ambientRef        = useRef<HTMLAudioElement | null>(null);
 
-  const [shadeComplete, setShadeComplete] = useState(false);
+  const [, setShadeComplete] = useState(false);
 
   // ── Midpoint swap: instantly switch frames while the shade is still moving ──
   // The shade is covering this area at 50% travel, so the crossfade is invisible.
