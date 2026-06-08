@@ -50,29 +50,48 @@ function Shutter({ open }: { open: boolean }) {
 }
 
 // ─── WindowShade ──────────────────────────────────────────────────────────────
-// slide.png slides UP through the transparent oval in WithoutHandler.png,
-// revealing the App.tsx fixed sky video behind it.
-
 interface WindowShadeProps {
   open: boolean;
   onShadeComplete?: () => void;
+  onShadeMidpoint?: () => void; // fires at ~50% of slide travel — swap frames here
 }
 
-function WindowShade({ open, onShadeComplete }: WindowShadeProps) {
+function WindowShade({ open, onShadeComplete, onShadeMidpoint }: WindowShadeProps) {
   const controls = useAnimation();
+  const shadeRef = useRef<HTMLDivElement>(null);
+  const completedRef = useRef(false);
+  const midpointRef  = useRef(false);
 
   useEffect(() => {
     if (!open) return;
+
+    const DURATION = 1.5; // faster: was 2.0
+    const DELAY    = 2.3;
+
+    // Fire midpoint callback at exactly 50% of travel — this is where we swap
+    // WithoutHandler → cabin.png so it's hidden under the still-moving shade
+    const midTimer = setTimeout(() => {
+      if (!midpointRef.current) {
+        midpointRef.current = true;
+        onShadeMidpoint?.();
+      }
+    }, (DELAY + DURATION * 0.50) * 1000);
+
     controls
       .start({
         y: "-100%",
-        transition: { duration: 2.0, ease: [0.76, 0, 0.24, 1], delay: 2.3 },
+        transition: { duration: DURATION, ease: [0.76, 0, 0.24, 1], delay: DELAY },
       })
-      .then(() => onShadeComplete?.());
+      .then(() => {
+        if (shadeRef.current) shadeRef.current.style.display = "none";
+        if (!completedRef.current) {
+          completedRef.current = true;
+          onShadeComplete?.();
+        }
+      });
 
-    const earlySwap = setTimeout(() => onShadeComplete?.(), 3500);
-    return () => clearTimeout(earlySwap);
-  }, [open, controls, onShadeComplete]);
+    return () => clearTimeout(midTimer);
+  }, [open, controls, onShadeComplete, onShadeMidpoint]);
 
   return (
     <div
@@ -82,6 +101,7 @@ function WindowShade({ open, onShadeComplete }: WindowShadeProps) {
       }}
     >
       <motion.div
+        ref={shadeRef}
         animate={controls}
         initial={{ y: "0%" }}
         style={{
@@ -117,6 +137,20 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
   const ambientRef        = useRef<HTMLAudioElement | null>(null);
 
   const [shadeComplete, setShadeComplete] = useState(false);
+
+  // ── Midpoint swap: instantly switch frames while the shade is still moving ──
+  // The shade is covering this area at 50% travel, so the crossfade is invisible.
+  // No opacity fade needed — just a hard instant swap.
+  const handleShadeMidpoint = () => {
+    if (cabinRef.current) {
+      cabinRef.current.style.transition = "none";
+      cabinRef.current.style.opacity = "1";
+    }
+    if (withoutHandlerRef.current) {
+      withoutHandlerRef.current.style.transition = "none";
+      withoutHandlerRef.current.style.opacity = "0";
+    }
+  };
 
   // ── Scroll-driven zoom ───────────────────────────────────────────────────
   useLayoutEffect(() => {
@@ -187,23 +221,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
       .to(ctaRef.current,   { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.2, ease: "power2.out" }, 0.8);
   }, [shutterOpen]);
 
-  // ── Swap to cabin.png after shade has fully slid up ─────────────────────
-  useEffect(() => {
-    if (!shadeComplete) return;
-    // cabin.png fades in first
-    if (cabinRef.current) {
-      cabinRef.current.style.transition = "opacity 0.3s ease";
-      cabinRef.current.style.opacity = "1";
-    }
-    // Then fade out no_logo_transparent.png AFTER cabin.png is fully opaque
-    // so the dark ring disappears without any flash
-    if (withoutHandlerRef.current) {
-      withoutHandlerRef.current.style.transition = "opacity 0.3s ease 0.3s";
-      withoutHandlerRef.current.style.opacity = "0";
-    }
-  }, [shadeComplete]);
-
-  // ── Ambient airplane sound (frames 0+1; fades out on scroll past frame 1) ─
+  // ── Ambient airplane sound ───────────────────────────────────────────────
   useEffect(() => {
     const isMobile = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     const scrollThreshold = isMobile ? window.innerHeight * 0.15 : 40;
@@ -242,17 +260,13 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
       document.removeEventListener("click",      unlock);
     };
 
-    // Audio unlock pattern: retry play() on every interaction until it resolves
     const unlock = () => {
       audio.play().then(() => {
         removeUnlockListeners();
         window.addEventListener("scroll", onScroll, { passive: true });
-      }).catch(() => {
-        // still blocked — will retry on next interaction
-      });
+      }).catch(() => {});
     };
 
-    // Try autoplay first; if it fails register unlock listeners
     audio.play().then(() => {
       window.addEventListener("scroll", onScroll, { passive: true });
     }).catch(() => {
@@ -279,20 +293,10 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         overflow: "clip",
         touchAction: "pan-y",
         isolation: "isolate",
-        background: "transparent", // App.tsx fixed sky video shows through
+        background: "transparent",
         zIndex: 1,
       }}
     >
-      {/*
-        LAYER STACK (bottom → top):
-        App.tsx fixed sky video (z:0) — visible through transparent section + transparent oval
-        z:2  shade wrapper   — slide.png slides UP through the oval, covers the sky initially
-        z:3  WithoutHandler.png — cabin frame; transparent oval = natural mask for shade below
-        z:4  cabin.png       — fades in after shade is gone
-        z:5  vignette
-        z:30 UI / text / CTA
-      */}
-
       {/* ── z:2 — Window shade (slide.png slides up on open) ── */}
       <div
         ref={shadeWrapperRef}
@@ -303,11 +307,12 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
       >
         <WindowShade
           open={shutterOpen}
+          onShadeMidpoint={handleShadeMidpoint}
           onShadeComplete={() => setShadeComplete(true)}
         />
       </div>
 
-      {/* ── z:3 — no_logo_transparent.png — no handle, mask for closed shutter ── */}
+      {/* ── z:3 — no_logo_transparent.png — mask for closed shutter ── */}
       <div
         ref={withoutHandlerRef}
         className="cabin-frame-layer"
@@ -319,7 +324,7 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
         }}
       />
 
-      {/* ── z:4 — cabin.png — clean edges, fades in after shutter opens ── */}
+      {/* ── z:4 — cabin.png — instant swap mid-animation ── */}
       <div
         ref={cabinRef}
         className="cabin-frame-layer"
@@ -330,7 +335,6 @@ export function HeroScene({ onJoinWaitlist, shutterOpen }: HeroSceneProps) {
           willChange: "transform", opacity: 0,
         }}
       />
-
 
       {/* ── z:5 — Vignette ── */}
       <div
