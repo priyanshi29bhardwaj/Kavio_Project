@@ -256,7 +256,7 @@ export function ProblemSection() {
     const ctx = gsap.context(() => {
 
       const headlines = headlineInners.current.filter(Boolean);
-      const rowEls    = rowRefs.current.filter(Boolean);
+      const rowEls    = rowRefs.current.filter((el): el is HTMLDivElement => el !== null);
 
       /* ════════════════ MOBILE: original simple reveals ════════════════ */
       if (isMobile) {
