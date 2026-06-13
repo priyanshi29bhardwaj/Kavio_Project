@@ -1,13 +1,8 @@
-import { useRef, useLayoutEffect } from "react";
+import { useRef, useLayoutEffect, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
-
-// ── Plane pointing right (flight path decoration) ────────────────────────────
-function PlaneRight({ size = 17 }: { color?: string; size?: number }) {
-  return <img src="/aeroplane.png" alt="plane" width={size} height={size} style={{ objectFit: "contain" }} />;
-}
 
 // ── Plane pointing up-right (takeoff, used in KAIVO row) ─────────────────────
 function PlaneTakeoff({ color = "#C8E44A", size = 13 }: { color?: string; size?: number }) {
@@ -19,19 +14,225 @@ function PlaneTakeoff({ color = "#C8E44A", size = 13 }: { color?: string; size?:
 }
 
 const rows = [
-  { tool: "Search",               desc: "Browse and filter everything yourself.",            isKaivo: false },
-  { tool: "Online Travel Agents", desc: "Compare endlessly, then book manually.",            isKaivo: false },
-  { tool: "AI Chat",              desc: "Get answers — then start booking from scratch.",    isKaivo: false },
-  { tool: "Kaivo",                desc: "Get matched, approve once, and move on.",           isKaivo: true  },
+  { tool: "Search",               desc: "Browse and filter everything yourself.",            status: "DELAYED",  isKaivo: false },
+  { tool: "Online Travel Agents", desc: "Compare endlessly, then book manually.",            status: "DELAYED",  isKaivo: false },
+  { tool: "AI Chat",              desc: "Get answers — then start booking from scratch.",    status: "DELAYED",  isKaivo: false },
+  { tool: "Kaivo",                desc: "Get matched, approve once, and move on.",           status: "BOARDING", isKaivo: true  },
 ];
+
+/* ────────────────────────────────────────────────────────────────────────────
+   CHAOS CARDS — the booking-junk storm. Each is a small fake UI fragment.
+   Shared styling helpers keep them on-palette.                              */
+
+const NAVY  = "#1B4A5A";
+const LIME  = "#C8E44A";
+const ORANGE = "#E8622A";
+const TEAL  = "#7ECECA";
+
+const chipStyle: React.CSSProperties = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontSize: "9px",
+  fontWeight: 700,
+  letterSpacing: "0.04em",
+  padding: "3px 8px",
+  borderRadius: "100px",
+  border: `1px solid rgba(27,74,90,0.25)`,
+  color: NAVY,
+  whiteSpace: "nowrap",
+};
+
+const cardBase: React.CSSProperties = {
+  position: "absolute",
+  background: "white",
+  border: "1px solid rgba(27,74,90,0.14)",
+  borderRadius: "8px",
+  boxShadow: "0 14px 38px rgba(27,74,90,0.16)",
+  fontFamily: "'Urbanist', sans-serif",
+  color: NAVY,
+  pointerEvents: "none",
+  userSelect: "none",
+  zIndex: 20,
+  willChange: "transform, opacity",
+};
+
+const cardTitle: React.CSSProperties = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontSize: "9px",
+  fontWeight: 700,
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+  color: "rgba(27,74,90,0.55)",
+  marginBottom: "8px",
+};
+
+function FakeTabBar() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px" }}>
+      {[ORANGE, LIME, TEAL].map((c) => (
+        <span key={c} style={{ width: 7, height: 7, borderRadius: "50%", background: c, opacity: 0.8 }} />
+      ))}
+      <div style={{ flex: 1, height: 6, borderRadius: 3, background: "rgba(27,74,90,0.08)" }} />
+    </div>
+  );
+}
+
+/* Card definitions: pos in % of section, rotation deg, width px */
+const CHAOS = [
+  {
+    top: "6%", left: "4%", rot: -7, w: 230,
+    node: (
+      <>
+        <FakeTabBar />
+        <div style={{ fontWeight: 800, fontSize: "12.5px", marginBottom: 4 }}>23 tabs open</div>
+        <div style={{ fontSize: "11px", color: "rgba(27,74,90,0.65)", fontWeight: 600 }}>
+          cheap-flights-NYC-final-v2 …
+        </div>
+      </>
+    ),
+  },
+  {
+    top: "10%", left: "70%", rot: 5, w: 240,
+    node: (
+      <>
+        <div style={cardTitle}>Price comparison</div>
+        <div style={{ display: "flex", gap: "10px", fontWeight: 800, fontSize: "14px" }}>
+          <span>$432</span>
+          <span style={{ color: ORANGE }}>$429</span>
+          <span>$431</span>
+        </div>
+        <div style={{ fontSize: "10.5px", fontWeight: 600, color: "rgba(27,74,90,0.6)", marginTop: 4 }}>
+          …same flight, three sites
+        </div>
+      </>
+    ),
+  },
+  {
+    top: "30%", left: "12%", rot: 4, w: 215,
+    node: (
+      <>
+        <div style={cardTitle}>Filters</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+          <span style={chipStyle}>Nonstop</span>
+          <span style={chipStyle}>1 stop</span>
+          <span style={{ ...chipStyle, borderColor: ORANGE, color: ORANGE }}>2+ stops?</span>
+          <span style={chipStyle}>Morning</span>
+          <span style={chipStyle}>Red-eye</span>
+        </div>
+      </>
+    ),
+  },
+  {
+    top: "55%", left: "5%", rot: -5, w: 235,
+    node: (
+      <>
+        <div style={{ fontWeight: 800, fontSize: "12.5px", marginBottom: 6 }}>⚠ Session expired</div>
+        <div style={{ fontSize: "11px", fontWeight: 600, color: "rgba(27,74,90,0.65)" }}>
+          Please re-enter passenger details to continue.
+        </div>
+      </>
+    ),
+  },
+  {
+    top: "72%", left: "22%", rot: 6, w: 220,
+    node: (
+      <>
+        <div style={cardTitle}>Baggage rules</div>
+        <div style={{ fontSize: "11.5px", fontWeight: 700 }}>
+          Carry-on: 7kg? 8kg? 10kg?
+        </div>
+        <div style={{ fontSize: "10.5px", fontWeight: 600, color: ORANGE, marginTop: 4 }}>
+          Depends on fare class…
+        </div>
+      </>
+    ),
+  },
+  {
+    top: "48%", left: "76%", rot: -6, w: 225,
+    node: (
+      <>
+        <div style={{ fontWeight: 800, fontSize: "12px", marginBottom: 6 }}>We value your privacy 🍪</div>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <span style={{ ...chipStyle, background: NAVY, color: "white", border: "none" }}>Accept all</span>
+          <span style={chipStyle}>Manage 312 partners</span>
+        </div>
+      </>
+    ),
+  },
+  {
+    top: "70%", left: "66%", rot: 8, w: 230,
+    node: (
+      <>
+        <div style={cardTitle}>Price alert</div>
+        <div style={{ fontWeight: 800, fontSize: "12.5px", color: ORANGE }}>
+          Prices went up 12% ↑
+        </div>
+        <div style={{ fontSize: "10.5px", fontWeight: 600, color: "rgba(27,74,90,0.6)", marginTop: 4 }}>
+          Book now to avoid further increases
+        </div>
+      </>
+    ),
+  },
+  {
+    top: "26%", left: "44%", rot: -3, w: 250,
+    node: (
+      <>
+        <div style={cardTitle}>AI Chat</div>
+        <div style={{
+          background: "rgba(126,206,202,0.14)",
+          borderRadius: "8px 8px 8px 2px",
+          padding: "8px 10px",
+          fontSize: "11px",
+          fontWeight: 600,
+          lineHeight: 1.5,
+        }}>
+          Here are 15 options you could consider! Would you like me to list 15 more?
+        </div>
+      </>
+    ),
+  },
+  {
+    top: "58%", left: "42%", rot: 3, w: 210,
+    node: (
+      <>
+        <div style={cardTitle}>Verify you're human</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 3 }}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} style={{
+              height: 22,
+              borderRadius: 3,
+              background: i === 4 ? "rgba(200,228,74,0.45)" : "rgba(27,74,90,0.08)",
+            }} />
+          ))}
+        </div>
+        <div style={{ fontSize: "10px", fontWeight: 600, color: "rgba(27,74,90,0.55)", marginTop: 5 }}>
+          Select all squares with traffic lights
+        </div>
+      </>
+    ),
+  },
+  {
+    top: "8%", left: "33%", rot: 9, w: 200,
+    node: (
+      <>
+        <div style={cardTitle}>Seat map</div>
+        <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
+          {Array.from({ length: 14 }).map((_, i) => (
+            <span key={i} style={{
+              width: 13, height: 13, borderRadius: 3,
+              background: i % 5 === 0 ? "rgba(232,98,42,0.5)" : "rgba(27,74,90,0.10)",
+            }} />
+          ))}
+        </div>
+        <div style={{ fontSize: "10px", fontWeight: 700, color: ORANGE, marginTop: 5 }}>
+          Window seats: +$47
+        </div>
+      </>
+    ),
+  },
+] as const;
 
 export function ProblemSection() {
   const sectionRef      = useRef<HTMLElement>(null);
-
-  // flight path
-  const lineContRef     = useRef<HTMLDivElement>(null);
-  const lineRef         = useRef<HTMLDivElement>(null);
-  const planeRef        = useRef<HTMLDivElement>(null);
 
   // left-column text
   const badgeRef        = useRef<HTMLDivElement>(null);
@@ -40,109 +241,126 @@ export function ProblemSection() {
   const subheadRef      = useRef<HTMLSpanElement>(null);
   const bodyRef         = useRef<HTMLParagraphElement>(null);
 
-  // table
+  // table + chaos
   const rowRefs         = useRef<(HTMLDivElement | null)[]>([]);
+  const chaosRefs       = useRef<(HTMLDivElement | null)[]>([]);
+
+  const [isMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    // noop — isMobile fixed at mount; resize across breakpoint requires reload,
+    // same trade-off the rest of the site makes.
+  }, []);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
 
-      // ── 1. Dashed flight-path + plane ───────────────────────────────────
-      const cont  = lineContRef.current;
-      const line  = lineRef.current;
-      const plane = planeRef.current;
+      const headlines = headlineInners.current.filter(Boolean);
+      const rowEls    = rowRefs.current.filter(Boolean);
 
-      if (cont && line && plane) {
-        gsap.set(line,  { clipPath: "inset(0 100% 0 0)" });
-        gsap.set(plane, { x: 0 });
+      /* ════════════════ MOBILE: original simple reveals ════════════════ */
+      if (isMobile) {
+        const trigger = { trigger: sectionRef.current, start: "top 65%" };
 
-        // End x = full container width minus the plane icon's own width (28px)
-        // so the plane's right tip lands exactly at the line's right edge
-        const endX = cont.offsetWidth - (plane.offsetWidth || 28);
+        gsap.fromTo(badgeRef.current, { opacity: 0, y: 18 },
+          { opacity: 1, y: 0, duration: 0.7, ease: "power2.out", scrollTrigger: trigger });
 
-        gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 88%",
-            end:   "top 25%",
-            scrub: 1,
-          },
-        })
-          .to(line,  { clipPath: "inset(0 0% 0 0)", ease: "none" })
-          .to(plane, { x: endX,                      ease: "none" }, 0);
+        gsap.fromTo(headlines, { y: "110%" },
+          { y: "0%", stagger: 0.09, duration: 0.85, ease: "power4.out", scrollTrigger: trigger });
+
+        gsap.fromTo(subheadRef.current, { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.65, ease: "power2.out",
+            scrollTrigger: { trigger: sectionRef.current, start: "top 55%" } });
+
+        gsap.fromTo(bodyRef.current, { opacity: 0, filter: "blur(7px)", y: 18 },
+          { opacity: 1, filter: "blur(0px)", y: 0, duration: 1.1, ease: "power2.out",
+            scrollTrigger: { trigger: bodyRef.current, start: "top 88%" } });
+
+        gsap.fromTo(rowEls, { opacity: 0, x: 28 },
+          { opacity: 1, x: 0, stagger: 0.13, duration: 0.65, ease: "power2.out",
+            scrollTrigger: { trigger: rowRefs.current[0], start: "top 85%" } });
+        return;
       }
 
-      const trigger = { trigger: sectionRef.current, start: "top 65%" };
+      /* ════════════════ DESKTOP: pinned tab-storm timeline ════════════════ */
+      const section = sectionRef.current!;
+      const chaos   = chaosRefs.current.filter(Boolean) as HTMLDivElement[];
 
-      // ── 2. Badge — simple fade-up ────────────────────────────────────────
-      gsap.fromTo(
-        badgeRef.current,
-        { opacity: 0, y: 18 },
-        { opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-          scrollTrigger: trigger }
-      );
+      // Idle drift — floats the card's inner wrapper so it never fights the
+      // storm timeline (which transforms the outer card element).
+      chaos.forEach((card, i) => {
+        const inner = card.firstElementChild;
+        if (!inner) return;
+        gsap.to(inner, {
+          y: `+=${10 + (i % 3) * 5}`,
+          rotation: `+=${i % 2 === 0 ? 2 : -2}`,
+          duration: 2.2 + (i % 4) * 0.45,
+          yoyo: true,
+          repeat: -1,
+          ease: "sine.inOut",
+        });
+      });
 
-      // ── 3. Headlines — clip reveal (text slides up from under hidden edge) ─
-      //   Each h2 starts at y:110% inside an overflow:hidden wrapper → slides to y:0
-      gsap.fromTo(
-        headlineInners.current.filter(Boolean),
-        { y: "110%" },
-        {
-          y: "0%",
-          stagger: 0.09,
-          duration: 0.85,
-          ease: "power4.out",
-          scrollTrigger: trigger,
-        }
-      );
+      // Real content starts hidden
+      gsap.set(badgeRef.current, { opacity: 0, y: 18 });
+      gsap.set(headlines, { y: "110%" });
+      gsap.set(subheadRef.current, { opacity: 0, y: 14 });
+      gsap.set(bodyRef.current, { opacity: 0, filter: "blur(7px)", y: 18 });
+      gsap.set(rowEls, { opacity: 0, x: 28 });
 
-      // ── 4. Orange divider line — draws in left→right ─────────────────────
-      gsap.fromTo(
-        dividerLineRef.current,
-        { scaleX: 0, transformOrigin: "left center" },
-        {
-          scaleX: 1, duration: 0.55, ease: "power2.inOut",
-          scrollTrigger: { trigger: sectionRef.current, start: "top 58%" },
-        }
-      );
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "+=160%",
+          pin: true,
+          scrub: 1,
+          anticipatePin: 1,
+        },
+      });
 
-      // ── 5. Sub-headline — fades up after the line ────────────────────────
-      gsap.fromTo(
-        subheadRef.current,
-        { opacity: 0, y: 14 },
-        {
-          opacity: 1, y: 0, duration: 0.65, ease: "power2.out",
-          scrollTrigger: { trigger: sectionRef.current, start: "top 55%" },
-        }
-      );
+      // Phase 1 — the storm tidies itself: every junk card glides to the
+      // comparison table, straightens out, and stacks onto its row slot —
+      // chaos physically reorganizing into the clean answer.
+      gsap.set(rowEls, { opacity: 0, x: 0 }); // rows wait in place (no slide)
 
-      // ── 6. Body — blur-to-sharp reveal ───────────────────────────────────
-      gsap.fromTo(
-        bodyRef.current,
-        { opacity: 0, filter: "blur(7px)", y: 18 },
-        {
-          opacity: 1, filter: "blur(0px)", y: 0,
-          duration: 1.1, ease: "power2.out",
-          scrollTrigger: { trigger: bodyRef.current, start: "top 88%" },
-        }
-      );
+      chaos.forEach((card, i) => {
+        const slot = i % rowEls.length; // 10 cards distributed over 4 rows
+        tl.to(card, {
+          x: () => {
+            const tr = rowEls[slot].getBoundingClientRect();
+            const cr = card.getBoundingClientRect();
+            return tr.left + tr.width / 2 - (cr.left + cr.width / 2);
+          },
+          y: () => {
+            const tr = rowEls[slot].getBoundingClientRect();
+            const cr = card.getBoundingClientRect();
+            return tr.top + tr.height / 2 - (cr.top + cr.height / 2);
+          },
+          rotation: 0,
+          scaleX: () => rowEls[slot].getBoundingClientRect().width / card.offsetWidth,
+          scaleY: () => rowEls[slot].getBoundingClientRect().height / card.offsetHeight,
+          duration: 0.5,
+          ease: "power3.inOut",
+        }, i * 0.03);
+      });
 
-      // ── 7. Table rows — stagger in from right ───────────────────────────
-      gsap.fromTo(
-        rowRefs.current.filter(Boolean),
-        { opacity: 0, x: 28 },
-        {
-          opacity: 1, x: 0,
-          stagger: 0.13,
-          duration: 0.65,
-          ease: "power2.out",
-          scrollTrigger: { trigger: rowRefs.current[0], start: "top 85%" },
-        }
-      );
+      // Cards have fused into row-shaped slabs — crossfade them into the
+      // real table rows in the exact same spot.
+      tl.to(chaos, { opacity: 0, duration: 0.14, ease: "power1.inOut" }, 0.62)
+        .to(rowEls, { opacity: 1, stagger: 0.035, duration: 0.14, ease: "power1.inOut" }, 0.62);
+
+      // Phase 2 — left column rises alongside the table forming
+      tl.to(badgeRef.current, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" }, 0.42)
+        .to(headlines, { y: "0%", stagger: 0.05, duration: 0.25, ease: "power4.out" }, 0.46)
+        .to(subheadRef.current, { opacity: 1, y: 0, duration: 0.16, ease: "power2.out" }, 0.62)
+        .to(bodyRef.current, { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.2, ease: "power2.out" }, 0.68)
+        .to({}, { duration: 0.14 }); // brief hold once settled
 
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [isMobile]);
 
   return (
     <section
@@ -150,40 +368,41 @@ export function ProblemSection() {
       className="problem-section"
       style={{
         minHeight: "100vh",
-        background: "white",
+        background: "radial-gradient(ellipse 120% 90% at 50% 0%, #14333F 0%, #0B222C 60%, #081A22 100%)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      {/* ── Full-width animated flight path ───────────────────────────────── */}
-      <div
-        ref={lineContRef}
-        className="problem-flight-path"
-        style={{ position: "relative", height: "32px", width: "100%" }}
-      >
+      <style>{`
+        @keyframes kaivo-boarding-pulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(200,228,74,0.45); }
+          50%      { box-shadow: 0 0 18px 2px rgba(200,228,74,0.25); }
+        }
+        @keyframes kaivo-dot-blink {
+          0%, 100% { opacity: 1; }
+          50%      { opacity: 0.35; }
+        }
+      `}</style>
+      {/* ── Chaos storm (desktop only) ────────────────────────────────────── */}
+      {!isMobile && CHAOS.map((c, i) => (
         <div
-          ref={lineRef}
+          key={i}
+          ref={(el) => { chaosRefs.current[i] = el; }}
           style={{
-            position: "absolute",
-            top: "50%", left: 0, right: 0,
-            height: 0,
-            borderTop: "1.5px dashed #7ECECA",
-            transform: "translateY(-50%)",
-          }}
-        />
-        <div
-          ref={planeRef}
-          style={{
-            position: "absolute",
-            top: "50%", left: 0,
-            transform: "translateY(-50%)",
-            lineHeight: 0,
+            ...cardBase,
+            top: c.top,
+            left: c.left,
+            width: c.w,
+            padding: "14px 16px",
+            transform: `rotate(${c.rot}deg)`,
           }}
         >
-          <PlaneRight color="#7ECECA" size={28} />
+          <div>{c.node}</div>
         </div>
-      </div>
+      ))}
 
       <div className="problem-inner" style={{ maxWidth: "1160px", margin: "0 auto", width: "100%" }}>
         {/* ── Two-column grid ───────────────────────────────────────────────── */}
@@ -197,21 +416,21 @@ export function ProblemSection() {
               ref={badgeRef}
               style={{
                 display: "inline-flex", alignItems: "center", gap: "8px",
-                border: "1.5px solid rgba(27,74,90,0.15)",
+                border: "1.5px solid rgba(126,206,202,0.35)",
                 borderRadius: "100px",
                 padding: "7px 18px",
                 marginBottom: "34px",
               }}
             >
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
-                <circle cx="6" cy="6" r="4.8" stroke="rgba(27,74,90,0.4)" strokeWidth="1.2"/>
-                <path d="M6 3.8V6.2" stroke="rgba(27,74,90,0.4)" strokeWidth="1.2" strokeLinecap="round"/>
-                <circle cx="6" cy="8.2" r="0.55" fill="rgba(27,74,90,0.4)"/>
+                <circle cx="6" cy="6" r="4.8" stroke="rgba(126,206,202,0.7)" strokeWidth="1.2"/>
+                <path d="M6 3.8V6.2" stroke="rgba(126,206,202,0.7)" strokeWidth="1.2" strokeLinecap="round"/>
+                <circle cx="6" cy="8.2" r="0.55" fill="rgba(126,206,202,0.7)"/>
               </svg>
               <span style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontWeight: 800, fontSize: "11px", letterSpacing: "0.30em",
-                color: "#1B4A5A", textTransform: "uppercase",
+                color: "#7ECECA", textTransform: "uppercase",
               }}>
                 The Problem
               </span>
@@ -233,7 +452,7 @@ export function ProblemSection() {
                     fontFamily: "'Urbanist', sans-serif",
                     fontWeight: 900,
                     fontSize: "clamp(40px, 4.8vw, 74px)",
-                    color: i === 2 ? "#C8E44A" : "#1B4A5A",
+                    color: i === 2 ? "#C8E44A" : "white",
                     lineHeight: 1.0,
                     margin: 0,
                     letterSpacing: "-0.025em",
@@ -277,38 +496,69 @@ export function ProblemSection() {
                 fontFamily: "'Urbanist', sans-serif",
                 fontWeight: 600,
                 fontSize: "clamp(14px, 1.35vw, 17px)",
-                color: "rgba(27,74,90,0.82)",
+                color: "rgba(255,255,255,0.78)",
                 lineHeight: 1.85,
                 margin: 0,
                 maxWidth: "420px",
               }}
             >
-              <strong style={{ fontWeight: 800, color: "rgba(27,74,90,0.90)" }}>
+              <strong style={{ fontWeight: 800, color: "rgba(255,255,255,0.85)" }}>
                 Tabs. Filters. Re-entering details. Comparing policies.
                 Checking baggage rules. Wondering if there's a better option.
               </strong>
               <br /><br />
-              <strong style={{ fontWeight: 800, color: "rgba(27,74,90,0.90)" }}>
+              <strong style={{ fontWeight: 800, color: "rgba(255,255,255,0.85)" }}>
                 Search gave access. Comparison sites multiplied decisions.
                 AI sped up answers.
               </strong>{" "}
-              <strong style={{ color: "#1B4A5A", fontWeight: 900 }}>
+              <strong style={{ color: "#C8E44A", fontWeight: 900 }}>
                 But you still do the work.
               </strong>
             </p>
           </div>
 
-          {/* ── Right: comparison card ──────────────────────────────────────── */}
+          {/* ── Right: departures board ─────────────────────────────────────── */}
           <div>
             <div
               className="problem-card"
               style={{
-                border: "1px solid rgba(27,74,90,0.1)",
-                borderRadius: "6px",
+                background: "rgba(4,16,22,0.6)",
+                border: "1px solid rgba(126,206,202,0.18)",
+                borderRadius: "14px",
                 overflow: "hidden",
+                boxShadow: "0 30px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(126,206,202,0.12)",
+                backdropFilter: "blur(6px)",
               }}
             >
-              {rows.map(({ tool, desc, isKaivo }, i) => (
+              {/* Board header */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "16px 22px",
+                  borderBottom: "1px dashed rgba(126,206,202,0.25)",
+                }}
+              >
+                <div style={{
+                  display: "flex", alignItems: "center", gap: "9px",
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 700, fontSize: "11px", letterSpacing: "0.34em",
+                  color: "#C8E44A", textTransform: "uppercase",
+                }}>
+                  <PlaneTakeoff color="#C8E44A" size={12} />
+                  Departures
+                </div>
+                <div style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 700, fontSize: "10px", letterSpacing: "0.22em",
+                  color: "rgba(126,206,202,0.6)", textTransform: "uppercase",
+                }}>
+                  Terminal K
+                </div>
+              </div>
+
+              {rows.map(({ tool, desc, status, isKaivo }, i) => (
                 <div
                   key={tool}
                   ref={(el) => { rowRefs.current[i] = el; }}
@@ -316,60 +566,58 @@ export function ProblemSection() {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    background: isKaivo ? "#1B4A5A" : "white",
-                    borderBottom: i < rows.length - 1 ? "1px solid rgba(27,74,90,0.07)" : "none",
-                    gap: "20px",
-                    minHeight: "68px",
+                    background: isKaivo ? "rgba(200,228,74,0.10)" : "transparent",
+                    borderBottom: i < rows.length - 1 ? "1px solid rgba(126,206,202,0.10)" : "none",
+                    borderLeft: isKaivo ? "3px solid #C8E44A" : "3px solid transparent",
+                    gap: "18px",
+                    minHeight: "72px",
+                    padding: "12px 22px 12px 19px",
                   }}
                 >
+                  {/* Status dot */}
+                  <span
+                    style={{
+                      width: 8, height: 8, borderRadius: "50%",
+                      flexShrink: 0,
+                      background: isKaivo ? "#C8E44A" : "#E8622A",
+                      animation: isKaivo ? "kaivo-dot-blink 1.6s ease-in-out infinite" : "none",
+                      boxShadow: isKaivo ? "0 0 8px rgba(200,228,74,0.7)" : "none",
+                    }}
+                  />
+
                   {/* Tool name */}
                   <div
                     className="problem-row-tool"
                     style={{
                       flexShrink: 0,
-                      fontFamily: "'Urbanist', sans-serif",
+                      width: "clamp(90px, 11vw, 150px)",
+                      fontFamily: "'Space Grotesk', sans-serif",
                       fontWeight: 700,
-                      fontSize: "clamp(10px, 1.1vw, 13px)",
-                      letterSpacing: "0.06em",
+                      fontSize: "clamp(10px, 1.05vw, 12.5px)",
+                      letterSpacing: "0.10em",
                       textTransform: "uppercase",
-                      color: isKaivo ? "#C8E44A" : "#1B4A5A",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "7px",
+                      color: isKaivo ? "#C8E44A" : "rgba(255,255,255,0.85)",
+                      lineHeight: 1.4,
                     }}
                   >
-                    {isKaivo && <PlaneTakeoff color="#C8E44A" size={13} />}
                     {tool}
                   </div>
-
-                  {/* Vertical divider */}
-                  <div
-                    style={{
-                      width: "1px",
-                      alignSelf: "stretch",
-                      background: isKaivo
-                        ? "rgba(200,228,74,0.2)"
-                        : "rgba(27,74,90,0.08)",
-                      flexShrink: 0,
-                    }}
-                  />
 
                   {/* Description */}
                   <div
                     style={{
+                      flex: 1,
                       fontFamily: "'Urbanist', sans-serif",
-                      fontSize: "clamp(14px, 1.25vw, 16px)",
-                      fontWeight: 700,
-                      color: isKaivo
-                        ? "white"
-                        : "rgba(27,74,90,0.90)",
+                      fontSize: "clamp(13px, 1.2vw, 15.5px)",
+                      fontWeight: 600,
+                      color: isKaivo ? "white" : "rgba(255,255,255,0.62)",
                       lineHeight: 1.5,
                     }}
                   >
                     {isKaivo ? (
                       <>
                         Get matched, approve once, and{" "}
-                        <span style={{ color: "#C8E44A", fontWeight: 700 }}>
+                        <span style={{ color: "#C8E44A", fontWeight: 800 }}>
                           move on.
                         </span>
                       </>
@@ -377,6 +625,26 @@ export function ProblemSection() {
                       desc
                     )}
                   </div>
+
+                  {/* Status stamp */}
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: 700,
+                      fontSize: "9.5px",
+                      letterSpacing: "0.18em",
+                      textTransform: "uppercase",
+                      padding: "5px 12px",
+                      borderRadius: "4px",
+                      color: isKaivo ? "#0B222C" : "#E8622A",
+                      background: isKaivo ? "#C8E44A" : "rgba(232,98,42,0.12)",
+                      border: isKaivo ? "none" : "1px solid rgba(232,98,42,0.4)",
+                      animation: isKaivo ? "kaivo-boarding-pulse 2s ease-in-out infinite" : "none",
+                    }}
+                  >
+                    {status}
+                  </span>
                 </div>
               ))}
             </div>

@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { Preloader }        from "./components/Preloader";
-import { HeroScene }        from "./components/HeroScene";
-import { CloudTextSection } from "./components/CloudTextSection";
+import { NewHeroSection }   from "./components/NewHeroSection";
+import { SkyAboutSection }  from "./components/SkyAboutSection";
+import { FleetSection }     from "./components/FleetSection";
 import { DemoSection }      from "./components/DemoSection";
 import { ProblemSection }   from "./components/ProblemSection";
 import { ShiftSection }     from "./components/ShiftSection";
@@ -25,6 +26,11 @@ import { KaivoWordmark } from "./components/KaivoLogo";
 gsap.registerPlugin(ScrollTrigger);
 ScrollTrigger.config({ ignoreMobileResize: true });
 
+// dev-only escape hatch for debugging scroll animations from the console
+if (import.meta.env.DEV) {
+  (window as unknown as Record<string, unknown>).__ScrollTrigger = ScrollTrigger;
+}
+
 const NAV_LINKS = [
   { label: "Home",    action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
   { label: "Waitlist", action: null }, // handled by setIsModalOpen — injected at render
@@ -39,84 +45,45 @@ function App() {
   const [shutterOpen,     setShutterOpen]     = useState(false);
   const [mobileMenuOpen,  setMobileMenuOpen]  = useState(false);
 
-  // Fixed sky video — replaces clouds.png; provides the golden-sunset background
-  // for HeroScene (the oval shows the HeroScene video on top) and for
-  // CloudTextSection (transparent bg, this fixed video shows through).
-  // DemoSection and below live in z-index 2 and cover this entirely.
-  const skyVideoRef = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const vid = skyVideoRef.current;
-    if (!vid) return;
-    // Park at frame 3 but do NOT play yet — playback starts when the shutter opens
-    // (see shutterOpen effect below) so both sky videos start in sync.
-    const park = () => { vid.currentTime = 3; };
-    // Loop manually from frame 3 (loop attr restarts at frame 0)
-    const onEnded = () => { vid.currentTime = 3; vid.play().catch(() => {}); };
-    vid.addEventListener("ended", onEnded);
-    if (vid.readyState >= 1) park();
-    else vid.addEventListener("loadedmetadata", park, { once: true });
-    return () => vid.removeEventListener("ended", onEnded);
-  }, []);
-
-  // Lenis + GSAP ScrollTrigger integration
+  // Lenis smooth scroll + GSAP ScrollTrigger. Lenis drives the REAL scroll
+  // position (default mode), so native position:sticky stays perfectly in sync
+  // — the earlier "stucky" feel was actually overflow-x:hidden breaking sticky
+  // (now `clip`), not Lenis. This effect runs once and uses functional state
+  // updates so Lenis is never torn down/recreated mid-scroll.
   useEffect(() => {
     const isTouchDevice = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
-    // On mobile/touch: skip Lenis entirely — native scroll is smoother and
-    // Lenis can interfere with iOS momentum scroll causing the page to shake.
-    // We still need to wire ScrollTrigger to native scroll events.
+    const updateNav = (scroll: number) => {
+      setNavVisible(scroll > 80);
+      setNavDark(scroll > window.innerHeight * 9.2);
+      setMobileMenuOpen((v) => (v ? false : v));
+    };
+
+    // Touch/mobile: native scroll (Lenis can fight iOS momentum)
     if (isTouchDevice) {
-      const onScroll = () => {
-        const scroll = window.scrollY;
-        ScrollTrigger.update();
-        setNavVisible(scroll > 80);
-        setNavDark(scroll > window.innerHeight * 3.2);
-        if (mobileMenuOpen) setMobileMenuOpen(false);
-      };
+      const onScroll = () => updateNav(window.scrollY);
       window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
       return () => window.removeEventListener("scroll", onScroll);
     }
 
-    // Desktop: use Lenis for smooth wheel scrolling
     const lenis = new Lenis({
-      duration: 1.3,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.1,
       smoothWheel: true,
+      syncTouch: false,
     });
 
     lenis.on("scroll", ScrollTrigger.update);
+    lenis.on("scroll", ({ scroll }: { scroll: number }) => updateNav(scroll));
     const rafFn = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(rafFn);
     gsap.ticker.lagSmoothing(0);
 
-    const onScroll = ({ scroll }: { scroll: number }) => {
-      setNavVisible(scroll > 80);
-      setNavDark(scroll > window.innerHeight * 3.2);
-      if (mobileMenuOpen) setMobileMenuOpen(false);
-    };
-    lenis.on("scroll", onScroll);
-
-    // Browser-zoom guard (desktop only): snap to top if zoomed while in hero
-    const onResize = () => {
-      if (lenis.scroll < window.innerHeight * 2.4) {
-        lenis.scrollTo(0, { immediate: true });
-      }
-    };
-    window.addEventListener("resize", onResize);
-
     return () => {
       lenis.destroy();
       gsap.ticker.remove(rafFn);
-      window.removeEventListener("resize", onResize);
     };
-  }, [mobileMenuOpen]);
-
-  // When shutter opens: start the fixed sky video in sync with the hero sky video
-  // (both parked at frame 3, both start playing here → zero frame-desync during crossfade)
-  useEffect(() => {
-    if (!shutterOpen) return;
-    skyVideoRef.current?.play().catch(() => {});
-  }, [shutterOpen]);
+  }, []);
 
   // Show navbar only after scrolling past the hero pin (~220% vh)
 
@@ -125,8 +92,6 @@ function App() {
 
   return (
     <div className="app-root" style={{ fontFamily: "'Urbanist', sans-serif", position: "relative", zIndex: 1 }}>
-      {/* ─── Cinematic film grain ───────────────────────────────────────────── */}
-      <div className="film-grain" />
       {/* ─── Preloader ──────────────────────────────────────────────────────── */}
       <Preloader onComplete={() => setShutterOpen(true)} />
 
@@ -328,34 +293,14 @@ function App() {
         </div>
       )}
 
-      {/* ─── Fixed golden-sky video — same file as the hero oval video.
-           z-index 0 sits behind HeroScene (z-index 1), so the oval in cabin.png
-           shows the HeroScene video (foreground), not this one.  CloudTextSection
-           has a transparent background, so this fixed video shows through there,
-           giving a seamless golden sky from hero → cloud-text section.
-           DemoSection+ are in the z-index 2 wrapper and cover this completely. */}
-      <video
-        ref={skyVideoRef}
-        muted
-        playsInline
-        preload="auto"
-        style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          width: "100%", height: "100%",
-          objectFit: "cover",
-          objectPosition: "50% 50%",
-          zIndex: 0,
-          willChange: "transform",
-          pointerEvents: "none",
-        }}
-      >
-        <source src="/window_behind_flipped.mp4" type="video/mp4" />
-      </video>
+      {/* ─── Frame 1: cabin-window zoom-through hero ───────────────────────── */}
+      <NewHeroSection shutterOpen={shutterOpen} onJoinWaitlist={() => setIsModalOpen(true)} />
 
-      {/* ─── Sky sections ────────────────────────────────────────────────────── */}
-      <HeroScene onJoinWaitlist={() => setIsModalOpen(true)} shutterOpen={shutterOpen} />
-      <CloudTextSection onJoinWaitlist={() => setIsModalOpen(true)} />
+      {/* ─── Frame 2: sky descent + about overlap parallax ─────────────────── */}
+      <SkyAboutSection onJoinWaitlist={() => setIsModalOpen(true)} />
+
+      {/* ─── Frame 3: fleet blueprint scanning wipe ────────────────────────── */}
+      <FleetSection />
 
       {/* ─── Solid website (sky stops here) ─────────────────────────────────
           This wrapper sits above the fixed sky at z:2 with a solid background,

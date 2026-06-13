@@ -37,9 +37,14 @@ function Barcode() {
   );
 }
 
-// ── Plane icon ─────────────────────────────────────────────────────────────────
-function PlaneRight({ size = 16 }: { color?: string; size?: number }) {
-  return <img src="/aeroplane.png" alt="plane" width={size} height={size} style={{ objectFit: "contain" }} />;
+// ── Plane icon — minimal navy glyph ───────────────────────────────────────────
+function PlaneRight({ color = "#1B4A5A", size = 16 }: { color?: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true"
+      style={{ transform: "rotate(90deg)" }}>
+      <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+    </svg>
+  );
 }
 
 export function ProductSection() {
@@ -57,9 +62,13 @@ export function ProductSection() {
 
   // card
   const cardRef     = useRef<HTMLDivElement>(null);
+  const sheenRef    = useRef<HTMLDivElement>(null);
+  const routeRef    = useRef<HTMLDivElement>(null);
+  const specRefs    = useRef<(HTMLDivElement | null)[]>([]);
   const oldRefs     = useRef<(HTMLDivElement | null)[]>([]);
   const newRefs     = useRef<(HTMLDivElement | null)[]>([]);
-  const perfRef     = useRef<HTMLDivElement>(null);
+  const chipOldRef  = useRef<HTMLDivElement>(null);
+  const chipNewRef  = useRef<HTMLDivElement>(null);
   const stubRef     = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -79,11 +88,18 @@ export function ProductSection() {
       gsap.set(badgeRef.current,              { opacity: 0, y: 14 });
       gsap.set([head0.current, head1.current],{ y: "110%" });
       gsap.set(bodyRef.current,               { opacity: 0, filter: "blur(6px)", y: 14 });
-      gsap.set(cardRef.current,               { opacity: 0, y: 44, scale: 0.98 });
-      gsap.set(oldRefs.current.filter(Boolean),{ opacity: 0, x: -16 });
-      gsap.set(newRefs.current.filter(Boolean),{ opacity: 0, x: 16 });
-      gsap.set(perfRef.current,               { scaleX: 0, transformOrigin: "left center" });
-      gsap.set(stubRef.current,               { opacity: 0, y: 14 });
+      // Card is dealt in like a physical pass: 3-D tilt from below + sheen sweep
+      gsap.set(cardRef.current, {
+        opacity: 0, y: 110, scale: 0.94, rotateX: -38,
+        transformPerspective: 1100, transformOrigin: "50% 100%",
+      });
+      gsap.set(sheenRef.current, { xPercent: -140 });
+      gsap.set(routeRef.current, { scaleX: 0, transformOrigin: "left center" });
+      gsap.set(specRefs.current.filter(Boolean), { opacity: 0, y: 12 });
+      gsap.set([chipOldRef.current, chipNewRef.current], { opacity: 0, y: 36 });
+      gsap.set(oldRefs.current.filter(Boolean),{ opacity: 0, x: -14 });
+      gsap.set(newRefs.current.filter(Boolean),{ opacity: 0, x: 14 });
+      gsap.set(stubRef.current, { opacity: 0, y: 12 });
 
       const entryTl = gsap.timeline({ paused: true });
       entryTl
@@ -91,11 +107,18 @@ export function ProductSection() {
         .to(head0.current,     { y: "0%",            duration: 0.85, ease: "power4.out" }, 0.15)
         .to(head1.current,     { y: "0%",            duration: 0.85, ease: "power4.out" }, 0.30)
         .to(bodyRef.current,   { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.65, ease: "power2.out" }, 0.52)
-        .to(cardRef.current,   { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: "power3.out" }, 0.42)
-        .to(oldRefs.current.filter(Boolean), { opacity: 1, x: 0, stagger: 0.12, duration: 0.6,  ease: "power2.out" }, 0.80)
-        .to(newRefs.current.filter(Boolean), { opacity: 1, x: 0, stagger: 0.12, duration: 0.6,  ease: "power2.out" }, 0.80)
-        .to(perfRef.current,   { scaleX: 1,          duration: 2.0,  ease: "power1.inOut" }, 1.10)
-        .to(stubRef.current,   { opacity: 1, y: 0,  duration: 0.7,  ease: "power2.out" }, 2.60);
+        // the pass lands
+        .to(cardRef.current,   { opacity: 1, y: 0, scale: 1, rotateX: 0, duration: 1.05, ease: "power4.out" }, 0.42)
+        // route line draws across, specs tick in
+        .to(routeRef.current,  { scaleX: 1, duration: 0.7, ease: "power2.inOut" }, 1.0)
+        .to(specRefs.current.filter(Boolean), { opacity: 1, y: 0, stagger: 0.09, duration: 0.45, ease: "power2.out" }, 1.15)
+        // glossy sheen sweeps over the settled pass
+        .to(sheenRef.current,  { xPercent: 140, duration: 0.9, ease: "power2.inOut" }, 1.30)
+        .to(stubRef.current,   { opacity: 1, y: 0,  duration: 0.6,  ease: "power2.out" }, 1.45)
+        // comparison chips rise underneath
+        .to([chipOldRef.current, chipNewRef.current], { opacity: 1, y: 0, stagger: 0.14, duration: 0.7, ease: "back.out(1.4)" }, 1.55)
+        .to(oldRefs.current.filter(Boolean), { opacity: 1, x: 0, stagger: 0.10, duration: 0.5, ease: "power2.out" }, 1.85)
+        .to(newRefs.current.filter(Boolean), { opacity: 1, x: 0, stagger: 0.10, duration: 0.5, ease: "power2.out" }, 1.95);
 
       ScrollTrigger.create({
         trigger: sectionRef.current,
@@ -207,292 +230,279 @@ export function ProductSection() {
         <div
           ref={cardRef}
           style={{
-            borderRadius: "14px",
+            position: "relative",
+            borderRadius: "28px",
             overflow: "hidden",
-            boxShadow: "0 18px 56px rgba(27,74,90,0.11), 0 3px 12px rgba(27,74,90,0.06)",
-            border: "1px solid rgba(27,74,90,0.09)",
+            background: "linear-gradient(135deg, #20454E 0%, #14333D 45%, #0C2129 100%)",
+            boxShadow: "0 34px 80px rgba(12,33,41,0.38), 0 6px 18px rgba(12,33,41,0.18)",
+            border: "1px solid rgba(255,255,255,0.07)",
             opacity: 0,
+            willChange: "transform",
           }}
         >
+          {/* Side notches — physical ticket cutouts */}
+          <div aria-hidden style={{
+            position: "absolute", left: -12, top: "46%",
+            width: 24, height: 24, borderRadius: "50%",
+            background: "white", zIndex: 3,
+          }} />
+          <div aria-hidden style={{
+            position: "absolute", right: -12, top: "46%",
+            width: 24, height: 24, borderRadius: "50%",
+            background: "white", zIndex: 3,
+          }} />
 
-          {/* ── HEADER — dark teal ─────────────────────────────────────────── */}
-          <div style={{ background: "#1B4A5A", padding: "18px 24px 16px" }}>
+          {/* Glossy sheen — swept across by GSAP (sits behind content) */}
+          <div ref={sheenRef} aria-hidden style={{
+            position: "absolute", top: 0, bottom: 0, left: 0, right: 0,
+            background: "linear-gradient(105deg, transparent 38%, rgba(255,255,255,0.10) 50%, transparent 62%)",
+            pointerEvents: "none", zIndex: 1,
+          }} />
 
-            {/* Top row: brand · title · flight no */}
-            <div style={{
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-              marginBottom: "14px",
-              paddingBottom: "12px",
-              borderBottom: "1px solid rgba(255,255,255,0.07)",
-            }}>
-              <span style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "10px", letterSpacing: "0.2em",
-                color: "rgba(255,255,255,0.80)", textTransform: "uppercase",
-              }}>
-                Kaivo Travel
-              </span>
-              <span style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 600, fontSize: "9px", letterSpacing: "0.32em",
-                color: "rgba(255,255,255,0.65)", textTransform: "uppercase",
-              }}>
-                Boarding Pass
-              </span>
-              <span style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "11px", letterSpacing: "0.1em",
-                color: "#C8E44A",
-              }}>
-                KV — 001
-              </span>
-            </div>
-
-            {/* FROM ✈ TO */}
-            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-
-              {/* FROM */}
-              <div style={{ minWidth: 0 }}>
-                <div style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontSize: "7px", letterSpacing: "0.26em",
-                  color: "rgba(255,255,255,0.65)", textTransform: "uppercase",
-                  marginBottom: "2px",
-                }}>From</div>
-                <div style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 900, fontSize: "clamp(22px, 3.2vw, 44px)",
-                  color: "rgba(255,255,255,0.75)",
-                  lineHeight: 1, letterSpacing: "-0.02em",
-                }}>TWS</div>
-                <div style={{
-                  fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 800, fontSize: "12px",
-                  color: "rgba(255,255,255,0.90)", marginTop: "2px",
-                }}>The Old Way</div>
-              </div>
-
-              {/* Flight path */}
-              <div style={{
-                flex: 1, display: "flex", alignItems: "center", gap: "8px",
-                paddingBottom: "8px",
-              }}>
-                <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.1)" }} />
-                <PlaneRight color="rgba(126,206,202,0.65)" size={24} />
-                <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.1)" }} />
-              </div>
-
-              {/* TO */}
-              <div style={{ textAlign: "right", minWidth: 0 }}>
-                <div style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontSize: "9px", letterSpacing: "0.26em",
-                  fontWeight: 700,
-                  color: "rgba(255,255,255,0.75)", textTransform: "uppercase",
-                  marginBottom: "2px",
-                }}>To</div>
-                <div style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 900, fontSize: "clamp(22px, 3.2vw, 44px)",
-                  color: "white",
-                  lineHeight: 1, letterSpacing: "-0.02em",
-                }}>KVO</div>
-                <div style={{
-                  fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 800, fontSize: "12px",
-                  color: "rgba(255,255,255,0.90)", marginTop: "2px",
-                }}>Better Outcomes</div>
-              </div>
-            </div>
-
-            {/* Flight details row */}
-            <div style={{
-              display: "flex", gap: "28px",
-              marginTop: "14px", paddingTop: "12px",
-              borderTop: "1px solid rgba(255,255,255,0.07)",
-            }}>
-              {[
-                { label: "Passenger", value: "You" },
-                { label: "Class",     value: "First" },
-                { label: "Seat",      value: "1A" },
-                { label: "Date",      value: "Anytime" },
-              ].map(({ label, value }) => (
-                <div key={label}>
-                  <div style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: "6.5px", letterSpacing: "0.24em",
-                    color: "rgba(255,255,255,0.60)", textTransform: "uppercase",
-                    marginBottom: "3px",
-                  }}>{label}</div>
-                  <div style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontWeight: 700, fontSize: "13px",
-                    color: "rgba(255,255,255,0.92)", letterSpacing: "0.04em",
-                  }}>{value}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ── BODY — two-column comparison ───────────────────────────────── */}
-          <div className="product-card-body" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-
-            {/* Left: old way */}
-            <div style={{
-              padding: "20px 22px",
-              background: "rgba(27,74,90,0.025)",
-              borderRight: "1px solid rgba(27,74,90,0.07)",
-            }}>
-              <div style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 800, fontSize: "11px", letterSpacing: "0.25em",
-                color: "rgba(27,74,90,0.88)", textTransform: "uppercase",
-                marginBottom: "14px",
-              }}>The Old Way</div>
-
-              {OLD_ITEMS.map((item, i) => (
-                <div
-                  key={item}
-                  ref={(el) => { oldRefs.current[i] = el; }}
-                  style={{
-                    display: "flex", alignItems: "flex-start", gap: "9px",
-                    marginBottom: i < OLD_ITEMS.length - 1 ? "11px" : 0,
-                    opacity: 0,
-                  }}
-                >
-                  <span style={{
-                    color: "rgba(27,74,90,0.55)", fontSize: "13px",
-                    lineHeight: "1.4", flexShrink: 0, fontWeight: 700,
-                  }}>×</span>
-                  <span style={{
-                    fontFamily: "'Urbanist', sans-serif",
-                    fontWeight: 700, fontSize: "clamp(12px, 1.05vw, 14px)",
-                    color: "rgba(27,74,90,0.78)", lineHeight: 1.45,
-                  }}>{item}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Right: with Kaivo */}
-            <div style={{ padding: "20px 22px", background: "#1B4A5A" }}>
-              <div style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 800, fontSize: "11px", letterSpacing: "0.25em",
-                color: "#C8E44A", textTransform: "uppercase",
-                marginBottom: "14px",
-              }}>With Kaivo</div>
-
-              {NEW_ITEMS.map((item, i) => (
-                <div
-                  key={item}
-                  ref={(el) => { newRefs.current[i] = el; }}
-                  style={{
-                    display: "flex", alignItems: "flex-start", gap: "9px",
-                    marginBottom: i < NEW_ITEMS.length - 1 ? "11px" : 0,
-                    opacity: 0,
-                  }}
-                >
-                  <span style={{
-                    color: "#C8E44A", fontSize: "12px",
-                    lineHeight: "1.4", flexShrink: 0, fontWeight: 700,
-                  }}>✓</span>
-                  <span style={{
-                    fontFamily: "'Urbanist', sans-serif",
-                    fontWeight: 700, fontSize: "clamp(12px, 1.05vw, 14px)",
-                    color: "rgba(255,255,255,0.95)", lineHeight: 1.45,
-                  }}>{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ── PERFORATED TEAR LINE ─────────────────────────────────────────── */}
+          {/* ── Header row: brand mark · boarding pass · ref ───────────────── */}
           <div style={{
-            background: "white",
-            display: "flex", alignItems: "center",
-            padding: "10px 0",
-            position: "relative",
+            position: "relative", zIndex: 2,
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            padding: "22px 28px 0",
           }}>
-            {/* Left semicircle notch (white circle over card border) */}
-            <div style={{
-              width: 18, height: 18, borderRadius: "50%",
-              background: "white",
-              border: "1px solid rgba(27,74,90,0.09)",
-              flexShrink: 0,
-              marginLeft: -10, zIndex: 2,
-            }} />
-            {/* Dashed line */}
-            <div
-              ref={perfRef}
-              style={{
-                flex: 1,
-                height: 0,
-                borderTop: "2px dashed rgba(27,74,90,0.40)",
-                transform: "scaleX(0)",
-                transformOrigin: "left center",
-                margin: "0 4px",
-              }}
-            />
-            {/* Scissors label */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{
+                width: 30, height: 30, borderRadius: "50%",
+                border: "1.5px solid rgba(255,255,255,0.25)",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
+              }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)" aria-hidden>
+                  <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+                </svg>
+              </span>
+              <span style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700, fontSize: "10px", letterSpacing: "0.26em",
+                color: "rgba(255,255,255,0.70)", textTransform: "uppercase",
+              }}>
+                Kaivo Travel&nbsp;&nbsp;·&nbsp;&nbsp;Boarding Pass
+              </span>
+            </div>
             <span style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: "9px", letterSpacing: "0.22em",
-              color: "rgba(27,74,90,0.65)", textTransform: "uppercase",
-              flexShrink: 0, padding: "0 10px",
-              fontWeight: 700,
+              fontWeight: 700, fontSize: "11px", letterSpacing: "0.22em",
+              color: "#C8E44A", textTransform: "uppercase",
             }}>
-              ✂ Tear Here
+              KV — 001
             </span>
-            <div style={{
-              flex: 1, height: 0,
-              borderTop: "2px dashed rgba(27,74,90,0.40)",
-            }} />
-            {/* Right semicircle notch */}
-            <div style={{
-              width: 18, height: 18, borderRadius: "50%",
-              background: "white",
-              border: "1px solid rgba(27,74,90,0.09)",
-              flexShrink: 0,
-              marginRight: -10, zIndex: 2,
-            }} />
           </div>
 
-          {/* ── STUB ─────────────────────────────────────────────────────────── */}
-          <div
-            ref={stubRef}
-            className="product-stub"
-            style={{
-              background: "#1B4A5A",
-              padding: "16px 24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "16px",
-              opacity: 0,
-            }}
-          >
-            <div>
-              <div style={{
-                fontFamily: "'Urbanist', sans-serif",
-                fontWeight: 700, fontSize: "clamp(12px, 1.2vw, 15px)",
-                color: "white", marginBottom: "5px", lineHeight: 1.3,
-              }}>
-                We exist to help you make better decisions, faster.
-              </div>
+          {/* ── Route: TWS ——————▶ KVO ─────────────────────────────────────── */}
+          <div style={{
+            position: "relative", zIndex: 2,
+            display: "flex", alignItems: "center", gap: "clamp(16px, 3vw, 40px)",
+            padding: "26px 28px 8px",
+          }}>
+            {/* FROM */}
+            <div style={{ minWidth: 0, flexShrink: 0 }}>
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "12px", letterSpacing: "0.12em",
-                color: "rgba(255,255,255,0.92)",
-              }}>
-                Natural-language booking&nbsp;&nbsp;·&nbsp;&nbsp;One review&nbsp;&nbsp;·&nbsp;&nbsp;One approval
-              </div>
+                fontWeight: 900, fontSize: "clamp(34px, 4.6vw, 64px)",
+                color: "white", lineHeight: 1, letterSpacing: "-0.02em",
+              }}>TWS</div>
+              <div style={{
+                fontFamily: "'Urbanist', sans-serif",
+                fontWeight: 700, fontSize: "13px",
+                color: "rgba(255,255,255,0.55)", marginTop: "6px",
+              }}>The Old Way</div>
             </div>
-            <div style={{ flexShrink: 0 }}>
+
+            {/* Route line — drawn by GSAP, arrowhead at destination */}
+            <div style={{ flex: 1, display: "flex", alignItems: "center", minWidth: "60px" }}>
+              <div ref={routeRef} style={{
+                flex: 1, height: "1.5px",
+                background: "rgba(255,255,255,0.30)",
+                transform: "scaleX(0)", transformOrigin: "left center",
+              }} />
+              <svg width="12" height="12" viewBox="0 0 12 12" style={{ flexShrink: 0, marginLeft: "-1px" }} aria-hidden>
+                <path d="M1 1L11 6L1 11V1Z" fill="rgba(255,255,255,0.75)" />
+              </svg>
+            </div>
+
+            {/* TO */}
+            <div style={{ textAlign: "right", minWidth: 0, flexShrink: 0 }}>
+              <div style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 900, fontSize: "clamp(34px, 4.6vw, 64px)",
+                color: "white", lineHeight: 1, letterSpacing: "-0.02em",
+              }}>KVO</div>
+              <div style={{
+                fontFamily: "'Urbanist', sans-serif",
+                fontWeight: 700, fontSize: "13px",
+                color: "rgba(255,255,255,0.55)", marginTop: "6px",
+              }}>Better Outcomes</div>
+            </div>
+          </div>
+
+          {/* ── Specs row (below the notch line) ───────────────────────────── */}
+          <div style={{
+            position: "relative", zIndex: 2,
+            display: "flex", alignItems: "center",
+            gap: "clamp(24px, 4vw, 64px)",
+            padding: "20px 28px",
+            marginTop: "12px",
+            borderTop: "1px dashed rgba(255,255,255,0.14)",
+          }}>
+            {[
+              { label: "Passenger", value: "You" },
+              { label: "Class",     value: "First" },
+              { label: "Seat",      value: "1A" },
+              { label: "Date",      value: "Anytime" },
+            ].map(({ label, value }, i) => (
+              <div key={label} ref={(el) => { specRefs.current[i] = el; }}>
+                <div style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: "8.5px", letterSpacing: "0.24em",
+                  color: "rgba(255,255,255,0.45)", textTransform: "uppercase",
+                  marginBottom: "5px", fontWeight: 700,
+                }}>{label}</div>
+                <div style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 700, fontSize: "15px",
+                  color: "rgba(255,255,255,0.95)", letterSpacing: "0.03em",
+                }}>{value}</div>
+              </div>
+            ))}
+            <div style={{ marginLeft: "auto", flexShrink: 0 }}>
               <Barcode />
             </div>
           </div>
 
+          {/* ── Bottom row: tagline pill + lime pill ───────────────────────── */}
+          <div
+            ref={stubRef}
+            className="product-stub"
+            style={{
+              position: "relative", zIndex: 2,
+              display: "flex", alignItems: "center", gap: "14px",
+              flexWrap: "wrap",
+              padding: "4px 28px 28px",
+              opacity: 0,
+            }}
+          >
+            <div style={{
+              flex: "1 1 260px",
+              background: "rgba(255,255,255,0.07)",
+              border: "1px solid rgba(255,255,255,0.10)",
+              borderRadius: "16px",
+              padding: "13px 22px",
+              fontFamily: "'Urbanist', sans-serif",
+              fontWeight: 700, fontSize: "clamp(12px, 1.15vw, 14.5px)",
+              color: "rgba(255,255,255,0.92)",
+              textAlign: "center",
+              lineHeight: 1.4,
+            }}>
+              We exist to help you make better decisions, faster.
+            </div>
+            <div style={{
+              flex: "1 1 260px",
+              background: "#C8E44A",
+              borderRadius: "16px",
+              padding: "13px 22px",
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 700, fontSize: "clamp(10px, 1vw, 12px)",
+              letterSpacing: "0.06em",
+              color: "#0C2129",
+              textAlign: "center",
+              textTransform: "uppercase",
+              lineHeight: 1.5,
+              boxShadow: "0 10px 28px rgba(200,228,74,0.25)",
+            }}>
+              ✓ Natural-language booking · One review · One approval
+            </div>
+          </div>
+
         </div>{/* end boarding pass card */}
+
+        {/* ── Comparison chips — rise underneath the pass ─────────────────────── */}
+        <div className="product-card-body" style={{
+          display: "grid", gridTemplateColumns: "1fr 1fr",
+          gap: "18px", marginTop: "20px",
+        }}>
+          {/* The Old Way */}
+          <div ref={chipOldRef} style={{
+            background: "white",
+            border: "1px solid rgba(27,74,90,0.10)",
+            borderRadius: "18px",
+            boxShadow: "0 16px 44px rgba(12,33,41,0.10)",
+            padding: "20px 24px",
+            opacity: 0,
+          }}>
+            <div style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 800, fontSize: "11px", letterSpacing: "0.25em",
+              color: "rgba(27,74,90,0.88)", textTransform: "uppercase",
+              marginBottom: "14px",
+            }}>The Old Way</div>
+
+            {OLD_ITEMS.map((item, i) => (
+              <div
+                key={item}
+                ref={(el) => { oldRefs.current[i] = el; }}
+                style={{
+                  display: "flex", alignItems: "flex-start", gap: "9px",
+                  marginBottom: i < OLD_ITEMS.length - 1 ? "11px" : 0,
+                  opacity: 0,
+                }}
+              >
+                <span style={{
+                  color: "rgba(27,74,90,0.55)", fontSize: "13px",
+                  lineHeight: "1.4", flexShrink: 0, fontWeight: 700,
+                }}>×</span>
+                <span style={{
+                  fontFamily: "'Urbanist', sans-serif",
+                  fontWeight: 700, fontSize: "clamp(12px, 1.05vw, 14px)",
+                  color: "rgba(27,74,90,0.78)", lineHeight: 1.45,
+                }}>{item}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* With Kaivo */}
+          <div ref={chipNewRef} style={{
+            background: "linear-gradient(135deg, #1E4049 0%, #12303A 100%)",
+            border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius: "18px",
+            boxShadow: "0 16px 44px rgba(12,33,41,0.22)",
+            padding: "20px 24px",
+            opacity: 0,
+          }}>
+            <div style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 800, fontSize: "11px", letterSpacing: "0.25em",
+              color: "#C8E44A", textTransform: "uppercase",
+              marginBottom: "14px",
+            }}>With Kaivo</div>
+
+            {NEW_ITEMS.map((item, i) => (
+              <div
+                key={item}
+                ref={(el) => { newRefs.current[i] = el; }}
+                style={{
+                  display: "flex", alignItems: "flex-start", gap: "9px",
+                  marginBottom: i < NEW_ITEMS.length - 1 ? "11px" : 0,
+                  opacity: 0,
+                }}
+              >
+                <span style={{
+                  color: "#C8E44A", fontSize: "12px",
+                  lineHeight: "1.4", flexShrink: 0, fontWeight: 700,
+                }}>✓</span>
+                <span style={{
+                  fontFamily: "'Urbanist', sans-serif",
+                  fontWeight: 700, fontSize: "clamp(12px, 1.05vw, 14px)",
+                  color: "rgba(255,255,255,0.95)", lineHeight: 1.45,
+                }}>{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>{/* end comparison chips */}
       </div>
     </section>
   );

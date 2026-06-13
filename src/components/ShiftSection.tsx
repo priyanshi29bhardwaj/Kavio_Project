@@ -26,9 +26,14 @@ const ticks = Array.from({ length: 60 }, (_, i) => {
   };
 });
 
-// ── Plane pointing right ──────────────────────────────────────────────────────
-function PlaneRight({ size = 20 }: { color?: string; size?: number }) {
-  return <img src="/aeroplane.png" alt="plane" width={size} height={size} style={{ objectFit: "contain" }} />;
+// ── Plane pointing right — minimal navy glyph ─────────────────────────────────
+function PlaneRight({ color = "#1B4A5A", size = 20 }: { color?: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true"
+      style={{ transform: "rotate(90deg)" }}>
+      <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+    </svg>
+  );
 }
 
 export function ShiftSection() {
@@ -42,6 +47,7 @@ export function ShiftSection() {
   const badgeRef      = useRef<HTMLDivElement>(null);
   const head0         = useRef<HTMLDivElement>(null);
   const head1         = useRef<HTMLDivElement>(null);
+  const head2         = useRef<HTMLDivElement>(null);
   const underlineRef  = useRef<HTMLDivElement>(null);
 
   // body + tagline
@@ -59,6 +65,12 @@ export function ShiftSection() {
   const wordRefs      = useRef<(HTMLSpanElement | null)[]>([]);
   const connRefs      = useRef<(HTMLDivElement | null)[]>([]);
   const arrowRefs     = useRef<(SVGPolygonElement | null)[]>([]);
+
+  // per-step booking artifacts (the mini story on the stage)
+  const artRefs       = useRef<(HTMLDivElement | null)[]>([]);
+
+  // runway plane (taxis along the steps row, takes off at DONE)
+  const planeFlyRef   = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -80,7 +92,7 @@ export function ShiftSection() {
 
       // ── Text + content entrance — single timeline, fires once ────────────
       gsap.set(badgeRef.current,     { opacity: 0, y: 14 });
-      gsap.set([head0.current, head1.current], { y: "105%" });
+      gsap.set([head0.current, head1.current, head2.current], { y: "105%" });
       gsap.set(underlineRef.current, { scaleX: 0, transformOrigin: "left center" });
       gsap.set(bodyRef.current,      { opacity: 0, filter: "blur(8px)", y: 20 });
       gsap.set(clockWrapRef.current, { opacity: 0, scale: 0.72, y: 24 });
@@ -92,6 +104,7 @@ export function ShiftSection() {
         .to(badgeRef.current,     { opacity: 1, y: 0,         duration: 0.5,  ease: "power2.out" }, 0)
         .to(head0.current,        { y: "0%",                  duration: 0.9,  ease: "power4.out" }, 0.15)
         .to(head1.current,        { y: "0%",                  duration: 0.9,  ease: "power4.out" }, 0.32)
+        .to(head2.current,        { y: "0%",                  duration: 0.9,  ease: "power4.out" }, 0.46)
         .to(underlineRef.current, { scaleX: 1,                duration: 0.75, ease: "power2.inOut" }, 0.72)
         .to(bodyRef.current,      { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.7, ease: "power2.out" }, 0.60)
         .to(clockWrapRef.current, { opacity: 1, scale: 1, y: 0, duration: 0.85, ease: "back.out(1.6)" }, 0.75)
@@ -105,8 +118,24 @@ export function ShiftSection() {
         onEnter: () => entryTl.play(),
       });
 
-      // ── MASTER LOOP — clock arc + hand + counter + word highlights ────────
-      const tl = gsap.timeline({ repeat: -1, paused: true });
+      // ── MASTER SEQUENCE — clock arc + hand + counter + word highlights ────
+      // Desktop: section pins and scroll scrubs through the 60 seconds.
+      // Mobile: same sequence as an auto-playing loop (no pin).
+      const isMobile = window.innerWidth < 768;
+      const tl = gsap.timeline(
+        isMobile
+          ? { repeat: -1, paused: true }
+          : {
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "center center",
+                end: "+=220%",
+                pin: true,
+                scrub: 1,
+                anticipatePin: 1,
+              },
+            }
+      );
 
       // Progress arc: strokeDashoffset from full → 0 (draws clockwise)
       tl.fromTo(arcRef.current,
@@ -134,17 +163,35 @@ export function ShiftSection() {
         },
       }, 0);
 
+      // Artifacts start hidden
+      gsap.set(artRefs.current.filter(Boolean), { opacity: 0, y: 16, scale: 0.92 });
+
       // Word highlights — 1 s each
       STEPS.forEach((_, i) => {
         const t = i;
 
+        // Booking artifact for this step — pops onto the stage
+        if (artRefs.current[i]) {
+          tl.to(artRefs.current[i], {
+            opacity: 1, y: 0, scale: 1,
+            duration: 0.18, ease: "back.out(1.6)",
+          }, t + 0.04);
+          // clear before the next one arrives (final DONE stamp stays on desktop)
+          if (i < STEPS.length - 1 || isMobile) {
+            tl.to(artRefs.current[i], {
+              opacity: 0, y: -12, scale: 0.95,
+              duration: 0.14, ease: "power2.in",
+            }, t + 0.84);
+          }
+        }
+
         // Step box → join-waitlist yellow highlight
         tl.to(wordRefs.current[i], {
-          backgroundColor: "#E8E840",
-          borderColor: "#E8E840",
+          backgroundColor: "#C8E44A",
+          borderColor: "#C8E44A",
           color: "#1B4A5A",
           scale: 1.1,
-          boxShadow: "0 4px 20px rgba(232,232,64,0.50)",
+          boxShadow: "0 4px 20px rgba(200,228,74,0.45)",
           duration: 0.12, ease: "power2.out",
         }, t);
 
@@ -164,7 +211,7 @@ export function ShiftSection() {
 
         // Reset step box
         tl.to(wordRefs.current[i], {
-          backgroundColor: "transparent",
+          backgroundColor: "white",
           borderColor: "rgba(27,74,90,0.28)",
           color: "#1B4A5A",
           scale: 1,
@@ -181,19 +228,49 @@ export function ShiftSection() {
         }
       });
 
+      // ── Runway plane: taxis under the steps, lifts off at DONE ───────────
+      const planeEl = planeFlyRef.current;
+      if (planeEl) {
+        gsap.set(planeEl, { x: 0, y: 0, rotation: 0, opacity: 0 });
+
+        // appear + taxi along the runway while the steps light up
+        tl.to(planeEl, { opacity: 1, duration: 0.12, ease: "none" }, 0.05);
+        tl.to(planeEl, {
+          x: () => (stepsRowRef.current?.offsetWidth ?? 600) * 0.80,
+          duration: 4,
+          ease: "none",
+        }, 0);
+
+        // takeoff at DONE — keeps moving right while climbing over the headline
+        tl.to(planeEl, {
+          x: () => (stepsRowRef.current?.offsetWidth ?? 600) * 0.80 + 320,
+          duration: 0.9,
+          ease: "none",
+        }, 4);
+        tl.to(planeEl, {
+          y: -110, // gentle climb — stays below the stage/text above the runway
+          rotation: -18,
+          duration: 0.9,
+          ease: "power2.in",
+        }, 4);
+        tl.to(planeEl, { opacity: 0, duration: 0.18, ease: "none" }, 4.65);
+      }
+
       tl.set(connRefs.current.filter(Boolean), { scaleX: 0 });
       tl.set(arrowRefs.current.filter(Boolean), { attr: { fill: "rgba(27,74,90,0.30)" } });
 
-      // Master loop fires when the section is visible — tied to section, not steps row
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start:   "top 60%",
-        end:     "bottom 15%",
-        onEnter:     () => tl.play(0),
-        onLeave:     () => tl.pause(),
-        onEnterBack: () => tl.play(),
-        onLeaveBack: () => tl.pause(),
-      });
+      // Mobile only: auto-play/pause the loop on visibility (desktop is scrubbed)
+      if (isMobile) {
+        ScrollTrigger.create({
+          trigger: sectionRef.current,
+          start:   "top 60%",
+          end:     "bottom 15%",
+          onEnter:     () => tl.play(0),
+          onLeave:     () => tl.pause(),
+          onEnterBack: () => tl.play(),
+          onLeaveBack: () => tl.pause(),
+        });
+      }
 
     }, sectionRef);
     return () => ctx.revert();
@@ -224,23 +301,6 @@ export function ShiftSection() {
         }}>
           <PlaneRight color="#1B4A5A" size={30} />
         </div>
-      </div>
-
-      {/* ── Background watermark "04" ────────────────────────────────────────── */}
-      <div aria-hidden style={{
-        position: "absolute",
-        right: "-1%", top: "50%",
-        transform: "translateY(-46%)",
-        fontFamily: "'Space Grotesk', sans-serif",
-        fontWeight: 900,
-        fontSize: "clamp(160px, 22vw, 340px)",
-        color: "rgba(27,74,90,0.028)",
-        lineHeight: 1,
-        pointerEvents: "none",
-        userSelect: "none",
-        letterSpacing: "-0.05em",
-      }}>
-        04
       </div>
 
       {/* ── Main content ────────────────────────────────────────────────────── */}
@@ -282,7 +342,7 @@ export function ShiftSection() {
             }}>The Shift</span>
           </div>
 
-          {/* ── Headline — clip reveal ──────────────────────────────────────────── */}
+          {/* ── Headline — clip reveal, three lines ─────────────────────────────── */}
           <div style={{ overflow: "hidden", lineHeight: 1, marginBottom: "4px" }}>
             <div ref={head0} style={{
               fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
@@ -293,14 +353,24 @@ export function ShiftSection() {
               The next interface
             </div>
           </div>
-          <div style={{ overflow: "hidden", lineHeight: 1 }}>
+          <div style={{ overflow: "hidden", lineHeight: 1, marginBottom: "4px" }}>
             <div ref={head1} style={{
               fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
               fontSize: "clamp(32px, 4.6vw, 68px)",
-              color: "#7ECECA",
+              color: "#1B4A5A",
               lineHeight: 1.0, letterSpacing: "-0.028em",
             }}>
-              isn't search. It's delegation.
+              isn't search.
+            </div>
+          </div>
+          <div style={{ overflow: "hidden", lineHeight: 1 }}>
+            <div ref={head2} style={{
+              fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
+              fontSize: "clamp(32px, 4.6vw, 68px)",
+              color: "#C8E44A",
+              lineHeight: 1.0, letterSpacing: "-0.028em",
+            }}>
+              It's delegation.
             </div>
           </div>
 
@@ -325,12 +395,7 @@ export function ShiftSection() {
           }}>
             You tell Kaivo what you need. It finds, compares, and prepares the best option.
             You review it. You approve it.{" "}
-            <strong style={{
-              color: "#1B4A5A", fontWeight: 800,
-              background: "linear-gradient(120deg, rgba(232,232,64,0.38) 0%, rgba(232,232,64,0.38) 100%)",
-              padding: "2px 7px",
-              borderRadius: "3px",
-            }}>
+            <strong style={{ color: "#1B4A5A", fontWeight: 900 }}>
               In 60 seconds it's done.
             </strong>
           </p>
@@ -442,12 +507,146 @@ export function ShiftSection() {
             </svg>
           </div>
 
+          {/* ── Booking stage — one artifact per step ──────────────────────────── */}
+          <div style={{ position: "relative", height: "clamp(64px, 9vh, 84px)", marginBottom: "8px" }}>
+            {/* 0 · INTENT — your request */}
+            <div ref={(el) => { artRefs.current[0] = el; }} style={{
+              position: "absolute", left: "50%", top: "50%",
+              transform: "translate(-50%, -50%)",
+              background: "rgba(126,206,202,0.16)",
+              border: "1px solid rgba(126,206,202,0.45)",
+              borderRadius: "14px 14px 14px 3px",
+              padding: "10px 18px",
+              fontFamily: "'Urbanist', sans-serif",
+              fontWeight: 700, fontSize: "13.5px", color: "#1B4A5A",
+              whiteSpace: "nowrap", opacity: 0,
+            }}>
+              "Berlin → Lisbon, Friday morning. Window seat, under €120."
+            </div>
+
+            {/* 1 · PREPARE — matched flight card */}
+            <div ref={(el) => { artRefs.current[1] = el; }} style={{
+              position: "absolute", left: "50%", top: "50%",
+              transform: "translate(-50%, -50%)",
+              background: "white",
+              border: "1px solid rgba(27,74,90,0.12)",
+              borderRadius: "8px",
+              boxShadow: "0 10px 30px rgba(27,74,90,0.10)",
+              padding: "10px 16px",
+              display: "flex", alignItems: "center", gap: "12px",
+              whiteSpace: "nowrap", opacity: 0,
+            }}>
+              <span style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700, fontSize: "13px", color: "#1B4A5A",
+                letterSpacing: "0.04em",
+              }}>
+                BER 07:40 → LIS 10:05
+              </span>
+              <span style={{
+                fontFamily: "'Urbanist', sans-serif",
+                fontWeight: 800, fontSize: "13px", color: "#1B4A5A",
+              }}>
+                €98
+              </span>
+              <span style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700, fontSize: "9px", letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                background: "#C8E44A", color: "#1B4A5A",
+                padding: "3px 9px", borderRadius: "100px",
+              }}>
+                Best match
+              </span>
+            </div>
+
+            {/* 2 · REVIEW — checks */}
+            <div ref={(el) => { artRefs.current[2] = el; }} style={{
+              position: "absolute", left: "50%", top: "50%",
+              transform: "translate(-50%, -50%)",
+              display: "flex", alignItems: "center", gap: "16px",
+              fontFamily: "'Urbanist', sans-serif",
+              fontWeight: 800, fontSize: "13.5px", color: "#1B4A5A",
+              whiteSpace: "nowrap", opacity: 0,
+            }}>
+              {["Price ✓", "Window seat ✓", "Carry-on ✓"].map((c) => (
+                <span key={c} style={{
+                  border: "1.5px solid rgba(200,228,74,0.9)",
+                  borderRadius: "100px",
+                  padding: "6px 14px",
+                }}>
+                  {c}
+                </span>
+              ))}
+            </div>
+
+            {/* 3 · APPROVE — the one tap */}
+            <div ref={(el) => { artRefs.current[3] = el; }} style={{
+              position: "absolute", left: "50%", top: "50%",
+              transform: "translate(-50%, -50%)",
+              background: "#1B4A5A",
+              borderRadius: "100px",
+              padding: "11px 28px",
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 700, fontSize: "12px", letterSpacing: "0.18em",
+              textTransform: "uppercase", color: "white",
+              boxShadow: "0 12px 30px rgba(27,74,90,0.30)",
+              whiteSpace: "nowrap", opacity: 0,
+            }}>
+              ✓&nbsp;&nbsp;Approved
+            </div>
+
+            {/* 4 · DONE — boarding stamp */}
+            <div ref={(el) => { artRefs.current[4] = el; }} style={{
+              position: "absolute", left: "50%", top: "50%",
+              transform: "translate(-50%, -50%) rotate(-3deg)",
+              border: "2.5px solid #C8E44A",
+              borderRadius: "8px",
+              padding: "9px 22px",
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 700, fontSize: "13px", letterSpacing: "0.22em",
+              textTransform: "uppercase", color: "#1B4A5A",
+              background: "rgba(200,228,74,0.12)",
+              whiteSpace: "nowrap", opacity: 0,
+            }}>
+              Booked — in 49 sec
+            </div>
+          </div>
+
           {/* ── Steps row ──────────────────────────────────────────────────────── */}
           <div ref={stepsRowRef} className="shift-steps-row" style={{
             display: "flex", alignItems: "center", justifyContent: "center",
             flexWrap: "wrap", rowGap: "10px",
             opacity: 0,
+            position: "relative",
+            padding: "22px 0",
           }}>
+            {/* Runway edge lines */}
+            <div aria-hidden style={{
+              position: "absolute", left: 0, right: 0, top: 0,
+              borderTop: "1.5px solid rgba(27,74,90,0.12)",
+            }} />
+            <div aria-hidden style={{
+              position: "absolute", left: 0, right: 0, bottom: 0,
+              borderBottom: "1.5px solid rgba(27,74,90,0.12)",
+            }} />
+            {/* Dashed runway centerline */}
+            <div aria-hidden style={{
+              position: "absolute", left: 0, right: 0, top: "50%",
+              height: 0,
+              borderTop: "2px dashed rgba(27,74,90,0.18)",
+              transform: "translateY(-50%)",
+            }} />
+            {/* Taxiing / takeoff plane */}
+            <div ref={planeFlyRef} style={{
+              position: "absolute", left: "2px", top: "50%",
+              transform: "translateY(-50%)",
+              lineHeight: 0, zIndex: 3,
+              pointerEvents: "none",
+              opacity: 0,
+            }}>
+              <PlaneRight size={26} />
+            </div>
             {STEPS.map((step, i) => (
               <div key={step} style={{ display: "flex", alignItems: "center" }}>
                 <span
@@ -465,7 +664,9 @@ export function ShiftSection() {
                     border: "1.5px solid rgba(27,74,90,0.28)",
                     borderRadius: "3px",
                     whiteSpace: "nowrap",
-                    backgroundColor: "transparent",
+                    backgroundColor: "white",
+                    position: "relative",
+                    zIndex: 1,
                   }}
                 >
                   {step}
@@ -534,22 +735,8 @@ export function ShiftSection() {
             opacity: 0,
           }}>
             Kaivo does the work.{" "}
-            <span style={{
-              color: "#1B4A5A", fontWeight: 800,
-              position: "relative",
-              display: "inline-block",
-            }}>
+            <span style={{ color: "#1B4A5A", fontWeight: 900 }}>
               You do the deciding.
-              {/* Yellow chalk underline */}
-              <span aria-hidden style={{
-                position: "absolute",
-                bottom: "-2px", left: 0, right: 0,
-                height: "6px",
-                background: "#F0E040",
-                opacity: 0.45,
-                borderRadius: "2px",
-                zIndex: -1,
-              }} />
             </span>
           </div>
 

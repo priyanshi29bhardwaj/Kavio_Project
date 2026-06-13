@@ -1,0 +1,525 @@
+/* ============================================================
+   NEW HERO (frame 1) + SKY ABOUT (frame 2)
+   jeskojets-style zoom-through window + descent parallax
+   ============================================================ */
+
+:root {
+  --nh-cabin: #16100b;
+  --nh-ivory: #f3efe9;
+  --nh-sky-deep: #015aa9;
+  --nh-sky-mid: #2f80c3;
+  --nh-sky-light: #aacde9;
+
+  /* window cutout geometry (fractions of the 2:1 cabin plate) */
+  --nh-win-left: 40.4%;
+  --nh-win-top: 21.8%;
+  --nh-win-w: 19.4%;
+  --nh-win-h: 54.2%;
+  --nh-win-cx: 50.15%;
+  --nh-win-cy: 48.9%;
+}
+
+/* ============================================================
+   FRAME 1 — HERO ZOOM-THROUGH
+   ------------------------------------------------------------
+   The cloud sky lives in a single fixed layer (.sky-stage) that
+   is mounted *underneath* the cabin from the very first paint.
+   A single GSAP ScrollTrigger pins .hero-w, scales the cabin
+   plate out through the window, and crossfades into .sky-stage.
+   No fixed-height/sticky tail, so there is no brown or blue gap.
+   ============================================================ */
+
+/* persistent sky — fixed behind the whole hero + descent. It sits BEHIND the
+   cabin from the first paint and shows straight through the window cutout, so
+   zooming the frame out reveals the *same* image with no swap/crossfade.
+   Lower opaque sections (fleet / solid site) paint over it. */
+.sky-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--nh-sky-deep);
+}
+
+/* overscanned (taller than viewport) so it can translate/scale for the
+   descent without ever exposing an edge. will-change IS correct here —
+   this element is transformed on every scroll frame, so we want it on its
+   own GPU layer. */
+.sky-stage_img {
+  position: absolute;
+  inset: -50% 0;
+  background-image: url("/new_hero/sky.webp");
+  background-size: cover;
+  background-position: 50% 55%;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* gentle deep-blue grade up top so the sky reads as endless and
+   white about-text stays legible over the bright cloud deck */
+.sky-stage_grade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(1, 60, 120, 0.45) 0%,
+    rgba(1, 70, 135, 0.12) 26%,
+    rgba(1, 90, 169, 0) 55%
+  );
+}
+
+.hero_scroll-area {
+  position: relative;
+  height: 260vh;         /* 160vh of scrub runway under the sticky hero */
+}
+
+/* native CSS sticky (not GSAP pin) — no reparenting / position:fixed toggling,
+   so reverse-scroll stays smooth with no torn/disrupted frames */
+.hero-w {
+  position: sticky;
+  top: 0;
+  z-index: 1;            /* above .sky-stage (z:0) */
+  height: 100vh;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- composite cabin plate (2:1, always covers viewport) ---
+   flex-centred (no CSS translate) so GSAP owns the transform outright and
+   scales cleanly from the window centre with no positioning drift/gap */
+.hero-w_bg {
+  position: relative;
+  flex: 0 0 auto;
+  width: max(102vw, 210vh);
+  aspect-ratio: 2 / 1;
+  transform-origin: var(--nh-win-cx) var(--nh-win-cy);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* (porthole back-sky removed — the fixed .sky-stage now shows through the
+   transparent cutout, so there is no separate image to swap to) */
+
+.hero-w_bg_window_clip {
+  position: absolute;
+  left: var(--nh-win-left);
+  top: var(--nh-win-top);
+  width: var(--nh-win-w);
+  height: var(--nh-win-h);
+  border-radius: 44% / 38%;
+  overflow: hidden;
+}
+
+.hero-w_bg_window_knob {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 102%;
+  object-fit: cover;
+  object-position: 50% 100%;
+  will-change: transform;
+}
+
+.hero-w_bg_window,
+.hero-w_bg_front {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- hero titles overlay --- */
+.hero-s {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  color: #fdfcfa;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.hero-s_brand {
+  position: absolute;
+  top: 4.5vh;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.hero-s_title {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  font-family: "Archivo", "Urbanist", sans-serif;
+  font-stretch: 122%;
+  font-weight: 520;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  font-size: clamp(2rem, 4vw, 4.4rem);
+  text-shadow: 0 0 60px rgba(0, 0, 0, 0.25);
+}
+
+.hero-s_title span { display: block; overflow: hidden; }
+.hero-s_title span > i {
+  display: block;
+  font-style: normal;
+  transform: translateY(110%);
+}
+
+/* pulled to the edges + smaller so the long words clear the centre window */
+.hero-s_title-l { top: 15vh; left: 3vw; }
+.hero-s_title-r { bottom: 22vh; right: 3vw; text-align: right; }
+
+.hero-s_caption-l {
+  position: absolute;
+  left: 6vw;
+  bottom: 9vh;
+  max-width: 23rem;
+  opacity: 0;
+}
+.hero-s_caption-l_head {
+  font-family: "Archivo", "Urbanist", sans-serif;
+  font-stretch: 115%;
+  font-size: 1.7rem;
+  font-weight: 540;
+  line-height: 1.08;
+  margin: 0;
+}
+.hero-s_caption-l_rule {
+  display: block;
+  width: 2.2rem;
+  height: 1px;
+  background: var(--nh-ivory);
+  margin: 1.3rem 0;
+}
+.hero-s_caption-l_body {
+  font-family: "Urbanist", sans-serif;
+  font-size: 0.96rem;
+  line-height: 1.55;
+  color: #e8e2da;
+  margin: 0;
+}
+
+.hero-s_caption-r {
+  position: absolute;
+  right: 6vw;
+  bottom: 9vh;
+  width: 25vw;
+  min-width: 19rem;
+  opacity: 0;
+}
+.hero-s_caption-r_rule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: rgba(243, 239, 233, 0.85);
+  margin-bottom: 1rem;
+}
+.hero-s_caption-r_row {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* hero CTA pill */
+.hero-cta {
+  position: absolute;
+  bottom: 2.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  opacity: 0;
+}
+.hero-cta button {
+  font-family: "Urbanist", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #18120c;
+  background: #fdfcfa;
+  border: none;
+  border-radius: 999px;
+  padding: 1.05rem 2.2rem;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.hero-cta button:hover { transform: scale(1.05); }
+
+/* --- post-zoom sky hero: logo + tagline shown once we've flown through
+   the window, sitting over the open sky --- */
+.sky-hero {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6rem;
+  text-align: center;
+  padding: 0 6vw;
+  color: #fff;
+  opacity: 0;            /* faded in by the hero timeline after the zoom */
+  pointer-events: none;
+}
+
+.sky-hero_title {
+  font-family: "Archivo", "Urbanist", sans-serif;
+  font-stretch: 120%;
+  font-weight: 560;
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+  font-size: clamp(2.6rem, 6vw, 6rem);
+  margin: 0;
+  text-shadow: 0 2px 50px rgba(1, 40, 80, 0.4);
+}
+
+.sky-hero_sub {
+  font-family: "Urbanist", sans-serif;
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+  text-shadow: 0 2px 24px rgba(1, 40, 80, 0.45);
+}
+
+.sky-hero_cta {
+  pointer-events: auto;
+  margin-top: 0.6rem;
+  font-family: "Urbanist", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #064a86;
+  background: #fdfcfa;
+  border: none;
+  border-radius: 999px;
+  padding: 1.05rem 2.4rem;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.sky-hero_cta:hover { transform: scale(1.05); }
+
+/* ============================================================
+   FRAME 2 — SKY ABOUT (pinned reveal + descent)
+   ------------------------------------------------------------
+   Transparent — the fixed .sky-stage from frame 1 shows straight
+   through, so the cloud scene continues with no seam or blue block.
+   The .about-s frame is pinned centred; paragraph and CTA share the
+   same centre cell and crossfade in place.
+   ============================================================ */
+.sky-about {
+  position: relative;
+  height: 240vh;            /* 140vh of scrub runway under the sticky text */
+  background: transparent;
+}
+
+.about-s {
+  position: sticky;         /* native sticky (not GSAP pin) */
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: 0 7vw;
+  color: #fff;
+}
+/* stack children in the same grid cell so they crossfade in place */
+.about-s > * { grid-area: 1 / 1; }
+
+
+.about-s_text {
+  position: relative;
+  max-width: 62rem;
+  font-family: "Archivo", "Urbanist", sans-serif;
+  font-stretch: 112%;
+  font-size: clamp(1.5rem, 2.9vw, 2.8rem);
+  font-weight: 500;
+  line-height: 1.28;
+  margin: 0;
+  text-shadow: 0 2px 40px rgba(1, 40, 80, 0.45);
+  will-change: opacity;
+  backface-visibility: hidden;
+}
+
+.about-s_cta {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 3rem;
+  width: 100%;
+  max-width: 62rem;
+  opacity: 0;
+  text-shadow: 0 2px 40px rgba(1, 40, 80, 0.45);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.about-s_cta_tag {
+  font-family: "Archivo", "Urbanist", sans-serif;
+  font-stretch: 118%;
+  font-size: clamp(1.8rem, 3.4vw, 3.4rem);
+  font-weight: 540;
+  line-height: 1.06;
+  margin: 0;
+}
+
+.about-s_cta_btn {
+  font-family: "Urbanist", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #064a86;
+  background: #fdfcfa;
+  border: none;
+  border-radius: 999px;
+  padding: 1.1rem 2.6rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.about-s_cta_btn:hover { transform: scale(1.05); }
+
+/* ============================================================
+   FRAME 3 — FLEET BLUEPRINT SCANNING WIPE
+   ============================================================ */
+.fleet_scroll-area {
+  position: relative;
+  height: 240vh;            /* 140vh of scrub runway under the sticky scene */
+  background: transparent;
+}
+
+.fleet-w {
+  position: sticky;         /* native sticky (not GSAP pin) */
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  /* the TOP is transparent so the same fixed cloud layer (.sky-stage) shows
+     straight through and continues seamlessly from the about section, then
+     melts down into the beige cabin world — no hard seam because it's
+     literally the same clouds continuing. The lower part is solid beige so no
+     sky shows once we're into the aircraft scene. */
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 9%,
+    rgba(201, 215, 233, 0.55) 18%,
+    #c6b9a7 30%,
+    #b3a594 55%,
+    #8f8170 100%
+  );
+}
+
+.fleet-bg_blue {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    linear-gradient(rgba(111, 212, 255, 0.05) 1px, transparent 1px) 0 0 / 100% 4.5rem,
+    linear-gradient(90deg, rgba(111, 212, 255, 0.05) 1px, transparent 1px) 0 0 / 4.5rem 100%,
+    radial-gradient(120% 110% at 50% 10%, #0a3158 0%, #051f3a 60%, #02101f 100%);
+}
+
+.fleet-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.fleet-imgs {
+  position: relative;
+  height: 92vh;
+  aspect-ratio: 2160 / 2400;
+  max-width: 92vw;
+}
+
+.img-jet,
+.blueprint {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* physical jet — wiped away (mask shrinks toward the top) */
+.img-jet {
+  --mask-size: 100% 150%;
+  object-fit: contain;
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: var(--mask-size);
+  mask-size: var(--mask-size);
+  -webkit-mask-position: 50% 0%;
+  mask-position: 50% 0%;
+  filter: drop-shadow(0 50px 80px rgba(30, 18, 8, 0.45));
+}
+
+/* blueprint — wiped into view from below */
+.blueprint {
+  --mask-size: 100% 0%;
+  --mask-y: 200%;
+  -webkit-mask-image: linear-gradient(to top, black 0%, black 88%, transparent 100%);
+  mask-image: linear-gradient(to top, black 0%, black 88%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: var(--mask-size);
+  mask-size: var(--mask-size);
+  -webkit-mask-position: 50% var(--mask-y);
+  mask-position: 50% var(--mask-y);
+}
+
+.blueprint_img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: invert(1) sepia(1) saturate(4.5) hue-rotate(165deg) brightness(0.95) contrast(1.25);
+  opacity: 0.9;
+}
+
+.blueprint_grid {
+  position: absolute;
+  inset: -6%;
+  background:
+    linear-gradient(rgba(111, 212, 255, 0.14) 1px, transparent 1px) 0 0 / 100% 3rem,
+    linear-gradient(90deg, rgba(111, 212, 255, 0.14) 1px, transparent 1px) 0 0 / 3rem 100%;
+  border: 1px dashed rgba(111, 212, 255, 0.35);
+}
+
+/* scanner line riding the wipe boundary */
+.scanline {
+  position: absolute;
+  top: 100%;
+  left: -8%;
+  width: 116%;
+  height: 2px;
+  background: #6fd4ff;
+  box-shadow:
+    0 0 14px 2px rgba(111, 212, 255, 0.9),
+    0 0 60px 14px rgba(111, 212, 255, 0.35);
+  opacity: 0;
+}
+
+/* ============================================================
+   responsive
+   ============================================================ */
+@media (max-width: 880px) {
+  .hero-s_title-l { top: 12vh; left: 5vw; }
+  .hero-s_title-r { bottom: 17vh; right: 5vw; }
+  .hero-s_caption-l { display: none; }
+  .hero-s_caption-r { right: 5vw; left: 5vw; width: auto; min-width: 0; }
+  .about-s_cta { flex-direction: column; align-items: flex-start; margin-top: 4rem; }
+  .fleet-imgs { height: auto; width: 92vw; }
+}
