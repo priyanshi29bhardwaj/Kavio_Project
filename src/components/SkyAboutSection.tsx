@@ -52,15 +52,17 @@ export function SkyAboutSection({ onJoinWaitlist }: SkyAboutSectionProps) {
     <section className="sky-about" ref={rootRef}>
       <div className="about-s">
         <p className="about-s_text">
-          Your perfect flight, matched by AI. Found and booked in under 60
-          seconds. No endless searching. No second-guessing. No admin overload.
-          Just better travel decisions — handled for you.
+          Your perfect flight, matched by AI.<br />
+          Found and booked in under 60 seconds.<br />
+          No endless searching.<br />
+          No second-guessing.<br />
+          No admin overload.<br />
+          Just better travel decisions, handled for you.
         </p>
 
         <div className="about-s_cta">
           <h3 className="about-s_cta_tag">
-            Stop doing.
-            <br />
+            Stop doing.<br />
             Start delegating.
           </h3>
           <button className="about-s_cta_btn" onClick={onJoinWaitlist}>

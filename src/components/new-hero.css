@@ -343,8 +343,8 @@
   font-family: "Archivo", "Urbanist", sans-serif;
   font-stretch: 112%;
   font-size: clamp(1.5rem, 2.9vw, 2.8rem);
-  font-weight: 500;
-  line-height: 1.28;
+  font-weight: 700;
+  line-height: 1.45;
   margin: 0;
   text-shadow: 0 2px 40px rgba(1, 40, 80, 0.45);
   will-change: opacity;
@@ -354,7 +354,7 @@
 .about-s_cta {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 3rem;
   width: 100%;
