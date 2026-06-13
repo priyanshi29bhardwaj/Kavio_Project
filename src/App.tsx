@@ -68,9 +68,8 @@ function App() {
     }
 
     const lenis = new Lenis({
-      lerp: 0.1,
+      lerp: 0.22,
       smoothWheel: true,
-      syncTouch: false,
     });
 
     lenis.on("scroll", ScrollTrigger.update);

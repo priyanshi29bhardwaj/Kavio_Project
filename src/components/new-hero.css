@@ -98,8 +98,9 @@
   width: max(102vw, 210vh);
   aspect-ratio: 2 / 1;
   transform-origin: var(--nh-win-cx) var(--nh-win-cy);
-  will-change: transform;
-  backface-visibility: hidden;
+  /* no will-change: GPU backing gets evicted when scrolled far away and
+     repaints as a blank flash when scrolling back. Re-rasterization on
+     scale is unavoidable either way, so no benefit to promoting here. */
 }
 
 /* (porthole back-sky removed — the fixed .sky-stage now shows through the
