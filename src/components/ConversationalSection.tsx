@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { KaivoMark } from "./KaivoLogo";
+import "./conversational.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -17,6 +18,132 @@ function ChipIcon() {
     </svg>
   );
 }
+
+// ── Orbiting travel objects ───────────────────────────────────────────────────
+// Small frosted cards in the brand palette. Rendered ABOVE the passport so they
+// are always visible as they circle it, like electrons around a nucleus.
+function StampChip() {
+  return (
+    <div className="travel-card" style={{
+      width: 64, height: 64, borderRadius: "50%",
+      border: "2px dashed rgba(232,98,42,0.75)",
+      background: "radial-gradient(circle, rgba(26,70,86,0.97), rgba(9,30,38,0.97))",
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+    }}>
+      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.18em", color: "#f4b48f" }}>PAR</span>
+      <svg width="24" height="12" viewBox="0 0 24 12" fill="#f4b48f" style={{ opacity: 0.95 }} aria-hidden>
+        <path d="M2 8l20-6-7 9-3-2-3 2-1-3-3 1z" />
+      </svg>
+      <span style={{ fontSize: 6, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(244,180,143,0.9)" }}>ENTRY</span>
+    </div>
+  );
+}
+
+function BoardingPassChip() {
+  return (
+    <div className="travel-card" style={{ width: 96, height: 54, display: "flex" }}>
+      <div style={{ flex: 1, padding: "8px 10px", borderRight: "1.5px dashed rgba(126,206,202,0.5)" }}>
+        <div style={{ fontSize: 7, letterSpacing: "0.14em", color: "rgba(126,206,202,0.85)" }}>BOARDING</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>LHR→JFK</div>
+        <div style={{ fontSize: 7, color: "rgba(234,246,244,0.7)", marginTop: 3 }}>SEAT 14A</div>
+      </div>
+      <div style={{
+        width: 24, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2,
+        background: "rgba(200,228,74,0.16)",
+      }}>
+        <span style={{ fontSize: 8, color: "rgba(200,228,74,0.95)", fontWeight: 800 }}>✈</span>
+        <span style={{ fontSize: 6, color: "rgba(234,246,244,0.65)", writingMode: "vertical-rl" }}>KV06</span>
+      </div>
+    </div>
+  );
+}
+
+function VisaChip() {
+  return (
+    <div className="travel-card" style={{ width: 76, height: 56, padding: "9px 10px" }}>
+      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", color: "#7ECECA" }}>VISA</div>
+      {[0, 1, 2].map((i) => (
+        <div key={i} style={{ height: 2.5, marginTop: 5, width: `${82 - i * 18}%`, background: "rgba(234,246,244,0.35)", borderRadius: 2 }} />
+      ))}
+    </div>
+  );
+}
+
+function LuggageTagChip() {
+  return (
+    <div style={{ position: "relative", transform: "rotate(-6deg)" }}>
+      <div style={{ width: 10, height: 10, borderRadius: "50%", border: "2.5px solid rgba(200,228,74,0.85)", margin: "0 auto 3px" }} />
+      <div className="travel-card" style={{
+        width: 54, height: 68, borderRadius: 8,
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+        background: "linear-gradient(150deg, rgba(200,228,74,0.22), rgba(9,30,38,0.97))",
+      }}>
+        <span style={{ fontSize: 15, fontWeight: 900, color: "#C8E44A", letterSpacing: "0.06em" }}>LHR</span>
+        <span style={{ fontSize: 6.5, color: "rgba(234,246,244,0.7)", letterSpacing: "0.14em" }}>PRIORITY</span>
+      </div>
+    </div>
+  );
+}
+
+function TicketChip() {
+  return (
+    <div className="travel-card" style={{ width: 90, height: 48, padding: "8px 12px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div style={{ position: "absolute", left: -6, top: "50%", width: 12, height: 12, borderRadius: "50%", background: "#143A47", transform: "translateY(-50%)" }} />
+      <div style={{ position: "absolute", right: -6, top: "50%", width: 12, height: 12, borderRadius: "50%", background: "#143A47", transform: "translateY(-50%)" }} />
+      <div style={{ fontSize: 7, letterSpacing: "0.16em", color: "rgba(126,206,202,0.85)" }}>E-TICKET</div>
+      <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>✈ 60 SEC</div>
+    </div>
+  );
+}
+
+function KeycardChip() {
+  return (
+    <div className="travel-card" style={{ width: 86, height: 54, padding: 0 }}>
+      <div style={{ padding: "8px 10px" }}>
+        <div style={{ fontSize: 7, letterSpacing: "0.16em", color: "rgba(126,206,202,0.85)" }}>HOTEL</div>
+        <div style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>ROOM KEY</div>
+      </div>
+      <div style={{
+        position: "absolute", bottom: 0, left: 0, right: 0, height: 11,
+        background: "repeating-linear-gradient(90deg, rgba(200,228,74,0.6) 0 4px, rgba(200,228,74,0.25) 4px 8px)",
+      }} />
+    </div>
+  );
+}
+
+function TrainChip() {
+  return (
+    <div className="travel-card" style={{ width: 88, height: 48, padding: "8px 12px" }}>
+      <div style={{ fontSize: 7, letterSpacing: "0.16em", color: "rgba(126,206,202,0.85)" }}>RAIL</div>
+      <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>🚄 EUROSTAR</div>
+    </div>
+  );
+}
+
+// Three crossing ellipses (atom shells), 780×580 coordinate space, centred at
+// (390,290). Sized to fully CIRCUMSCRIBE the passport so the objects float in
+// the open space all the way around it — never across its face.
+const ELLIPSE_A = "M775,290 a385,275 0 1 0 -770,0 a385,275 0 1 0 770,0";
+const ELLIPSE_B = "M756.5,423.4 a390,265 20 1 0 -733,-266.8 a390,265 20 1 0 733,266.8";
+const ELLIPSE_C = "M756.5,156.6 a390,265 -20 1 0 -733,266.8 a390,265 -20 1 0 733,-266.8";
+
+interface OrbitObj {
+  path: string;
+  dur: number;
+  delay: number;
+  tilt: number;
+  node: React.ReactNode;
+}
+
+const ORBIT_OBJECTS: OrbitObj[] = [
+  { path: ELLIPSE_A, dur: 30, delay: 0,     tilt: -4, node: <StampChip /> },
+  { path: ELLIPSE_A, dur: 30, delay: -10,   tilt: 5,  node: <BoardingPassChip /> },
+  { path: ELLIPSE_A, dur: 30, delay: -20,   tilt: -3, node: <LuggageTagChip /> },
+  { path: ELLIPSE_B, dur: 36, delay: 0,     tilt: 4,  node: <VisaChip /> },
+  { path: ELLIPSE_B, dur: 36, delay: -18,   tilt: -5, node: <KeycardChip /> },
+  { path: ELLIPSE_C, dur: 26, delay: 0,     tilt: 3,  node: <TicketChip /> },
+  { path: ELLIPSE_C, dur: 26, delay: -13,   tilt: -4, node: <TrainChip /> },
+];
 
 const BUBBLES = [
   "Book me a window seat if it's under £40 extra.",
@@ -85,20 +212,37 @@ export function ConversationalSection() {
     <section
       ref={sectionRef}
       style={{
-        background: "#1B4A5A",
+        background:
+          "radial-gradient(120% 90% at 70% 12%, #245A6C 0%, #1B4A5A 45%, #143A47 100%)",
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
         overflow: "hidden",
+        paddingTop: "80px",
+        paddingBottom: "80px",
       }}
     >
-      {/* White → teal bleed from ProductSection */}
+      {/* White → teal bleed from ProductSection — taller & eased for a soft,
+          cinematic fade instead of a hard band */}
       <div aria-hidden style={{
         position: "absolute", top: 0, left: 0, right: 0,
-        height: "160px",
-        background: "linear-gradient(to bottom, white, #1B4A5A)",
+        height: "340px",
+        background:
+          "linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,0.86) 14%, rgba(120,170,180,0.5) 42%, rgba(27,74,90,0.85) 74%, rgba(27,74,90,0) 100%)",
+        pointerEvents: "none",
+        zIndex: 0,
+      }} />
+
+      {/* Soft aqua glow that bleeds down from the seam — ties the white frame
+          into the teal world */}
+      <div aria-hidden style={{
+        position: "absolute", top: "-120px", left: "50%",
+        transform: "translateX(-50%)",
+        width: "120%", height: "420px",
+        background:
+          "radial-gradient(60% 100% at 50% 0%, rgba(126,206,202,0.22) 0%, transparent 70%)",
         pointerEvents: "none",
         zIndex: 0,
       }} />
@@ -226,73 +370,141 @@ export function ConversationalSection() {
           </div>
         </div>
 
-        {/* ── RIGHT — passport (scroll-animated) ──────────────────────────── */}
+        {/* ── RIGHT — passport at the nucleus of an orbiting travel system ── */}
         <div
           className="conv-passport"
-          style={{ flex: 1, display: "flex", justifyContent: "center" }}
+          style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}
         >
+          <div className="conv-stage">
+
+            {/* faint guide ellipses behind everything */}
+            <svg className="orbit-rings" viewBox="0 0 780 580" fill="none" aria-hidden>
+              <path d={ELLIPSE_A} stroke="rgba(126,206,202,0.12)" strokeWidth="1" />
+              <path d={ELLIPSE_B} stroke="rgba(126,206,202,0.10)" strokeWidth="1" />
+              <path d={ELLIPSE_C} stroke="rgba(126,206,202,0.10)" strokeWidth="1" />
+            </svg>
+
+            {/* central glow (the nucleus) */}
+            <div aria-hidden style={{
+              position: "absolute", top: "50%", left: "50%",
+              width: "300px", height: "300px", transform: "translate(-50%,-50%)",
+              background: "radial-gradient(circle, rgba(126,206,202,0.16) 0%, transparent 68%)",
+              zIndex: 1, pointerEvents: "none",
+            }} />
+
+          {/* ── Passport (the liked static version) ──────────────────────── */}
+          <div className="passport-core">
           <div style={{
             display: "flex",
             width: "100%",
-            maxWidth: "530px",
             height: "clamp(290px, 42vh, 400px)",
-            borderRadius: "10px",
+            borderRadius: "12px",
             overflow: "hidden",
+            transform: "perspective(1600px) rotateY(-7deg) rotateX(1.5deg)",
+            transformOrigin: "center left",
             boxShadow:
-              "0 36px 80px rgba(0,0,0,0.28), 0 8px 20px rgba(0,0,0,0.18), inset 0 0 0 1px rgba(126,206,202,0.12)",
+              "0 50px 100px rgba(0,0,0,0.40), 0 18px 40px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(126,206,202,0.14)",
           }}>
 
             {/* Cover page */}
             <div style={{
               width: "44%",
-              background: "linear-gradient(155deg, #0e3040 0%, #071f29 100%)",
+              background:
+                "linear-gradient(155deg, #1a4d63 0%, #103747 38%, #0a2531 70%, #061a23 100%)",
               display: "flex", flexDirection: "column",
               alignItems: "center", justifyContent: "center",
               padding: "18px 14px",
               position: "relative", overflow: "hidden",
             }}>
+              {/* concentric guilloche security rings */}
+              <div aria-hidden style={{
+                position: "absolute", top: "38%", left: "50%",
+                width: "150%", aspectRatio: "1",
+                transform: "translate(-50%, -50%)",
+                borderRadius: "50%",
+                background:
+                  "repeating-radial-gradient(circle at center, transparent 0 9px, rgba(126,206,202,0.05) 9px 10px)",
+                pointerEvents: "none",
+              }} />
+              {/* warm glow halo behind the emblem */}
+              <div aria-hidden style={{
+                position: "absolute", top: "34%", left: "50%",
+                width: "120px", height: "120px",
+                transform: "translate(-50%, -50%)",
+                background:
+                  "radial-gradient(circle, rgba(200,228,74,0.22) 0%, transparent 68%)",
+                pointerEvents: "none",
+              }} />
+              {/* gold-foil double border */}
               <div style={{
-                position: "absolute", inset: "8px",
-                border: "1px solid rgba(126,206,202,0.18)",
+                position: "absolute", inset: "7px",
+                border: "1px solid rgba(200,228,74,0.32)",
+                borderRadius: "4px", pointerEvents: "none",
+              }} />
+              <div style={{
+                position: "absolute", inset: "10px",
+                border: "1px solid rgba(126,206,202,0.14)",
                 borderRadius: "3px", pointerEvents: "none",
               }} />
+              {/* gold corner brackets */}
+              {[
+                { top: "7px", left: "7px", borderWidth: "1.5px 0 0 1.5px" },
+                { top: "7px", right: "7px", borderWidth: "1.5px 1.5px 0 0" },
+                { bottom: "7px", left: "7px", borderWidth: "0 0 1.5px 1.5px" },
+                { bottom: "7px", right: "7px", borderWidth: "0 1.5px 1.5px 0" },
+              ].map((c, i) => (
+                <div key={i} aria-hidden style={{
+                  position: "absolute", width: "12px", height: "12px",
+                  borderStyle: "solid", borderColor: "rgba(200,228,74,0.65)",
+                  pointerEvents: "none", ...c,
+                }} />
+              ))}
+              {/* soft sheen sweep across the cover */}
               <div aria-hidden style={{
                 position: "absolute", inset: 0,
-                backgroundImage:
-                  "repeating-linear-gradient(55deg, transparent 0px, transparent 18px, rgba(126,206,202,0.03) 18px, rgba(126,206,202,0.03) 19px)",
+                background:
+                  "linear-gradient(120deg, transparent 35%, rgba(255,255,255,0.07) 50%, transparent 65%)",
                 pointerEvents: "none",
               }} />
 
-              <KaivoMark size={64} color="rgba(200,228,74,0.90)" />
-              <div style={{ height: "10px" }} />
+              <div aria-hidden style={{
+                filter: "drop-shadow(0 0 10px rgba(200,228,74,0.45))",
+                position: "relative",
+              }}>
+                <KaivoMark size={66} color="#d4ed5e" />
+              </div>
+              <div style={{ height: "12px" }} />
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontWeight: 900, fontSize: "clamp(13px, 1.6vw, 20px)",
-                letterSpacing: "0.28em", color: "rgba(255,255,255,0.9)",
+                letterSpacing: "0.30em", color: "#ffffff",
+                textShadow: "0 1px 6px rgba(0,0,0,0.4)",
               }}>KAIVO</div>
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 800, fontSize: "11px", letterSpacing: "0.44em",
-                color: "rgba(255,255,255,0.80)", marginTop: "3px",
+                fontWeight: 800, fontSize: "11px", letterSpacing: "0.46em",
+                color: "rgba(255,255,255,0.78)", marginTop: "4px",
               }}>TRAVEL</div>
-              <div style={{ height: "10px" }} />
+              <div style={{ height: "12px" }} />
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 800, fontSize: "12px", letterSpacing: "0.28em",
-                color: "rgba(126,206,202,0.95)",
-                borderTop: "1px solid rgba(126,206,202,0.35)",
-                paddingTop: "8px",
+                fontWeight: 800, fontSize: "12px", letterSpacing: "0.30em",
+                color: "#9fe0db",
+                borderTop: "1px solid rgba(126,206,202,0.40)",
+                paddingTop: "9px",
               }}>PASSPORT</div>
 
-              <div style={{ position: "absolute", bottom: "14px", right: "12px" }}>
+              <div style={{ position: "absolute", bottom: "14px", right: "12px", opacity: 0.85 }}>
                 <ChipIcon />
               </div>
             </div>
 
             {/* Spine */}
             <div style={{
-              width: "7px", flexShrink: 0,
-              background: "linear-gradient(to right, #06171f, #0c2a36, #06171f)",
+              width: "9px", flexShrink: 0,
+              background:
+                "linear-gradient(to right, #06171f, #0c2a36 45%, #02464f 50%, #0c2a36 55%, #06171f)",
+              boxShadow: "inset 0 0 4px rgba(0,0,0,0.6)",
             }} />
 
             {/* Inside page — clips open via GSAP */}
@@ -300,13 +512,21 @@ export function ConversationalSection() {
               ref={insidePageRef}
               style={{
                 flex: 1,
-                background: "#faf7f2",
+                background:
+                  "linear-gradient(105deg, #f5efe4 0%, #faf7f2 12%, #faf7f2 100%)",
                 padding: "16px 14px",
                 overflow: "hidden",
                 clipPath: "inset(0 100% 0 0)",
                 position: "relative",
               }}
             >
+              {/* page-curl shadow near the spine for a real-paper feel */}
+              <div aria-hidden style={{
+                position: "absolute", top: 0, bottom: 0, left: 0, width: "34px",
+                background:
+                  "linear-gradient(to right, rgba(27,74,90,0.16), transparent)",
+                pointerEvents: "none",
+              }} />
               {/* Lined paper */}
               <div aria-hidden style={{
                 position: "absolute", inset: 0,
@@ -327,14 +547,31 @@ export function ConversationalSection() {
                 whiteSpace: "nowrap",
               }}>KAIVO</div>
 
-              {/* Label */}
+              {/* Header bar */}
               <div style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: "6.5px", letterSpacing: "0.26em",
-                color: "rgba(27,74,90,0.28)", textTransform: "uppercase",
-                marginBottom: "10px", position: "relative",
+                display: "flex", alignItems: "center", gap: "6px",
+                marginBottom: "12px", position: "relative",
+                paddingBottom: "7px",
+                borderBottom: "1px solid rgba(27,74,90,0.12)",
               }}>
-                Travel Instructions
+                <span style={{
+                  width: "5px", height: "5px", borderRadius: "50%",
+                  background: "#7BBF4A", flexShrink: 0,
+                  boxShadow: "0 0 4px rgba(123,191,74,0.6)",
+                }} />
+                <span style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: "7px", fontWeight: 700, letterSpacing: "0.26em",
+                  color: "rgba(27,74,90,0.55)", textTransform: "uppercase",
+                }}>
+                  Travel Instructions
+                </span>
+                <span style={{
+                  marginLeft: "auto",
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: "6.5px", letterSpacing: "0.18em",
+                  color: "rgba(27,74,90,0.3)",
+                }}>NO. 06</span>
               </div>
 
               {/* Conversation bubbles */}
@@ -343,13 +580,14 @@ export function ConversationalSection() {
                   key={i}
                   ref={(el) => { bubbleRefs.current[i] = el; }}
                   style={{
-                    background: "rgba(27,74,90,0.07)",
-                    border: "1px solid rgba(27,74,90,0.1)",
-                    borderRadius: "8px 8px 8px 2px",
-                    padding: "9px 28px 9px 11px",
-                    marginBottom: i < 2 ? "8px" : 0,
+                    background: "linear-gradient(180deg, #ffffff 0%, #f3f7f6 100%)",
+                    border: "1px solid rgba(27,74,90,0.10)",
+                    borderRadius: "10px 10px 10px 3px",
+                    padding: "10px 30px 10px 12px",
+                    marginBottom: i < 2 ? "9px" : 0,
                     opacity: 0,
                     position: "relative",
+                    boxShadow: "0 2px 8px rgba(27,74,90,0.08)",
                   }}
                 >
                   <div style={{
@@ -361,33 +599,74 @@ export function ConversationalSection() {
                     "{text}"
                   </div>
                   <div style={{
-                    position: "absolute", bottom: "5px", right: "7px",
+                    position: "absolute", bottom: "5px", right: "8px",
                     fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: "7px", color: "rgba(27,74,90,0.3)",
+                    fontSize: "8px", fontWeight: 700,
+                    color: "#7BBF4A",
                   }}>✓✓</div>
                 </div>
               ))}
 
-              {/* Stamp */}
+              {/* Stamp — double ring */}
               <div style={{
-                position: "absolute", bottom: "12px", right: "12px",
-                width: "38px", height: "38px",
-                border: "2px solid rgba(232,98,42,0.25)",
+                position: "absolute", bottom: "30px", right: "14px",
+                width: "44px", height: "44px",
+                border: "2px solid rgba(232,98,42,0.35)",
                 borderRadius: "50%",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 transform: "rotate(-14deg)",
               }}>
                 <div style={{
+                  position: "absolute", inset: "3px",
+                  border: "1px dashed rgba(232,98,42,0.3)",
+                  borderRadius: "50%",
+                }} />
+                <div style={{
                   fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "5.5px", fontWeight: 700,
                   letterSpacing: "0.12em",
-                  color: "rgba(232,98,42,0.45)",
+                  color: "rgba(232,98,42,0.55)",
                   textAlign: "center", lineHeight: 1.3,
                 }}>ENTRY<br />GRANTED</div>
               </div>
+
+              {/* MRZ machine-readable strip */}
+              <div aria-hidden style={{
+                position: "absolute", bottom: 0, left: 0, right: 0,
+                padding: "5px 14px 7px",
+                background: "rgba(27,74,90,0.04)",
+                borderTop: "1px solid rgba(27,74,90,0.10)",
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: "7px", fontWeight: 600,
+                letterSpacing: "0.08em",
+                color: "rgba(27,74,90,0.32)",
+                lineHeight: 1.5,
+                whiteSpace: "nowrap", overflow: "hidden",
+              }}>
+                P&lt;KAIVOTRAVEL&lt;&lt;DELEGATE&lt;&lt;&lt;&lt;&lt;&lt;&lt;<br />
+                KV06AI&lt;&lt;9KAI2026&lt;&lt;&lt;BOOKED&lt;&lt;&lt;60S
+              </div>
             </div>
 
-          </div>{/* end passport */}
+          </div>{/* end passport card */}
+          </div>{/* end passport-core */}
+
+            {/* orbiting travel objects — above the passport, always visible */}
+            <div className="orbit-layer">
+              {ORBIT_OBJECTS.map((o, i) => (
+                <div
+                  key={i}
+                  className="orbit-item"
+                  style={{ offsetPath: `path('${o.path}')`, animationDuration: `${o.dur}s`, animationDelay: `${o.delay}s` }}
+                >
+                  <div className="orbit-chip" style={{ "--chip-tilt": `${o.tilt}deg` } as React.CSSProperties}>
+                    {o.node}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+          </div>{/* end conv-stage */}
         </div>
       </div>
     </section>
