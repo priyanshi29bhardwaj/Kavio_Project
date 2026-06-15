@@ -116,14 +116,35 @@
   overflow: hidden;
 }
 
-.hero-w_bg_window_knob {
+/* the closed blind: an opaque, softly-lit translucent panel that fills the
+   whole porthole. Reads like a real cabin shade pulled down — luminous in the
+   centre (daylight behind it) and falling off to the edges — instead of the
+   old stretched grey lip. Slides up as one piece to open. */
+.hero-w_bg_window_shade {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 102%;
-  object-fit: cover;
-  object-position: 50% 100%;
+  background:
+    radial-gradient(135% 90% at 50% 42%,
+      #c8c8c8 0%,
+      #b8b8b8 48%,
+      #a8a8a8 82%,
+      #989898 100%);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.18);
   will-change: transform;
+}
+
+/* the pull-grip lip, pinned to the bottom edge of the shade at its natural
+   (thin) aspect ratio — the tab you'd push up. Travels to the top as the
+   shade opens. */
+.hero-w_bg_window_grip {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
 }
 
 .hero-w_bg_window,

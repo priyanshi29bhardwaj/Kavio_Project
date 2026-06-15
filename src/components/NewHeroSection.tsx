@@ -90,8 +90,8 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
     const ctx = gsap.context(() => {
       gsap
         .timeline()
-        .to(".hero-w_bg_window_knob", {
-          yPercent: -92,
+        .to(".hero-w_bg_window_shade", {
+          yPercent: -88,
           duration: 1.9,
           ease: "kaivoInOut",
         })
@@ -128,12 +128,17 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
       <section className="hero-w">
         {/* composite cabin window background (sky shows through the cutout) */}
         <div className="hero-w_bg">
-          {/* window blind / shutter (clipped to the cutout) */}
+          {/* window blind / shutter (clipped to the cutout) — an opaque shade
+              panel that fills the porthole when closed, with the pull-grip lip
+              pinned to its bottom edge. Sliding the whole shade up carries the
+              grip to the top, exactly like a real cabin window blind. */}
           <div className="hero-w_bg_window_clip">
-            <img className="hero-w_bg_window_knob" src="/new_hero/shutter.webp" alt="" />
+            <div className="hero-w_bg_window_shade">
+              <img className="hero-w_bg_window_grip" src="/new_hero/shutter.webp" alt="" />
+            </div>
           </div>
           {/* 2. window frame */}
-          <img className="hero-w_bg_window" src="/new_hero/window-frame.png" alt="" />
+          <img className="hero-w_bg_window" src="/new_hero/cabin1.png" alt="" />
           {/* 3. interior cabin paneling with transparent cutout */}
           <img className="hero-w_bg_front" src="/new_hero/cabin-front.webp" alt="" />
         </div>
