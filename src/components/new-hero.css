@@ -49,12 +49,21 @@
 .sky-stage_img {
   position: absolute;
   inset: -50% 0;
+  /* 140% wide so the element can translate left without exposing an edge */
+  width: 140%;
+  left: 0;
   background-image: url("/new_hero/sky.webp");
   background-size: cover;
   background-position: 50% 55%;
   transform-origin: 50% 50%;
   will-change: transform;
   backface-visibility: hidden;
+  animation: sky-drift 18s linear infinite;
+}
+
+@keyframes sky-drift {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(-28.6%); } /* 40% of 140% width → seamless loop */
 }
 
 /* gentle deep-blue grade up top so the sky reads as endless and
@@ -182,7 +191,7 @@
   font-weight: 520;
   line-height: 0.98;
   letter-spacing: -0.01em;
-  font-size: clamp(2rem, 4vw, 4.4rem);
+  font-size: clamp(2rem, 4.2vw, 4.8rem);
   text-shadow: 0 0 60px rgba(0, 0, 0, 0.25);
 }
 
@@ -193,23 +202,22 @@
   transform: translateY(110%);
 }
 
-/* pulled to the edges + smaller so the long words clear the centre window */
-.hero-s_title-l { top: 15vh; left: 3vw; }
-.hero-s_title-r { bottom: 22vh; right: 3vw; text-align: right; }
+.hero-s_title-l { top: 18vh; left: 3vw; }
+.hero-s_title-r { top: 45vh; right: 3vw; text-align: right; }
 
 .hero-s_caption-l {
   position: absolute;
   left: 6vw;
   bottom: 9vh;
-  max-width: 23rem;
   opacity: 0;
 }
 .hero-s_caption-l_head {
   font-family: "Archivo", "Urbanist", sans-serif;
-  font-stretch: 115%;
-  font-size: 1.7rem;
-  font-weight: 540;
+  font-stretch: 122%;
+  font-size: clamp(1.3rem, 2.4vw, 2.6rem);
+  font-weight: 520;
   line-height: 1.08;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 .hero-s_caption-l_rule {
@@ -221,8 +229,9 @@
 }
 .hero-s_caption-l_body {
   font-family: "Urbanist", sans-serif;
-  font-size: 0.96rem;
-  line-height: 1.55;
+  font-size: clamp(0.9rem, 1.4vw, 1.3rem);
+  font-weight: 400;
+  line-height: 1.5;
   color: #e8e2da;
   margin: 0;
 }
@@ -245,11 +254,43 @@
 .hero-s_caption-r_row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-family: "Space Grotesk", sans-serif;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.hero-s_caption-r_scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* two chevrons rotated to point down, cascading downward */
+.hero-chevrons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.7;
+  overflow: hidden;
+  height: 1.4em;
+}
+.hero-chevrons span {
+  display: block;
+  font-size: 0.75rem;
+  transform: rotate(90deg);
+  animation: chevron-drop 1.2s ease-in-out infinite;
+}
+.hero-chevrons span:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+@keyframes chevron-drop {
+  0%   { opacity: 0.2; transform: rotate(90deg) translateX(-4px); }
+  50%  { opacity: 1;   transform: rotate(90deg) translateX(0px); }
+  100% { opacity: 0.2; transform: rotate(90deg) translateX(4px); }
 }
 
 /* hero CTA pill */
@@ -260,20 +301,44 @@
   transform: translateX(-50%);
   z-index: 6;
   opacity: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(253, 252, 250, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(253, 252, 250, 0.35);
+  border-radius: 999px;
+  padding: 0.4rem 0.4rem 0.4rem 1.8rem;
 }
-.hero-cta button {
+.hero-cta_text {
   font-family: "Urbanist", sans-serif;
   font-size: 0.98rem;
   font-weight: 700;
-  color: #18120c;
+  color: #fdfcfa;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.hero-cta_icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
   background: #fdfcfa;
   border: none;
-  border-radius: 999px;
-  padding: 1.05rem 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  color: #18120c;
+  flex-shrink: 0;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
-.hero-cta button:hover { transform: scale(1.05); }
+.hero-cta_icon:hover { transform: scale(1.1); }
+.hero-cta:hover .hero-cta_text { opacity: 0.9; }
 
 /* --- post-zoom sky hero: logo + tagline shown once we've flown through
    the window, sitting over the open sky --- */

@@ -150,47 +150,58 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
           </div>
 
           <h2 className="hero-s_title hero-s_title-l">
-            <span><i>AI powered</i></span>
-            <span><i>conversational</i></span>
+            <span><i>AI Powered</i></span>
+            <span><i>Conversational</i></span>
           </h2>
           <h2 className="hero-s_title hero-s_title-r">
-            <span><i>travel booking</i></span>
-            <span><i>agent</i></span>
+            <span><i>Travel Booking</i></span>
+            <span><i>Agent</i></span>
           </h2>
 
           <div className="hero-s_caption-l">
             <p className="hero-s_caption-l_head">
               Delegate
               <br />
-              and approve
+              And Approve
             </p>
             <span className="hero-s_caption-l_rule" />
-            <p className="hero-s_caption-l_body">Book a flight in 60 seconds.</p>
+            <p className="hero-s_caption-l_body">Book A Flight In 60 Seconds.</p>
           </div>
 
           <div className="hero-s_caption-r">
             <span className="hero-s_caption-r_rule" />
             <div className="hero-s_caption-r_row">
-              <span>Scroll down</span>
-              <span>To start the journey</span>
+              <span className="hero-s_caption-r_scroll">
+                <span className="hero-chevrons" aria-hidden>
+                  <span>❯</span>
+                  <span>❯</span>
+                </span>
+                Scroll Down
+              </span>
+              <span>To Start The Journey</span>
             </div>
           </div>
         </div>
 
         {/* CTA pill */}
         <div className="hero-cta">
-          <button onClick={onJoinWaitlist}>Join Waitlist</button>
+          <button className="hero-cta_text" onClick={onJoinWaitlist}>Join Waitlist</button>
+          <button className="hero-cta_icon" onClick={onJoinWaitlist} aria-label="Join Waitlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+            </svg>
+          </button>
         </div>
 
         {/* post-zoom screen — shown once we've flown through the window */}
         <div className="sky-hero">
           <KaivoWordmark height={32} color="#ffffff" />
           <h1 className="sky-hero_title">
-            Conversational travel
+            Conversational Travel
             <br />
-            booking agent
+            Booking Agent
           </h1>
-          <p className="sky-hero_sub">AI-powered. Book a flight in 60 seconds.</p>
+          <p className="sky-hero_sub">AI-Powered. Book A Flight In 60 Seconds.</p>
           <button className="sky-hero_cta" onClick={onJoinWaitlist}>
             Join Waitlist
           </button>
