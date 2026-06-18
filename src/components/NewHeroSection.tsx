@@ -51,7 +51,11 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
   // ── scroll-driven animations ──────────────────────────────────────────────
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // cabin + handle fly through the window on scroll
+      // cabin + handle fly through the window on scroll.
+      // immediateRender is left at its default (true for fromTo) so that at
+      // scrub progress=0 the FROM state (scale:1) is always explicitly applied.
+      // In a production Vite build there is only one effect mount (no Strict-Mode
+      // double-invoke), so the FROM values must be locked in at tween creation.
       gsap.timeline({
         scrollTrigger: {
           trigger: rootRef.current,
@@ -62,10 +66,10 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
         },
         defaults: { ease: "none" },
       })
-        .fromTo(cabinRef.current,      { scale: 1 }, { scale: 9, duration: 0.6, immediateRender: false }, 0)
-        .fromTo(handleClipRef.current, { scale: 1 }, { scale: 9, duration: 0.6, immediateRender: false }, 0)
+        .fromTo(cabinRef.current,      { scale: 1 }, { scale: 9,    duration: 0.6 }, 0)
+        .fromTo(handleClipRef.current, { scale: 1 }, { scale: 9,    duration: 0.6 }, 0)
         .to(handleImgRef.current,  { opacity: 0, duration: 0.22 }, 0.3)
-        .fromTo(skyVideoRef.current,   { scale: 1 }, { scale: 1.12, duration: 0.9, immediateRender: false }, 0);
+        .fromTo(skyVideoRef.current,   { scale: 1 }, { scale: 1.12, duration: 0.9 }, 0);
 
       // continuous descent — pan the sky video downward; deferred so sibling
       // sections (sky-about) are in the DOM before ScrollTrigger resolves them
@@ -99,16 +103,23 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
         scrollTrigger: { trigger: rootRef.current, start: "84% top", end: "bottom top", scrub: 2 },
       });
 
-      // The cabin zoom is scrub-driven off the 380vh scroll area. If ScrollTrigger
-      // measured its start/end before the sky video + cabin images finished
-      // loading, those positions are stale — so at scroll 0 it computes a
-      // non-zero progress and leaves the cabin stuck mid-zoom. Recompute once
-      // everything has loaded (and on resize) so positions are always correct.
+      // Ensure ScrollTrigger positions are measured after all assets are ready.
+      // In a production CDN build, images/fonts can load after the first
+      // useLayoutEffect run, so we refresh at a few checkpoints:
+      //   1. rAF after mount (catches the common case)
+      //   2. window.load (all resources including CDN images)
+      //   3. document.fonts.ready (web fonts can shift element heights)
+      //   4. 600 ms timeout (final safety net for slow CDN edge nodes)
+      // NOTE: we intentionally do NOT add a manual window.resize -> refresh here.
+      // ScrollTrigger already auto-refreshes on resize, and App.tsx sets
+      // ScrollTrigger.config({ ignoreMobileResize: true }) so the mobile URL-bar
+      // show/hide (which fires resize mid-scroll) doesn't retrigger a refresh and
+      // jolt the pinned hero. A manual listener would bypass that protection.
       const refresh = () => ScrollTrigger.refresh();
       window.addEventListener("load", refresh);
-      window.addEventListener("resize", refresh);
+      document.fonts.ready.then(refresh);
+      const safetyTimer = setTimeout(refresh, 600);
       if (document.readyState === "complete") {
-        // already loaded — refresh on the next frame
         requestAnimationFrame(refresh);
       }
 
@@ -123,11 +134,11 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
           hidden = false;
           gsap.to([titleRef.current, heroFgRef.current], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
           gsap.to(handleImgRef.current, { opacity: 1, duration: 0.3, ease: "power2.out", overwrite: true });
-          // Safety: a fast scroll back to the top can leave the scrub-driven
-          // cabin zoom desynced (stuck mid-flight). A full refresh recomputes
-          // the trigger positions AND re-applies progress 0 → clean top state;
-          // gsap.set reinforces it in case the refresh runs a frame late.
-          ScrollTrigger.refresh();
+          // Belt-and-suspenders snap to the clean top state. With the per-frame
+          // ScrollTrigger.update() now wired in App.tsx, the scrub resolves the
+          // cabin to scale 1 on its own — but we also force it here for an instant
+          // (non-eased) reset. Crucially NO overwrite: that would KILL the scrub
+          // tween and stop the zoom from working on the next scroll-down.
           gsap.set(cabinRef.current,      { scale: 1 });
           gsap.set(handleClipRef.current, { scale: 1 });
           gsap.set(skyVideoRef.current,   { scale: 1 });
@@ -137,7 +148,7 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
       return () => {
         window.removeEventListener("scroll", onScroll);
         window.removeEventListener("load", refresh);
-        window.removeEventListener("resize", refresh);
+        clearTimeout(safetyTimer);
       };
     }, rootRef);
 

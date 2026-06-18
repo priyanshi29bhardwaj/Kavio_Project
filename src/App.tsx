@@ -72,9 +72,25 @@ function App() {
       smoothWheel: true,
     });
 
+    // Canonical Lenis -> ScrollTrigger wiring: update on every emitted scroll.
     lenis.on("scroll", ScrollTrigger.update);
     lenis.on("scroll", ({ scroll }: { scroll: number }) => updateNav(scroll));
-    const rafFn = (time: number) => lenis.raf(time * 1000);
+
+    // Drive Lenis from the GSAP ticker, and ALSO call ScrollTrigger.update() on
+    // every frame — not only via the `lenis.on("scroll")` event above. Lenis stops
+    // emitting scroll events a few pixels before it settles at the very top/bottom,
+    // so with event-only wiring a fast scroll back to the hero could leave the
+    // scrub-driven cabin zoom frozen mid-flight: its last-known scroll position was
+    // stale, so progress never reached 0 and the cabin stuck at ~2.5x with GPU
+    // compositing trails. Running update() every frame (after lenis.raf writes the
+    // new scroll position) guarantees the scrub always reflects the true scroll and
+    // resolves cleanly to scale 1 at the top. The double update during active
+    // scrolling is cheap and idempotent. This only reproduced in the production
+    // build (dev masked it via React Strict-Mode double-init + faster local timing).
+    const rafFn = (time: number) => {
+      lenis.raf(time * 1000);
+      ScrollTrigger.update();
+    };
     gsap.ticker.add(rafFn);
     gsap.ticker.lagSmoothing(0);
 

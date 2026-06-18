@@ -334,7 +334,55 @@ export function BusinessModelSection() {
           </div>
         </div>{/* end board */}
 
-        {/* ── Two-column breakdown ─────────────────────────────────────────── */}
+        {/* ── Receipt / Paper Trail ─────────────────────────────────────────── */}
+        <style>{`
+          .receipt-lines {
+            background-image: repeating-linear-gradient(
+              transparent, transparent 27px,
+              rgba(160,120,50,0.07) 27px, rgba(160,120,50,0.07) 28px
+            );
+          }
+          .receipt-tear {
+            height: 18px;
+            background:
+              radial-gradient(circle at 9px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 27px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 45px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 63px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 81px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 99px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 117px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 135px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 153px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 171px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 189px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 207px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 225px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 243px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 261px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 279px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 297px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 315px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 333px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 351px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 369px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 387px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 405px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 423px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 441px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 459px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 477px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 495px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 513px 0, #FDF8EC 8px, transparent 9px),
+              radial-gradient(circle at 531px 0, #FDF8EC 8px, transparent 9px);
+            background-color: white;
+            background-repeat: no-repeat;
+          }
+          @media (max-width: 680px) {
+            .biz-cols { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
+
         <div
           ref={bottomRef}
           className="biz-cols"
@@ -343,145 +391,237 @@ export function BusinessModelSection() {
             gridTemplateColumns: "1fr 1fr",
             gap: "clamp(16px, 2.5vw, 32px)",
             opacity: 0,
+            alignItems: "stretch",
           }}
         >
 
-          {/* LEFT — Traditional model (old) */}
+          {/* LEFT — old thermal receipt */}
           <div style={{
-            background: "#fff5f1",
-            border: "1.5px solid rgba(232,98,42,0.22)",
-            borderRadius: "12px",
-            padding: "clamp(18px, 2.4vw, 28px)",
+            background: "#FDF8EC",
+            borderRadius: "4px 4px 0 0",
+            overflow: "hidden",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.10), 2px 2px 0 rgba(0,0,0,0.04)",
             display: "flex",
             flexDirection: "column",
-            gap: "14px",
+            position: "relative",
           }}>
+            {/* Receipt header */}
             <div style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700, fontSize: "11px", letterSpacing: "0.3em",
-              color: "#E8622A", textTransform: "uppercase",
-            }}>Traditional Platforms</div>
-
-            <div style={{
-              fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
-              fontSize: "clamp(15px, 1.4vw, 17px)",
-              color: "rgba(27,74,90,0.88)", lineHeight: 1.5,
+              background: "#B83A2A",
+              padding: "16px 22px 14px",
+              textAlign: "center",
             }}>
-              Traditional travel platforms make money from:
+              <div style={{
+                fontFamily: "'Courier New', Courier, monospace",
+                fontWeight: "bold", fontSize: "11px", letterSpacing: "0.36em",
+                color: "rgba(255,255,255,0.92)", textTransform: "uppercase",
+                marginBottom: "5px",
+              }}>Traditional Platforms</div>
+              <div style={{
+                fontFamily: "'Courier New', Courier, monospace",
+                fontSize: "9px", letterSpacing: "0.28em",
+                color: "rgba(255,255,255,0.45)",
+              }}>* * * R E C E I P T * * *</div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {["Ads", "Sponsored placements", "Click optimization"].map((item) => (
-                <div key={item} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div style={{
-                    width: "7px", height: "7px", borderRadius: "50%",
-                    background: "#E8622A", flexShrink: 0,
-                  }} />
+            {/* Paper body */}
+            <div className="receipt-lines" style={{ flex: 1, padding: "20px 22px 0" }}>
+              <div style={{
+                fontFamily: "'Courier New', Courier, monospace",
+                fontSize: "clamp(10px, 1.0vw, 12px)",
+                color: "rgba(60,38,16,0.58)",
+                lineHeight: 1.7,
+                marginBottom: "16px",
+                letterSpacing: "0.01em",
+              }}>
+                Traditional travel platforms<br />make money from:
+              </div>
+
+              {/* Dashed rule */}
+              <div style={{ borderTop: "1.5px dashed rgba(120,80,30,0.22)", marginBottom: "16px" }} />
+
+              {/* Line items */}
+              {["Ads", "Sponsored placements", "Click optimization"].map((item, i) => (
+                <div key={item} style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: i < 2 ? "12px" : "0",
+                  gap: "8px",
+                }}>
                   <span style={{
-                    fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
-                    fontSize: "clamp(14px, 1.3vw, 16px)",
-                    color: "rgba(27,74,90,0.82)",
+                    fontFamily: "'Courier New', Courier, monospace",
+                    fontSize: "clamp(12px, 1.15vw, 14px)",
+                    color: "rgba(40,22,8,0.78)",
+                    letterSpacing: "0.02em",
                   }}>{item}</span>
+                  <span style={{
+                    fontFamily: "'Courier New', Courier, monospace",
+                    fontSize: "13px", fontWeight: "bold",
+                    color: "#B83A2A", flexShrink: 0,
+                  }}>✗</span>
                 </div>
               ))}
+
+              {/* Double dashed rule (subtotal) */}
+              <div style={{ borderTop: "1.5px dashed rgba(120,80,30,0.22)", margin: "16px 0 5px" }} />
+              <div style={{ borderTop: "1.5px dashed rgba(120,80,30,0.22)", marginBottom: "16px" }} />
+
+              {/* Problem callout — receipt total block */}
+              <div style={{
+                background: "rgba(184,58,42,0.07)",
+                border: "1px dashed rgba(184,58,42,0.32)",
+                borderRadius: "2px",
+                padding: "14px 16px",
+                marginBottom: "0",
+              }}>
+                <div style={{
+                  fontFamily: "'Courier New', Courier, monospace",
+                  fontWeight: "bold", fontSize: "9px", letterSpacing: "0.28em",
+                  color: "#B83A2A", textTransform: "uppercase",
+                  marginBottom: "8px",
+                }}>** WHICH CREATES A PROBLEM: **</div>
+                <div style={{
+                  fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
+                  fontSize: "clamp(14px, 1.3vw, 17px)",
+                  color: "#B83A2A", lineHeight: 1.4,
+                }}>
+                  They win when you keep searching.
+                </div>
+              </div>
             </div>
 
-            {/* Problem callout */}
+            {/* Perforated tear edge */}
+            <div className="receipt-tear" style={{ marginTop: "16px" }} />
+
+            {/* Corner fold */}
+            <div aria-hidden style={{
+              position: "absolute", bottom: 18, right: 0,
+              width: 0, height: 0,
+              borderStyle: "solid",
+              borderWidth: "0 0 24px 24px",
+              borderColor: "transparent transparent rgba(150,110,50,0.16) transparent",
+            }} />
+          </div>
+
+          {/* RIGHT — clean Kaivo invoice */}
+          <div style={{
+            background: "#FFFFFF",
+            borderRadius: "4px",
+            overflow: "hidden",
+            boxShadow: "0 8px 32px rgba(27,74,90,0.10), 0 1px 4px rgba(27,74,90,0.06)",
+            border: "1px solid rgba(27,74,90,0.09)",
+            display: "flex",
+            flexDirection: "column",
+          }}>
+            {/* Invoice header */}
             <div style={{
-              marginTop: "4px",
-              background: "rgba(232,98,42,0.08)",
-              borderRadius: "8px",
-              padding: "14px 16px",
+              background: "#1B4A5A",
+              padding: "16px 22px 14px",
             }}>
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "11px", letterSpacing: "0.26em",
-                color: "#E8622A", textTransform: "uppercase",
-                marginBottom: "8px",
-              }}>Which creates a problem:</div>
+                fontWeight: 700, fontSize: "11px", letterSpacing: "0.40em",
+                color: "#7ECECA", textTransform: "uppercase",
+                marginBottom: "5px",
+              }}>Kaivo</div>
+              <div style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: "9px", letterSpacing: "0.30em",
+                color: "rgba(255,255,255,0.32)",
+              }}>INVOICE · CLEAR TERMS</div>
+            </div>
+
+            {/* Invoice body */}
+            <div style={{ flex: 1, padding: "20px 22px 0" }}>
               <div style={{
                 fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
-                fontSize: "clamp(15px, 1.4vw, 18px)",
-                color: "#E8622A", lineHeight: 1.4,
+                fontSize: "clamp(15px, 1.45vw, 19px)",
+                color: "#1B4A5A", lineHeight: 1.25, letterSpacing: "-0.01em",
+                marginBottom: "16px",
               }}>
-                They win when you keep searching.
+                Kaivo is built differently.
               </div>
-            </div>
-          </div>
 
-          {/* RIGHT — Kaivo model (new) */}
-          <div style={{
-            background: "#f0f8f8",
-            border: "1.5px solid rgba(27,74,90,0.14)",
-            borderRadius: "12px",
-            padding: "clamp(18px, 2.4vw, 28px)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "14px",
-          }}>
-            <div style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700, fontSize: "11px", letterSpacing: "0.3em",
-              color: "#1B4A5A", textTransform: "uppercase",
-            }}>Kaivo</div>
+              {/* Rule */}
+              <div style={{ borderTop: "1px solid rgba(27,74,90,0.10)", marginBottom: "16px" }} />
 
-            <div style={{
-              fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
-              fontSize: "clamp(15px, 1.5vw, 20px)",
-              color: "#1B4A5A", lineHeight: 1.2, letterSpacing: "-0.02em",
-            }}>
-              Kaivo is built differently.
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {/* Line items */}
               {[
                 { dot: "#5aaa44", text: "No ads" },
                 { dot: "#5aaa44", text: "No hidden incentives" },
                 { dot: "#5aaa44", text: "No pay-to-rank placements" },
                 { dot: "#2a9d9d", text: "Revenue only when bookings happen" },
-              ].map((item) => (
-                <div key={item.text} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              ].map((item, i) => (
+                <div key={item.text} style={{
+                  display: "flex", alignItems: "center",
+                  gap: "10px",
+                  marginBottom: i < 3 ? "12px" : "0",
+                }}>
                   <div style={{
-                    width: "7px", height: "7px", borderRadius: "50%",
+                    width: "18px", height: "18px", borderRadius: "50%",
                     background: item.dot, flexShrink: 0,
-                  }} />
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <svg width="9" height="7" viewBox="0 0 9 7" fill="none" aria-hidden>
+                      <path d="M1 3.5L3.3 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
                   <span style={{
                     fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
-                    fontSize: "clamp(14px, 1.3vw, 16px)",
+                    fontSize: "clamp(13px, 1.2vw, 15px)",
                     color: "rgba(27,74,90,0.85)",
                   }}>{item.text}</span>
                 </div>
               ))}
-            </div>
 
-            {/* Incentive alignment */}
-            <div style={{
-              marginTop: "4px",
-              background: "rgba(27,74,90,0.07)",
-              borderRadius: "8px",
-              padding: "14px 16px",
-            }}>
+              {/* Rule */}
+              <div style={{ borderTop: "1px solid rgba(27,74,90,0.10)", margin: "16px 0" }} />
+
+              {/* Incentive alignment — invoice totals style */}
               <div style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "11px", letterSpacing: "0.26em",
-                color: "rgba(27,74,90,0.85)", textTransform: "uppercase",
-                marginBottom: "10px",
-              }}>Our incentives align with yours:</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {["Help you choose well.", "Handle the work."].map((item) => (
-                  <div key={item} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                background: "rgba(27,74,90,0.05)",
+                borderRadius: "6px",
+                padding: "14px 16px",
+                marginBottom: "0",
+              }}>
+                <div style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 700, fontSize: "9px", letterSpacing: "0.30em",
+                  color: "rgba(27,74,90,0.55)", textTransform: "uppercase",
+                  marginBottom: "10px",
+                }}>Our incentives align with yours:</div>
+                {["Help you choose well.", "Handle the work."].map((item, i) => (
+                  <div key={item} style={{
+                    display: "flex", alignItems: "center",
+                    gap: "10px",
+                    marginBottom: i < 1 ? "9px" : "0",
+                  }}>
                     <div style={{
                       width: "7px", height: "7px", borderRadius: "50%",
                       background: "#E8622A", flexShrink: 0,
                     }} />
                     <span style={{
                       fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
-                      fontSize: "clamp(14px, 1.3vw, 17px)",
+                      fontSize: "clamp(13px, 1.25vw, 16px)",
                       color: "#1B4A5A",
                     }}>{item}</span>
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Clean footer */}
+            <div style={{
+              padding: "14px 22px 16px",
+              textAlign: "right",
+              marginTop: "auto",
+            }}>
+              <div style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: "8px", letterSpacing: "0.22em",
+                color: "rgba(27,74,90,0.22)",
+              }}>TERMS CLEAR · NO HIDDEN FEES</div>
             </div>
           </div>
 

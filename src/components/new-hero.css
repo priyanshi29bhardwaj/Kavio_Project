@@ -136,6 +136,12 @@
   z-index: 2;
   transform-origin: 49% 50%;
   will-change: transform;
+  /* keep the masked layer on a stable GPU composite so scaling it up to 9x and
+     snapping back to 1 doesn't leave tiled repaint trails (seen in production).
+     will-change already promotes the layer; backface-visibility keeps its
+     repaint clean. We do NOT set `transform` here — GSAP owns that property. */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   pointer-events: none;
   -webkit-mask-image: url("/kaivo-hero/cabin-mask.png");
   mask-image: url("/kaivo-hero/cabin-mask.png");
