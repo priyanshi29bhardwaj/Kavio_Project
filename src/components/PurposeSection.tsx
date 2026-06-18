@@ -1,125 +1,116 @@
 import { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { PlaneIcon } from "./PlaneIcon";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export function PurposeSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const badgeRef   = useRef<HTMLDivElement>(null);
 
-  // Each line sits inside overflow:hidden — clips up on reveal
-  const line1 = useRef<HTMLDivElement>(null);
-  const line2 = useRef<HTMLDivElement>(null);
-  const line3 = useRef<HTMLDivElement>(null);
-  const line4 = useRef<HTMLDivElement>(null);
-  const line5 = useRef<HTMLDivElement>(null);
-  const p2l1  = useRef<HTMLDivElement>(null);
-  const p2l2  = useRef<HTMLDivElement>(null);
-  const subRef = useRef<HTMLDivElement>(null);
+  // Entrance targets
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const heroRef  = useRef<HTMLDivElement>(null);
+  const leftRef  = useRef<HTMLDivElement>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
 
-  // Colour-change targets
+  // "The shift" flight path
+  const laneRef  = useRef<HTMLDivElement>(null);
+  const lineRef  = useRef<HTMLDivElement>(null);
+  const planeRef = useRef<HTMLDivElement>(null);
+
+  // Colour-reveal targets (same words / beats as the original manifesto)
   const dim1 = useRef<HTMLSpanElement>(null); // "search better."
-  const dim2 = useRef<HTMLSpanElement>(null); // "browsing."
-  const hl1  = useRef<HTMLSpanElement>(null); // "get things done."  → aqua
-  const hl2  = useRef<HTMLSpanElement>(null); // "outcomes."          → aqua
+  const hl1  = useRef<HTMLSpanElement>(null); // "get things done."  → yellow
+  const dim2 = useRef<HTMLSpanElement>(null); // "browsing."          → orange
+  const hl2  = useRef<HTMLSpanElement>(null); // "outcomes."          → teal
   const hl3  = useRef<HTMLSpanElement>(null); // "Better decisions."  → orange
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.set(
-        [line1.current, line2.current, line3.current,
-         line4.current, line5.current, p2l1.current, p2l2.current],
-        { y: "115%" }
-      );
-      gsap.set([badgeRef.current, subRef.current], { opacity: 0, y: 20 });
+
+      // ── Entrance ────────────────────────────────────────────────────────
+      gsap.set(badgeRef.current, { opacity: 0, y: 16 });
+      gsap.set(heroRef.current,  { opacity: 0, y: 28 });
+      gsap.set([leftRef.current, rightRef.current], { opacity: 0, y: 34 });
 
       const tl = gsap.timeline({ paused: true });
-
-      // ── 1. Clip-reveal lines ─────────────────────────────────────────────
       tl
-        .to(badgeRef.current, { opacity: 1, y: 0, duration: 0.55, ease: "power2.out" }, 0)
-        .to(line1.current,    { y: "0%",          duration: 0.95, ease: "power4.out" }, 0.15)
-        .to(line2.current,    { y: "0%",          duration: 0.95, ease: "power4.out" }, 0.28)
-        .to(line3.current,    { y: "0%",          duration: 0.95, ease: "power4.out" }, 0.41)
-        .to(line4.current,    { y: "0%",          duration: 0.95, ease: "power4.out" }, 0.54)
-        .to(line5.current,    { y: "0%",          duration: 0.95, ease: "power4.out" }, 0.67)
-        .to(p2l1.current,     { y: "0%",          duration: 0.8,  ease: "power3.out" }, 0.82)
-        .to(p2l2.current,     { y: "0%",          duration: 0.8,  ease: "power3.out" }, 0.96)
-        .to(subRef.current,   { opacity: 1, y: 0, duration: 0.6,  ease: "power2.out" }, 1.10)
-
-      // ── 2. "search better." → yellow; "browsing." dims to grey ──────────
-        .to(dim1.current,
-          { color: "#E8E840", duration: 0.55, ease: "power1.inOut" }, 1.35)
-        .to(dim2.current,
-          { color: "#E8622A", duration: 0.55, ease: "power1.inOut" }, 1.35)
-
-      // ── 3. "get things done." → yellow; "outcomes." → aqua; hl3 → orange ──
-        .to(hl1.current,
-          { color: "#E8E840", fontWeight: 900, duration: 0.5, ease: "power2.out" }, 1.55)
-        .to(hl2.current,
-          { color: "#7ECECA", fontWeight: 700, duration: 0.5, ease: "power2.out" }, 1.90)
-        .to(hl3.current,
-          { color: "#E8622A", fontWeight: 800, duration: 0.5, ease: "power2.out" }, 2.25);
+        .to(badgeRef.current, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0)
+        .to(heroRef.current,  { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.12)
+        .to(leftRef.current,  { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.34)
+        .to(rightRef.current, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.46)
+        // colour reveals
+        .to(dim2.current, { color: "#E8622A", duration: 0.55, ease: "power1.inOut" }, 0.7)
+        .to(hl2.current,  { color: "#7ECECA", fontWeight: 800, duration: 0.5, ease: "power2.out" }, 1.25)
+        .to(hl3.current,  { color: "#FF7A4D", fontWeight: 900, duration: 0.5, ease: "power2.out" }, 1.5);
 
       ScrollTrigger.create({
         trigger: sectionRef.current,
-        start:   "top 70%",
+        start:   "top 68%",
         once:    true,
         onEnter: () => tl.play(),
       });
+
+      // ── "The shift" plane flies old → new on scroll ─────────────────────
+      const lane  = laneRef.current;
+      const line  = lineRef.current;
+      const plane = planeRef.current;
+      if (lane && line && plane) {
+        gsap.set(line,  { clipPath: "inset(0 100% 0 0)" });
+        gsap.set(plane, { x: 0 });
+        const endX = () => lane.offsetWidth - (plane.offsetWidth || 48);
+        gsap.timeline({
+          scrollTrigger: { trigger: sectionRef.current, start: "top 55%", end: "bottom 70%", scrub: 1 },
+        })
+          .to(line,  { clipPath: "inset(0 0% 0 0)", ease: "none" })
+          .to(plane, { x: endX, ease: "none" }, 0);
+      }
     }, sectionRef);
     return () => ctx.revert();
   }, []);
-
-  const LINE: React.CSSProperties = { overflow: "hidden", lineHeight: 1.12 };
-  const INNER: React.CSSProperties = { display: "block" };
 
   return (
     <section
       ref={sectionRef}
       style={{
         background: "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         position: "relative",
         overflow: "hidden",
-        padding: "clamp(60px, 8vh, 90px) 0 clamp(40px, 5vh, 60px)",
+        padding: "clamp(64px, 9vh, 110px) 0 clamp(56px, 7vh, 88px)",
       }}
     >
-
       {/* Top gradient seam from WhyLoveSection */}
       <div aria-hidden style={{
-        position: "absolute", top: 0, left: 0, right: 0,
-        height: "160px",
+        position: "absolute", top: 0, left: 0, right: 0, height: "160px",
         background: "linear-gradient(to bottom, #D6EEEE 0%, #f0f9f9 50%, transparent 100%)",
-        pointerEvents: "none",
-        zIndex: 0,
+        pointerEvents: "none", zIndex: 0,
       }} />
 
+      <style>{`
+        .purpose-shift {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: clamp(16px, 2.2vw, 26px);
+          margin-top: clamp(34px, 5vh, 60px);
+        }
+        @media (max-width: 760px) {
+          .purpose-shift { grid-template-columns: 1fr; }
+          .purpose-lane  { display: none !important; }
+        }
+      `}</style>
 
       <div style={{
-        maxWidth: "820px",
-        width: "100%",
-        padding: "0 clamp(20px, 5vw, 60px)",
-        position: "relative",
-        zIndex: 1,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "clamp(6px, 1vh, 10px)",
-        textAlign: "center",
+        position: "relative", zIndex: 1,
+        maxWidth: "1080px", margin: "0 auto",
+        padding: "0 clamp(20px, 5vw, 56px)",
       }}>
 
-        {/* ── Badge ───────────────────────────────────────────────────────── */}
+        {/* ── Badge ─────────────────────────────────────────────────────── */}
         <div ref={badgeRef} style={{
           display: "inline-flex", alignItems: "center", gap: "8px",
-          border: "1.5px solid rgba(27,74,90,0.15)",
-          borderRadius: "100px",
-          padding: "7px 18px",
-          marginBottom: "clamp(18px, 2.8vh, 32px)",
-          opacity: 0,
+          border: "1.5px solid rgba(27,74,90,0.15)", borderRadius: "100px",
+          padding: "9px 20px", marginBottom: "clamp(22px, 3vh, 34px)",
         }}>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
             <circle cx="6" cy="6" r="4.8" stroke="rgba(27,74,90,0.4)" strokeWidth="1.2"/>
@@ -133,87 +124,160 @@ export function PurposeSection() {
           }}>Our Purpose</span>
         </div>
 
-        {/* ── Main headline — 5 clip lines ────────────────────────────────── */}
-        <div style={{
-          fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
-          fontSize: "clamp(30px, 4.0vw, 56px)",
-          color: "#1B4A5A", letterSpacing: "-0.03em",
-          marginBottom: "clamp(20px, 3vh, 32px)",
-          width: "100%",
-        }}>
-          <div style={LINE}><div ref={line1} style={INNER}>We believe the next great</div></div>
-          <div style={LINE}><div ref={line2} style={INNER}>consumer products won't</div></div>
-          <div style={LINE}>
-            <div ref={line3} style={INNER}>
-              help people{" "}
-              <span ref={dim1} style={{ display: "inline" }}>search better.</span>
-            </div>
-          </div>
-          <div style={LINE}><div ref={line4} style={INNER}>They'll help people</div></div>
-          <div style={LINE}>
-            <div ref={line5} style={INNER}>
-              <span ref={hl1} style={{ display: "inline" }}>get things done.</span>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Para 2 — 2 clip lines ───────────────────────────────────────── */}
-        <div style={{
-          fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
-          fontSize: "clamp(15px, 1.8vw, 22px)",
-          color: "rgba(27,74,90,0.85)", letterSpacing: "-0.01em",
-          lineHeight: 1.55,
-          marginBottom: "clamp(22px, 3.2vh, 36px)",
-          width: "100%",
-        }}>
-          <div style={LINE}>
-            <div ref={p2l1} style={INNER}>
-              For years, software has optimized{" "}
-              <span ref={dim2} style={{ display: "inline" }}>browsing.</span>
-            </div>
-          </div>
-          <div style={LINE}>
-            <div ref={p2l2} style={INNER}>
-              Kaivo optimizes{" "}
-              <span ref={hl2} style={{ display: "inline" }}>outcomes.</span>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Sub-line ─────────────────────────────────────────────────────── */}
-        <div
-          ref={subRef}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "clamp(18px, 3vw, 36px)",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            paddingTop: "clamp(12px, 2vh, 22px)",
-            borderTop: "1px solid rgba(27,74,90,0.08)",
-            width: "100%",
-            opacity: 0,
-          }}
-        >
-          {(["Less browsing.", "Less admin."] as const).map((item) => (
-            <span key={item} style={{
-              fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
-              fontSize: "clamp(13px, 1.4vw, 18px)",
-              color: "rgba(27,74,90,0.78)",
-            }}>
-              {item}
-            </span>
-          ))}
-          <span ref={hl3} style={{
-            fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
-            fontSize: "clamp(13px, 1.4vw, 18px)",
-            color: "#1B4A5A",
-            display: "inline",
+        {/* ── Hero manifesto ────────────────────────────────────────────── */}
+        <div ref={heroRef} style={{ display: "flex", gap: "clamp(18px, 2.4vw, 32px)" }}>
+          {/* teal accent bar */}
+          <div aria-hidden style={{
+            flexShrink: 0, width: "4px", borderRadius: "4px",
+            background: "linear-gradient(to bottom, #7ECECA, rgba(126,206,202,0.15))",
+          }} />
+          <div style={{
+            fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
+            fontSize: "clamp(28px, 3.6vw, 52px)",
+            color: "#1B4A5A", letterSpacing: "-0.032em", lineHeight: 1.12,
+            maxWidth: "960px",
           }}>
-            Better decisions.
-          </span>
+            We believe the next great consumer products won't help people{" "}
+            <span ref={dim1}>search better.</span>{" "}
+            They'll help people{" "}
+            <span ref={hl1}>get things done.</span>
+          </div>
         </div>
 
+        {/* ── "The shift" labels + flight path ──────────────────────────── */}
+        <div className="purpose-lane" style={{
+          marginTop: "clamp(40px, 6vh, 72px)",
+          display: "flex", alignItems: "center", gap: "16px",
+        }}>
+          <span style={{
+            fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800,
+            fontSize: "11px", letterSpacing: "0.26em", color: "rgba(27,74,90,0.45)",
+            textTransform: "uppercase", flexShrink: 0,
+          }}>The Old Way</span>
+
+          {/* animated flight lane */}
+          <div ref={laneRef} style={{ position: "relative", flex: 1, height: "30px" }}>
+            <div aria-hidden style={{
+              position: "absolute", top: "50%", left: 0, right: 0, height: 0,
+              borderTop: "1.5px dashed rgba(27,74,90,0.18)", transform: "translateY(-50%)",
+            }} />
+            <div ref={lineRef} style={{
+              position: "absolute", top: "50%", left: 0, right: 0, height: 0,
+              borderTop: "1.5px dashed #7ECECA", transform: "translateY(-50%)",
+            }} />
+            <div ref={planeRef} style={{
+              position: "absolute", top: "50%", left: 0,
+              transform: "translateY(-50%)", lineHeight: 0,
+            }}>
+              <PlaneIcon size={48} color="#1B4A5A" />
+            </div>
+          </div>
+
+          <span style={{
+            fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800,
+            fontSize: "11px", letterSpacing: "0.26em", color: "#7ECECA",
+            textTransform: "uppercase", flexShrink: 0,
+          }}>The Kaivo Way</span>
+        </div>
+
+        {/* ── Before → After panels ─────────────────────────────────────── */}
+        <div className="purpose-shift">
+
+          {/* OLD WAY — muted paper */}
+          <div ref={leftRef} style={{
+            background: "#F4F3EE",
+            border: "1px solid rgba(27,74,90,0.07)",
+            borderRadius: "22px",
+            padding: "clamp(26px, 3vw, 40px)",
+            display: "flex", flexDirection: "column",
+            position: "relative", overflow: "hidden",
+          }}>
+            <span style={{
+              fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800,
+              fontSize: "10px", letterSpacing: "0.28em", color: "rgba(27,74,90,0.40)",
+              textTransform: "uppercase", marginBottom: "18px",
+            }}>Optimized for</span>
+
+            <div style={{
+              fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
+              fontSize: "clamp(20px, 2.2vw, 30px)",
+              color: "rgba(27,74,90,0.55)", lineHeight: 1.3, letterSpacing: "-0.02em",
+            }}>
+              For years, software has optimized{" "}
+              <span ref={dim2}>browsing.</span>
+            </div>
+
+            <div style={{ flex: 1, minHeight: "20px" }} />
+
+            <div style={{
+              borderTop: "1px solid rgba(27,74,90,0.10)",
+              paddingTop: "20px", marginTop: "24px",
+              display: "flex", flexDirection: "column", gap: "12px",
+            }}>
+              {["Less browsing.", "Less admin."].map((t) => (
+                <div key={t} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span aria-hidden style={{
+                    width: "18px", height: "1.5px", background: "rgba(27,74,90,0.30)", flexShrink: 0,
+                  }} />
+                  <span style={{
+                    fontFamily: "'Urbanist', sans-serif", fontWeight: 700,
+                    fontSize: "clamp(14px, 1.4vw, 17px)", color: "rgba(27,74,90,0.55)",
+                  }}>{t}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* KAIVO WAY — vibrant navy */}
+          <div ref={rightRef} style={{
+            background: "#163C49",
+            borderRadius: "22px",
+            padding: "clamp(26px, 3vw, 40px)",
+            display: "flex", flexDirection: "column",
+            position: "relative", overflow: "hidden",
+          }}>
+            {/* soft teal glow */}
+            <div aria-hidden style={{
+              position: "absolute", top: "-30%", right: "-20%",
+              width: "70%", height: "80%", borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(126,206,202,0.22) 0%, transparent 70%)",
+              pointerEvents: "none",
+            }} />
+
+            <span style={{
+              fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800,
+              fontSize: "10px", letterSpacing: "0.28em", color: "rgba(126,206,202,0.75)",
+              textTransform: "uppercase", marginBottom: "18px", position: "relative",
+            }}>Optimized for</span>
+
+            <div style={{
+              fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
+              fontSize: "clamp(20px, 2.2vw, 30px)",
+              color: "rgba(255,255,255,0.92)", lineHeight: 1.3, letterSpacing: "-0.02em",
+              position: "relative",
+            }}>
+              Kaivo optimizes{" "}
+              <span ref={hl2} style={{ color: "rgba(126,206,202,0.45)" }}>outcomes.</span>
+            </div>
+
+            <div style={{ flex: 1, minHeight: "20px" }} />
+
+            <div style={{
+              borderTop: "1px solid rgba(126,206,202,0.20)",
+              paddingTop: "22px", marginTop: "24px",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              gap: "16px", position: "relative",
+            }}>
+              <span ref={hl3} style={{
+                fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
+                fontSize: "clamp(20px, 2.2vw, 30px)", letterSpacing: "-0.02em",
+                color: "rgba(255,255,255,0.85)",
+              }}>Better decisions.</span>
+              <PlaneIcon size={48} color="#7ECECA" />
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
   );

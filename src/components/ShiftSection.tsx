@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { PlaneIcon } from "./PlaneIcon";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,16 +26,6 @@ const ticks = Array.from({ length: 60 }, (_, i) => {
     isMaj,
   };
 });
-
-// ── Plane pointing right — minimal navy glyph ─────────────────────────────────
-function PlaneRight({ color = "#1B4A5A", size = 20 }: { color?: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true"
-      style={{ transform: "rotate(90deg)" }}>
-      <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
-    </svg>
-  );
-}
 
 export function ShiftSection() {
   const sectionRef    = useRef<HTMLElement>(null);
@@ -299,7 +290,7 @@ export function ShiftSection() {
           transform: "translateY(-50%)",
           lineHeight: 0, zIndex: 2,
         }}>
-          <PlaneRight color="#1B4A5A" size={30} />
+          <PlaneIcon color="#1B4A5A" size={48} />
         </div>
       </div>
 
@@ -645,7 +636,7 @@ export function ShiftSection() {
               pointerEvents: "none",
               opacity: 0,
             }}>
-              <PlaneRight size={26} />
+              <PlaneIcon size={48} />
             </div>
             {STEPS.map((step, i) => (
               <div key={step} style={{ display: "flex", alignItems: "center" }}>

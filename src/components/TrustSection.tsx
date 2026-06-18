@@ -104,13 +104,13 @@ export function TrustSection() {
       }}
     >
 
-      {/* Teal → white gradient seam from ConversationalSection */}
+      {/* Simple divider line from ConversationalSection — clean edge, no colour fade */}
       <div aria-hidden style={{
         position: "absolute", top: 0, left: 0, right: 0,
-        height: "200px",
-        background: "linear-gradient(to bottom, #1B4A5A, white)",
+        height: "1px",
+        background: "rgba(126,206,202,0.30)",
         pointerEvents: "none",
-        zIndex: 0,
+        zIndex: 1,
       }} />
 
 

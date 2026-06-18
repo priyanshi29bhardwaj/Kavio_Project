@@ -20,17 +20,6 @@ interface Member {
 
 const TEAM: Member[] = [
   {
-    name: "Aragon M. v. B. Brettschneider",
-    role: "CEO",
-    image: "/aragon.png",
-    logos: [
-      { src: "/rocket-logo.webp", alt: "Rocket Internet" },
-      { src: "/accenture.webp",   alt: "Accenture" },
-    ],
-    linkedin: "https://www.linkedin.com/in/aragonbrettschneider",
-    bio: "Aragon brings a rare combination of entrepreneurial hustle and management consulting rigour. He led digital venture building at Rocket Internet, scaling startups across emerging markets in record time. At Accenture, he advised Fortune 500 companies on AI-driven digital transformation. Aragon founded Kaivo with a firm belief: booking a flight should take 60 seconds, not 60 minutes.",
-  },
-  {
     name: "Davide Nuessle",
     role: "COO",
     image: "/davide.png",
@@ -40,6 +29,17 @@ const TEAM: Member[] = [
     ],
     linkedin: "https://www.linkedin.com/in/davide-nuessle-b82860174/",
     bio: "Davide is the operational backbone of Kaivo. A strategy consultant at Bain & Company, he worked with leading travel and transportation companies on growth and efficiency. At BlackRock, he managed global investment portfolios and built rigorous analytical frameworks. At Kaivo, he ensures the platform runs — flawlessly, every day.",
+  },
+  {
+    name: "Aragon M. v. B. Brettschneider",
+    role: "CEO",
+    image: "/aragon.png",
+    logos: [
+      { src: "/rocket-logo.webp", alt: "Rocket Internet" },
+      { src: "/accenture.webp",   alt: "Accenture" },
+    ],
+    linkedin: "https://www.linkedin.com/in/aragonbrettschneider",
+    bio: "Aragon brings a rare combination of entrepreneurial hustle and management consulting rigour. He led digital venture building at Rocket Internet, scaling startups across emerging markets in record time. At Accenture, he advised Fortune 500 companies on AI-driven digital transformation. Aragon founded Kaivo with a firm belief: booking a flight should take 60 seconds, not 60 minutes.",
   },
   {
     name: "Claire Cairns",

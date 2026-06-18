@@ -21,6 +21,7 @@ import { FoundersCTASection }   from "./components/FoundersCTASection";
 import { ContactSection }       from "./components/ContactSection";
 import { JoinWaitlistModal } from "./components/JoinWaitlistModal";
 import { KaivoWordmark } from "./components/KaivoLogo";
+import { PlaneIcon } from "./components/PlaneIcon";
 
 gsap.registerPlugin(ScrollTrigger);
 ScrollTrigger.config({ ignoreMobileResize: true });
@@ -332,15 +333,9 @@ function App() {
         <div style={{ flex: 1, height: "1px", background: "rgba(126,206,202,0.18)" }} />
 
         {/* Plane icon */}
-        <svg
-          width="22" height="22"
-          viewBox="0 0 24 24"
-          fill="#7ECECA"
-          style={{ margin: "0 16px", opacity: 0.7, flexShrink: 0 }}
-          aria-hidden
-        >
-          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
-        </svg>
+        <div style={{ margin: "0 16px", opacity: 0.7, flexShrink: 0 }}>
+          <PlaneIcon size={48} color="#7ECECA" />
+        </div>
 
         {/* Right line */}
         <div style={{ flex: 1, height: "1px", background: "rgba(126,206,202,0.18)" }} />

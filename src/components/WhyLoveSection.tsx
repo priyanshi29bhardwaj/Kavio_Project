@@ -1,58 +1,80 @@
 import { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { PlaneIcon } from "./PlaneIcon";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Commercial aircraft silhouette, pointing right — matches the flight-path aesthetic
-function PlaneSVG({ size = 56, color = "#1B4A5A" }: { size?: number; color?: string }) {
+// ── Per-engine line icons (24×24, single stroke) ──────────────────────────
+const ICONS: Record<string, React.ReactNode> = {
+  // Delegation — hand it off / send away
+  DELEGATION: (
+    <>
+      <path d="M5 15v3h14v-3" />
+      <path d="M12 4v9" />
+      <path d="M8 8l4-4 4 4" />
+    </>
+  ),
+  // Trust — shield with check
+  TRUST: (
+    <>
+      <path d="M12 3l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V6z" />
+      <path d="M9 12l2 2 4-4" />
+    </>
+  ),
+  // Knowledge — compass
+  KNOWLEDGE: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M15 9l-2 4-4 2 2-4z" />
+    </>
+  ),
+  // Conversation — chat bubble
+  CONVERSATION: (
+    <>
+      <path d="M5 6h14v9h-8l-4 3v-3H5z" />
+      <path d="M9 10.5h0M12 10.5h0M15 10.5h0" />
+    </>
+  ),
+  // Personalisation — tune / sliders
+  PERSONALISATION: (
+    <>
+      <path d="M4 8h16M4 16h16" />
+      <circle cx="9" cy="8" r="2" />
+      <circle cx="15" cy="16" r="2" />
+    </>
+  ),
+};
+
+const ENGINES = [
+  { num: "01", name: "DELEGATION",      body: "Hand it over. Kaivo does the searching, comparing and booking, so you don't have to." },
+  { num: "02", name: "TRUST",           body: "The best price we can find, shown with its reasoning. Nothing hidden, nothing pushed." },
+  { num: "03", name: "KNOWLEDGE",       body: "Kaivo knows when to book, how fares move, and when waiting beats buying." },
+  { num: "04", name: "CONVERSATION",    body: "Talk or type, like messaging a friend. No filters, no forms, no twelve open tabs." },
+  { num: "05", name: "PERSONALISATION", body: "The more you use it, the better it gets. Kaivo adapts to how you travel." },
+] as const;
+
+// ── Spinning jet-turbine graphic for the feature card ─────────────────────
+function Turbine({ size = 150 }: { size?: number }) {
   return (
-    <svg width={size} height={Math.round(size * 0.38)} viewBox="0 0 200 76" fill={color} aria-hidden>
-      {/* Fuselage */}
-      <path d="M18,40 Q36,32 68,30 L172,28 Q194,28 200,38 Q194,48 172,48 L68,46 Q36,44 18,40Z" />
-      {/* Main wing upper */}
-      <path d="M118,30 L84,4 L72,7 L106,31Z" />
-      {/* Main wing lower */}
-      <path d="M118,46 L84,72 L72,69 L106,45Z" />
-      {/* Vertical tail fin */}
-      <path d="M38,32 L26,12 L35,12 L46,32Z" />
-      {/* Horizontal stabiliser upper */}
-      <path d="M42,33 L24,22 L21,24 L36,35Z" />
-      {/* Horizontal stabiliser lower */}
-      <path d="M42,43 L24,54 L21,52 L36,41Z" />
-      {/* Engine pod */}
-      <path d="M96,47 Q108,47 116,48 L116,52 Q108,53 96,53 Q90,52 88,50 Q90,47 96,47Z" />
+    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden style={{ display: "block" }}>
+      <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(126,206,202,0.30)" strokeWidth="1.5" />
+      <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(126,206,202,0.18)" strokeWidth="1" />
+      <g className="turbine-blades" style={{ transformOrigin: "50px 50px" }}>
+        {Array.from({ length: 12 }).map((_, i) => (
+          <path
+            key={i}
+            d="M50 50 L45 14 Q50 11 55 14 Z"
+            fill="rgba(126,206,202,0.55)"
+            transform={`rotate(${i * 30} 50 50)`}
+          />
+        ))}
+      </g>
+      <circle cx="50" cy="50" r="9" fill="#7ECECA" />
+      <circle cx="50" cy="50" r="3.5" fill="#163C49" />
     </svg>
   );
 }
-
-const ENGINES = [
-  {
-    num: "01",
-    name: "DELEGATION",
-    body: "Hand it over. Kaivo does the searching, comparing and booking, so you don't have to.",
-  },
-  {
-    num: "02",
-    name: "TRUST",
-    body: "The best price we can find, shown with its reasoning. Nothing hidden, nothing pushed.",
-  },
-  {
-    num: "03",
-    name: "KNOWLEDGE",
-    body: "Kaivo knows when to book, how fares move, and when waiting beats buying.",
-  },
-  {
-    num: "04",
-    name: "CONVERSATION",
-    body: "Talk or type, like messaging a friend. No filters, no forms, no twelve open tabs.",
-  },
-  {
-    num: "05",
-    name: "PERSONALISATION",
-    body: "The more you use it, the better it gets. Kaivo adapts to how you travel.",
-  },
-] as const;
 
 export function WhyLoveSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -78,7 +100,7 @@ export function WhyLoveSection() {
       if (cont && line && plane) {
         gsap.set(line,  { clipPath: "inset(0 100% 0 0)" });
         gsap.set(plane, { x: 0 });
-        const endX = cont.offsetWidth - (plane.offsetWidth || 40);
+        const endX = () => cont.offsetWidth - (plane.offsetWidth || 48);
         gsap.timeline({
           scrollTrigger: { trigger: sectionRef.current, start: "top 88%", end: "top 25%", scrub: 1 },
         })
@@ -90,14 +112,14 @@ export function WhyLoveSection() {
       gsap.set(badgeRef.current,                 { opacity: 0, y: 14 });
       gsap.set(headRef.current,                  { opacity: 0, y: 28 });
       gsap.set(subRef.current,                   { opacity: 0, y: 18 });
-      gsap.set(cardRefs.current.filter(Boolean), { opacity: 0, y: 28 });
+      gsap.set(cardRefs.current.filter(Boolean), { opacity: 0, y: 30 });
 
       const tl = gsap.timeline({ paused: true });
       tl
         .to(badgeRef.current, { opacity: 1, y: 0, duration: 0.5,  ease: "power2.out" }, 0)
-        .to(headRef.current,  { opacity: 1, y: 0, duration: 0.7,  ease: "power3.out" }, 0.15)
-        .to(subRef.current,   { opacity: 1, y: 0, duration: 0.55, ease: "power2.out" }, 0.30)
-        .to(cardRefs.current, { opacity: 1, y: 0, duration: 0.55, stagger: 0.1, ease: "power2.out" }, 0.48);
+        .to(headRef.current,  { opacity: 1, y: 0, duration: 0.7,  ease: "power3.out" }, 0.12)
+        .to(subRef.current,   { opacity: 1, y: 0, duration: 0.55, ease: "power2.out" }, 0.28)
+        .to(cardRefs.current.filter(Boolean), { opacity: 1, y: 0, duration: 0.6, stagger: 0.09, ease: "power3.out" }, 0.42);
 
       ScrollTrigger.create({
         trigger: sectionRef.current,
@@ -141,9 +163,64 @@ export function WhyLoveSection() {
           position: "absolute", top: "50%", left: 0,
           transform: "translateY(-50%)", lineHeight: 0,
         }}>
-          <PlaneSVG size={44} color="#7ECECA" />
+          <PlaneIcon size={48} color="#7ECECA" />
         </div>
       </div>
+
+      <style>{`
+        .engine-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: clamp(14px, 1.6vw, 20px);
+          width: 100%;
+        }
+        @media (max-width: 940px) { .engine-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .engine-grid { grid-template-columns: 1fr; } }
+
+        .engine-card {
+          position: relative;
+          overflow: hidden;
+          background: #FBFDFD;
+          border: 1px solid rgba(27,74,90,0.10);
+          border-radius: 20px;
+          padding: clamp(22px, 2.4vw, 30px);
+          min-height: 230px;
+          display: flex;
+          flex-direction: column;
+          transition: transform .38s cubic-bezier(.2,.7,.2,1),
+                      box-shadow .38s ease, border-color .38s ease;
+        }
+        .engine-card:hover {
+          transform: translateY(-6px);
+          border-color: rgba(126,206,202,0.65);
+          box-shadow: 0 22px 46px -22px rgba(27,74,90,0.30);
+        }
+        .engine-ghost {
+          position: absolute; right: 14px; bottom: -18px;
+          font-family: 'Space Grotesk', sans-serif; font-weight: 800;
+          font-size: 116px; line-height: 1; letter-spacing: -0.04em;
+          color: rgba(27,74,90,0.045);
+          pointer-events: none; transition: color .38s ease;
+        }
+        .engine-card:hover .engine-ghost { color: rgba(126,206,202,0.14); }
+        .engine-accent {
+          height: 3px; width: 36px; border-radius: 3px;
+          background: #7ECECA; margin-top: auto;
+          transition: width .42s cubic-bezier(.2,.7,.2,1);
+        }
+        .engine-card:hover .engine-accent { width: 100%; }
+        .engine-icon-chip {
+          width: 46px; height: 46px; border-radius: 13px;
+          background: rgba(126,206,202,0.16);
+          display: flex; align-items: center; justify-content: center;
+          transition: background .38s ease;
+        }
+        .engine-card:hover .engine-icon-chip { background: rgba(126,206,202,0.30); }
+
+        .turbine-blades { animation: turbine-spin 14s linear infinite; }
+        .engine-feature:hover .turbine-blades { animation-duration: 3s; }
+        @keyframes turbine-spin { to { transform: rotate(360deg); } }
+      `}</style>
 
       {/* ── Content ───────────────────────────────────────────────────── */}
       <div style={{
@@ -154,7 +231,7 @@ export function WhyLoveSection() {
         zIndex:        1,
         display:       "flex",
         flexDirection: "column",
-        gap:           "clamp(24px, 3vh, 40px)",
+        gap:           "clamp(28px, 4vh, 48px)",
       }}>
 
         {/* ── Badge + Headline ─────────────────────────────────────────── */}
@@ -196,54 +273,82 @@ export function WhyLoveSection() {
           </p>
         </div>
 
-        {/* ── Engine list ──────────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+        {/* ── Engine card grid ─────────────────────────────────────────── */}
+        <div className="engine-grid">
           {ENGINES.map((e, i) => (
             <div
-              key={i}
+              key={e.name}
               ref={(el) => { cardRefs.current[i] = el; }}
-              style={{
-                display: "flex", alignItems: "flex-start", gap: "clamp(20px, 3vw, 40px)",
-                padding: "clamp(18px, 2.2vh, 28px) 0",
-                borderBottom: i < ENGINES.length - 1 ? "1px solid rgba(27,74,90,0.08)" : "none",
-                opacity: 0,
-              }}
+              className="engine-card"
             >
-              {/* Number */}
+              <span className="engine-ghost">{e.num}</span>
+
+              {/* Icon + number row */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "22px" }}>
+                <div className="engine-icon-chip">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="#1B4A5A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    {ICONS[e.name]}
+                  </svg>
+                </div>
+                <span style={{
+                  fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800,
+                  fontSize: "12px", letterSpacing: "0.16em", color: "#7ECECA",
+                }}>{e.num}</span>
+              </div>
+
+              {/* Name */}
               <div style={{
                 fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800,
-                fontSize: "clamp(12px, 1vw, 14px)", letterSpacing: "0.18em",
-                color: "#7ECECA", flexShrink: 0, paddingTop: "3px",
-                minWidth: "28px",
+                fontSize: "13px", letterSpacing: "0.22em",
+                color: "#1B4A5A", textTransform: "uppercase", marginBottom: "12px",
+                position: "relative",
               }}>
-                {e.num}
+                {e.name}
               </div>
 
-              {/* Divider */}
+              {/* Body */}
               <div style={{
-                width: "1px", alignSelf: "stretch",
-                background: "rgba(27,74,90,0.1)", flexShrink: 0,
-              }} />
-
-              {/* Name + body */}
-              <div style={{ flex: 1 }}>
-                <div style={{
-                  fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800,
-                  fontSize: "clamp(11px, 1vw, 13px)", letterSpacing: "0.28em",
-                  color: "#1B4A5A", textTransform: "uppercase", marginBottom: "8px",
-                }}>
-                  {e.name}
-                </div>
-                <div style={{
-                  fontFamily: "'Urbanist', sans-serif", fontWeight: 600,
-                  fontSize: "clamp(15px, 1.5vw, 19px)",
-                  color: "rgba(27,74,90,0.80)", lineHeight: 1.6,
-                }}>
-                  {e.body}
-                </div>
+                fontFamily: "'Urbanist', sans-serif", fontWeight: 600,
+                fontSize: "clamp(15px, 1.4vw, 17px)",
+                color: "rgba(27,74,90,0.78)", lineHeight: 1.55,
+                marginBottom: "22px", position: "relative",
+              }}>
+                {e.body}
               </div>
+
+              <div className="engine-accent" />
             </div>
           ))}
+
+          {/* ── Feature card — the engine itself ──────────────────────── */}
+          <div
+            ref={(el) => { cardRefs.current[ENGINES.length] = el; }}
+            className="engine-card engine-feature"
+            style={{
+              background: "#163C49",
+              border: "1px solid rgba(126,206,202,0.18)",
+              alignItems: "center", justifyContent: "center", textAlign: "center",
+            }}
+          >
+            {/* soft glow */}
+            <div aria-hidden style={{
+              position: "absolute", inset: 0,
+              background: "radial-gradient(circle at 50% 42%, rgba(126,206,202,0.18) 0%, transparent 60%)",
+              pointerEvents: "none",
+            }} />
+            <div style={{ position: "relative", marginBottom: "18px" }}>
+              <Turbine size={130} />
+            </div>
+            <div style={{
+              fontFamily: "'Urbanist', sans-serif", fontWeight: 900,
+              fontSize: "clamp(20px, 2vw, 26px)", color: "white",
+              lineHeight: 1.1, letterSpacing: "-0.02em", position: "relative",
+            }}>
+              Engineered<br />
+              <span style={{ color: "#7ECECA" }}>to deliver.</span>
+            </div>
+          </div>
         </div>
 
       </div>

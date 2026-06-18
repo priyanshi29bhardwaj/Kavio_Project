@@ -1,17 +1,9 @@
 import { useRef, useLayoutEffect, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { PlaneIcon } from "./PlaneIcon";
 
 gsap.registerPlugin(ScrollTrigger);
-
-// ── Plane pointing up-right (takeoff, used in KAIVO row) ─────────────────────
-function PlaneTakeoff({ color = "#C8E44A", size = 13 }: { color?: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true">
-      <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
-    </svg>
-  );
-}
 
 const rows = [
   { tool: "Search",               desc: "Browse and filter everything yourself.",            status: "DELAYED",  isKaivo: false },
@@ -546,7 +538,7 @@ export function ProblemSection() {
                   fontWeight: 700, fontSize: "11px", letterSpacing: "0.34em",
                   color: "#C8E44A", textTransform: "uppercase",
                 }}>
-                  <PlaneTakeoff color="#C8E44A" size={12} />
+                  <PlaneIcon color="#C8E44A" size={20} />
                   Departures
                 </div>
                 <div style={{

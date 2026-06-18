@@ -224,27 +224,13 @@ export function ConversationalSection() {
         paddingBottom: "80px",
       }}
     >
-      {/* White → teal bleed from ProductSection — taller & eased for a soft,
-          cinematic fade instead of a hard band */}
+      {/* Simple divider line from ProductSection — clean edge, no colour fade */}
       <div aria-hidden style={{
         position: "absolute", top: 0, left: 0, right: 0,
-        height: "340px",
-        background:
-          "linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,0.86) 14%, rgba(120,170,180,0.5) 42%, rgba(27,74,90,0.85) 74%, rgba(27,74,90,0) 100%)",
+        height: "1px",
+        background: "rgba(126,206,202,0.30)",
         pointerEvents: "none",
-        zIndex: 0,
-      }} />
-
-      {/* Soft aqua glow that bleeds down from the seam — ties the white frame
-          into the teal world */}
-      <div aria-hidden style={{
-        position: "absolute", top: "-120px", left: "50%",
-        transform: "translateX(-50%)",
-        width: "120%", height: "420px",
-        background:
-          "radial-gradient(60% 100% at 50% 0%, rgba(126,206,202,0.22) 0%, transparent 70%)",
-        pointerEvents: "none",
-        zIndex: 0,
+        zIndex: 1,
       }} />
 
       {/* Subtle diagonal stripe overlay */}
@@ -253,6 +239,17 @@ export function ConversationalSection() {
         backgroundImage:
           "repeating-linear-gradient(55deg, transparent 0px, transparent 30px, rgba(126,206,202,0.022) 30px, rgba(126,206,202,0.022) 31px)",
         pointerEvents: "none",
+      }} />
+
+      {/* Bottom fade — flatten the radial into a clean, uniform navy so the
+          handoff into TrustSection's seam is seamless (no color mismatch) */}
+      <div aria-hidden style={{
+        position: "absolute", bottom: 0, left: 0, right: 0,
+        height: "320px",
+        background:
+          "linear-gradient(to bottom, rgba(20,58,71,0) 0%, #143A47 72%, #143A47 100%)",
+        pointerEvents: "none",
+        zIndex: 0,
       }} />
 
 

@@ -58,13 +58,14 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
           start: "top top",
           end: "bottom bottom",
           scrub: true,
+          invalidateOnRefresh: true,
         },
         defaults: { ease: "none" },
       })
-        .to(cabinRef.current,      { scale: 9, duration: 0.6 }, 0)
-        .to(handleClipRef.current, { scale: 9, duration: 0.6 }, 0)
+        .fromTo(cabinRef.current,      { scale: 1 }, { scale: 9, duration: 0.6, immediateRender: false }, 0)
+        .fromTo(handleClipRef.current, { scale: 1 }, { scale: 9, duration: 0.6, immediateRender: false }, 0)
         .to(handleImgRef.current,  { opacity: 0, duration: 0.22 }, 0.3)
-        .to(skyVideoRef.current,   { scale: 1.12, duration: 0.9 }, 0);
+        .fromTo(skyVideoRef.current,   { scale: 1 }, { scale: 1.12, duration: 0.9, immediateRender: false }, 0);
 
       // continuous descent — pan the sky video downward; deferred so sibling
       // sections (sky-about) are in the DOM before ScrollTrigger resolves them
@@ -98,6 +99,19 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
         scrollTrigger: { trigger: rootRef.current, start: "84% top", end: "bottom top", scrub: 2 },
       });
 
+      // The cabin zoom is scrub-driven off the 380vh scroll area. If ScrollTrigger
+      // measured its start/end before the sky video + cabin images finished
+      // loading, those positions are stale — so at scroll 0 it computes a
+      // non-zero progress and leaves the cabin stuck mid-zoom. Recompute once
+      // everything has loaded (and on resize) so positions are always correct.
+      const refresh = () => ScrollTrigger.refresh();
+      window.addEventListener("load", refresh);
+      window.addEventListener("resize", refresh);
+      if (document.readyState === "complete") {
+        // already loaded — refresh on the next frame
+        requestAnimationFrame(refresh);
+      }
+
       // hide titles + FG on any scroll; restore when back at top
       let hidden = false;
       const onScroll = () => {
@@ -109,10 +123,22 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
           hidden = false;
           gsap.to([titleRef.current, heroFgRef.current], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
           gsap.to(handleImgRef.current, { opacity: 1, duration: 0.3, ease: "power2.out", overwrite: true });
+          // Safety: a fast scroll back to the top can leave the scrub-driven
+          // cabin zoom desynced (stuck mid-flight). A full refresh recomputes
+          // the trigger positions AND re-applies progress 0 → clean top state;
+          // gsap.set reinforces it in case the refresh runs a frame late.
+          ScrollTrigger.refresh();
+          gsap.set(cabinRef.current,      { scale: 1 });
+          gsap.set(handleClipRef.current, { scale: 1 });
+          gsap.set(skyVideoRef.current,   { scale: 1 });
         }
       };
       window.addEventListener("scroll", onScroll, { passive: true });
-      return () => window.removeEventListener("scroll", onScroll);
+      return () => {
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("load", refresh);
+        window.removeEventListener("resize", refresh);
+      };
     }, rootRef);
 
     return () => ctx.revert();
@@ -198,7 +224,7 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
             {/* bottom foreground row */}
             <div ref={heroFgRef} className="hero-fg" id="heroFg">
               <div className="hero-lead">
-                <h3>Delegate And Approve:<br />Book a Flight in 60&nbsp;Seconds</h3>
+                <h3>Delegate &amp; Approve:<br />Book a Flight in 60&nbsp;Seconds</h3>
               </div>
 
               <button className="btn-pill" onClick={onJoinWaitlist}>
