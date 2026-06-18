@@ -6,7 +6,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Preloader }        from "./components/Preloader";
 import { NewHeroSection }   from "./components/NewHeroSection";
 import { SkyAboutSection }  from "./components/SkyAboutSection";
-import { FleetSection }     from "./components/FleetSection";
 import { DemoSection }      from "./components/DemoSection";
 import { ProblemSection }   from "./components/ProblemSection";
 import { ShiftSection }     from "./components/ShiftSection";
