@@ -141,16 +141,6 @@ export function BusinessModelSection() {
         zIndex: 0,
       }} />
 
-      {/* Watermark */}
-      <div aria-hidden style={{
-        position: "absolute", right: "-1%", top: "50%",
-        transform: "translateY(-46%)",
-        fontFamily: "'Space Grotesk', sans-serif", fontWeight: 900,
-        fontSize: "clamp(140px, 20vw, 300px)",
-        color: "rgba(27,74,90,0.028)",
-        lineHeight: 1, pointerEvents: "none", userSelect: "none",
-        letterSpacing: "-0.05em",
-      }}>10</div>
 
       <div style={{
         maxWidth: "960px",

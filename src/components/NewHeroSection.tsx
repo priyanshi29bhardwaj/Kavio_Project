@@ -7,206 +7,225 @@ import "./new-hero.css";
 
 gsap.registerPlugin(ScrollTrigger, CustomEase);
 
-if (!CustomEase.get("kaivoInOut")) CustomEase.create("kaivoInOut", "0.76, 0, 0.24, 1");
-if (!CustomEase.get("kaivoOut")) CustomEase.create("kaivoOut", "0.25, 1, 0.5, 1");
-if (!CustomEase.get("kaivoIn")) CustomEase.create("kaivoIn", "0.5, 0, 0.75, 0");
+if (!CustomEase.get("kInOut")) CustomEase.create("kInOut", "0.76, 0, 0.24, 1");
+if (!CustomEase.get("kOut"))   CustomEase.create("kOut",   "0.25, 1, 0.5, 1");
 
 interface NewHeroSectionProps {
-  /** flips to true when the Preloader (frame 0) finishes */
   shutterOpen: boolean;
   onJoinWaitlist: () => void;
 }
 
-// ─── Frame 1: cabin-window zoom-through hero ─────────────────────────────────
-// One pinned ScrollTrigger drives the whole shot. The cloud sky (.sky-stage)
-// is mounted fixed *underneath* the cabin from the first paint. As the scroll
-// progresses the composite cabin plate scales out through the window cutout
-// while the titles blow up and fly off; near the end the cabin dissolves and
-// .sky-stage crossfades to full opacity — so the viewer flies through the
-// window into an endless sky as one uninterrupted cinematic shot. There is no
-// fixed-height/sticky tail, so no brown or blue gap appears in either
-// scroll direction.
 export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionProps) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const introPlayed = useRef(false);
+  const rootRef       = useRef<HTMLElement>(null);
+  const stageRef      = useRef<HTMLDivElement>(null);
+  const shutterRef    = useRef<HTMLImageElement>(null);
+  const handleClipRef = useRef<HTMLDivElement>(null);
+  const handleImgRef  = useRef<HTMLImageElement>(null);
+  const cabinRef      = useRef<HTMLImageElement>(null);
+  const skyVideoRef   = useRef<HTMLVideoElement>(null);
+  const titleRef      = useRef<HTMLHeadingElement>(null);
+  const heroFgRef     = useRef<HTMLDivElement>(null);
+  const brandRevRef   = useRef<HTMLDivElement>(null);
+  const introPlayed   = useRef(false);
 
+  // How far the shutter must translate upward (as % of its own height) so the
+  // bottom edge of the panel clears the top inner edge of the window opening.
+  function shutterLift() {
+    const st = stageRef.current;
+    if (!st || !st.clientHeight) return -68;
+    const H = st.clientHeight, W = st.clientWidth;
+    const scale = Math.max(W / 1672, H / 941);
+    return -(((764 - 94) * scale / H) * 100 - 1);
+  }
+
+  // The knob settles slightly lower than a full lift so the tab peeks into the
+  // glass rather than tucking fully behind the frame.
+  function handleRest() {
+    const st = stageRef.current;
+    if (!st || !st.clientHeight) return -69;
+    const H = st.clientHeight, W = st.clientWidth;
+    const scale = Math.max(W / 1672, H / 941);
+    return -(((764 - 110) * scale / H) * 100);
+  }
+
+  // ── scroll-driven animations ──────────────────────────────────────────────
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const heroTl = gsap.timeline({
+      // cabin + handle fly through the window on scroll
+      gsap.timeline({
         scrollTrigger: {
           trigger: rootRef.current,
           start: "top top",
           end: "bottom bottom",
-          // scrub:true — the animation tracks Lenis's already-smoothed scroll
-          // 1:1 with NO lag. (A numeric scrub lags, so on a fast scroll back to
-          // top the cabin was caught mid-dissolve = the big flash.)
           scrub: true,
         },
         defaults: { ease: "none" },
+      })
+        .to(cabinRef.current,      { scale: 9, duration: 0.6 }, 0)
+        .to(handleClipRef.current, { scale: 9, duration: 0.6 }, 0)
+        .to(handleImgRef.current,  { opacity: 0, duration: 0.22 }, 0.3)
+        .to(skyVideoRef.current,   { scale: 1.12, duration: 0.9 }, 0);
+
+      // continuous descent — pan the sky video downward; deferred so sibling
+      // sections (sky-about) are in the DOM before ScrollTrigger resolves them
+      requestAnimationFrame(() => {
+        gsap.fromTo(
+          skyVideoRef.current,
+          { objectPosition: "50% 44%" },
+          {
+            objectPosition: "50% 92%",
+            ease: "none",
+            overwrite: "auto",
+            scrollTrigger: {
+              trigger: rootRef.current,
+              start: "top top",
+              endTrigger: ".sky-about",
+              end: "bottom bottom",
+              scrub: 1.5,
+            },
+          }
+        );
+        ScrollTrigger.refresh();
       });
 
-      heroTl
-        // fly THROUGH the window: the cabin plate (frame + wall) scales out from
-        // the window centre and flies past, revealing the sky that is ALREADY
-        // behind it (.sky-stage) — same image, no swap/crossfade.
-        // scale is capped at 4.8 so the layer never exceeds the GPU max texture
-        // size (which caused tearing/fragmenting on reverse scroll)
-        .to(".hero-w_bg", { scale: 4, duration: 0.45, ease: "power1.in" }, 0)
-        // titles blow up and fly off both sides, then fade
-        .to(".hero-s", { scale: 6, duration: 0.38, ease: "power1.in" }, 0)
-        .to(".hero-s_title-l", { xPercent: -130, duration: 0.38, ease: "power1.in" }, 0)
-        .to(".hero-s_title-r", { xPercent: 130, duration: 0.38, ease: "power1.in" }, 0)
-        // fromTo with immediateRender:false — otherwise the scrub captures the
-        // CSS opacity:0 at mount (before the intro reveals it) and the fade
-        // becomes a 0→0 no-op, leaving the initial CTA stuck on screen behind
-        // the post-zoom one
-        .fromTo(
-          ".hero-cta",
-          { opacity: 1 },
-          { opacity: 0, duration: 0.07, immediateRender: false },
-          0.03
-        )
-        .to(".hero-s", { opacity: 0, duration: 0.14 }, 0.2)
-        // the cabin frame/wall dissolves as it engulfs the frame — fully gone by
-        // ~0.38 so the oversized layer never lingers
-        .to(".hero-w_bg", { opacity: 0, duration: 0.12 }, 0.26)
-        // post-zoom screen: Kaivo logo + tagline settle in over the open sky
-        .fromTo(
-          ".sky-hero",
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.14, ease: "power2.out" },
-          0.38
-        );
+      // brand reveal fades in after the cabin zoom, then out before about
+      gsap.fromTo(brandRevRef.current, { opacity: 0 }, {
+        opacity: 1, ease: "none",
+        scrollTrigger: { trigger: rootRef.current, start: "55% top", end: "65% top", scrub: 2 },
+      });
+      gsap.to(brandRevRef.current, {
+        opacity: 0, ease: "none",
+        scrollTrigger: { trigger: rootRef.current, start: "84% top", end: "bottom top", scrub: 2 },
+      });
+
+      // hide titles + FG on any scroll; restore when back at top
+      let hidden = false;
+      const onScroll = () => {
+        const y = window.scrollY;
+        if (y > 20 && !hidden) {
+          hidden = true;
+          gsap.to([titleRef.current, heroFgRef.current], { opacity: 0, duration: 0.25, ease: "power2.in", overwrite: true });
+        } else if (y < 5 && hidden) {
+          hidden = false;
+          gsap.to([titleRef.current, heroFgRef.current], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
+          gsap.to(handleImgRef.current, { opacity: 1, duration: 0.3, ease: "power2.out", overwrite: true });
+        }
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      return () => window.removeEventListener("scroll", onScroll);
     }, rootRef);
 
     return () => ctx.revert();
   }, []);
 
-  // intro: window blind opens once the preloader hands off
+  // ── entrance animation (fires once the preloader hands off) ──────────────
   useEffect(() => {
-    if (!shutterOpen || introPlayed.current || !rootRef.current) return;
+    if (!shutterOpen || introPlayed.current) return;
     introPlayed.current = true;
 
-    const ctx = gsap.context(() => {
-      gsap
-        .timeline()
-        .to(".hero-w_bg_window_shade", {
-          yPercent: -88,
-          duration: 1.9,
-          ease: "kaivoInOut",
-        })
-        .to(
-          ".hero-s_title span > i",
-          { y: 0, duration: 1.25, ease: "kaivoOut", stagger: 0.09 },
-          "-=1.1"
-        )
-        .fromTo(
-          [".hero-s_caption-l", ".hero-s_caption-r"],
-          { opacity: 0, y: 28 },
-          { opacity: 1, y: 0, duration: 1, ease: "kaivoOut", stagger: 0.12 },
-          "-=0.8"
-        )
-        .to(".hero-cta", { opacity: 1, duration: 0.9, ease: "kaivoOut" }, "-=0.9");
-    }, rootRef);
+    if (skyVideoRef.current) skyVideoRef.current.play().catch(() => {});
 
-    return () => {
-      ctx.kill();
-    };
+    // set starting states
+    gsap.set([cabinRef.current, shutterRef.current, skyVideoRef.current], { scale: 1.12 });
+    gsap.set(shutterRef.current,   { yPercent: 0 });
+    gsap.set(handleImgRef.current, { yPercent: shutterLift(), opacity: 0 });
+    gsap.set(titleRef.current,     { opacity: 0, y: 40 });
+    gsap.set(heroFgRef.current,    { opacity: 0 });
+
+    gsap.timeline()
+      // settle the cabin + sky to scale 1
+      .to([cabinRef.current, shutterRef.current, skyVideoRef.current], { scale: 1, duration: 1.7, ease: "kOut" })
+      // lift the shutter panel
+      .to(shutterRef.current, { yPercent: () => shutterLift(), duration: 3.4, ease: "kInOut" }, "-=1.7")
+      // panel gone → knob-only layer takes over (no visible jump)
+      .set(shutterRef.current,   { opacity: 0 })
+      .set(handleImgRef.current, { opacity: 1 })
+      // knob settles to its resting position
+      .to(handleImgRef.current, { yPercent: () => handleRest(), duration: 0.35, ease: "kOut" })
+      // reveal copy
+      .to(titleRef.current,  { opacity: 1, y: 0, duration: 1.1, ease: "kOut" }, "-=1.2")
+      .to(heroFgRef.current, { opacity: 1, duration: 1,   ease: "kOut" }, "-=1");
   }, [shutterOpen]);
 
   return (
-    <div className="hero_scroll-area" ref={rootRef}>
-      {/* persistent cloud scene — mounted underneath the cabin from the first
-          paint and visible straight through the window cutout. Zooming the
-          frame out reveals THIS exact image (no swap), and it stays put through
-          the sky-about descent below */}
-      <div className="sky-stage" aria-hidden>
-        <div className="sky-stage_img" />
-        <div className="sky-stage_grade" />
+    <>
+      {/* ── persistent fixed sky (video) — sits behind every section ── */}
+      <div className="sky-fixed" id="skyFixed">
+        <video
+          ref={skyVideoRef}
+          className="sky-video"
+          id="skyVideo"
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/kaivo-hero/sky-poster.jpg"
+        >
+          <source src="/kaivo-hero/sky.mp4" type="video/mp4" />
+        </video>
       </div>
 
-      <section className="hero-w">
-        {/* composite cabin window background (sky shows through the cutout) */}
-        <div className="hero-w_bg">
-          {/* window blind / shutter (clipped to the cutout) — an opaque shade
-              panel that fills the porthole when closed, with the pull-grip lip
-              pinned to its bottom edge. Sliding the whole shade up carries the
-              grip to the top, exactly like a real cabin window blind. */}
-          <div className="hero-w_bg_window_clip">
-            <div className="hero-w_bg_window_shade">
-              <img className="hero-w_bg_window_grip" src="/new_hero/shutter.webp" alt="" />
+      {/* ── brand reveal (fixed overlay after zoom-through) ── */}
+      <div className="brand-reveal" ref={brandRevRef} id="brandReveal">
+        <KaivoWordmark height={72} color="#ffffff" style={{ width: "clamp(14rem,28vw,26rem)", height: "auto" }} />
+        <p className="brand-reveal_tag">CONVERSATIONAL TRAVEL BOOKING</p>
+      </div>
+
+      {/* ── hero scroll area ── */}
+      <section className="hero_scroll-area" ref={rootRef}>
+        <div className="hero-w">
+          <div className="hero-stage" ref={stageRef}>
+
+            {/* window shutter — lifts on entrance, swaps to knob-only after */}
+            <img ref={shutterRef} className="shutter" id="shutter" src="/kaivo-hero/cabin-shutter.png" alt="" />
+
+            {/* knob clip scales with the cabin so it stays glued to the window */}
+            <div ref={handleClipRef} className="handle-clip" id="handleClip">
+              <img ref={handleImgRef} id="shutterHandle" src="/kaivo-hero/cabin-knob.png" alt="" style={{ opacity: 0 }} />
             </div>
-          </div>
-          {/* 2. window frame */}
-          <img className="hero-w_bg_window" src="/new_hero/cabin1.png" alt="" />
-          {/* 3. interior cabin paneling with transparent cutout */}
-          <img className="hero-w_bg_front" src="/new_hero/cabin-front.webp" alt="" />
-        </div>
 
-        {/* hero titles */}
-        <div className="hero-s">
-          <div className="hero-s_brand">
-            <KaivoWordmark height={26} color="#fdfcfa" />
-          </div>
+            {/* cabin frame + wall with transparent window cutout */}
+            <img ref={cabinRef} className="cabin" id="cabin" src="/kaivo-hero/cabin-full.png" alt="" />
 
-          <h2 className="hero-s_title hero-s_title-l">
-            <span><i>AI Powered</i></span>
-            <span><i>Conversational</i></span>
-          </h2>
-          <h2 className="hero-s_title hero-s_title-r">
-            <span><i>Travel Booking</i></span>
-            <span><i>Agent</i></span>
-          </h2>
+            {/* hero title */}
+            <h2 ref={titleRef} className="title title--r" id="titleL">
+              AI-Powered.<br />
+              Conversational<br />
+              Travel&nbsp;Booking<br />
+              Agent
+            </h2>
 
-          <div className="hero-s_caption-l">
-            <p className="hero-s_caption-l_head">
-              Delegate
-              <br />
-              And Approve
-            </p>
-            <span className="hero-s_caption-l_rule" />
-            <p className="hero-s_caption-l_body">Book A Flight In 60 Seconds.</p>
-          </div>
+            {/* bottom foreground row */}
+            <div ref={heroFgRef} className="hero-fg" id="heroFg">
+              <div className="hero-lead">
+                <h3>Delegate And Approve:<br />Book a Flight in 60&nbsp;Seconds</h3>
+              </div>
 
-          <div className="hero-s_caption-r">
-            <span className="hero-s_caption-r_rule" />
-            <div className="hero-s_caption-r_row">
-              <span className="hero-s_caption-r_scroll">
-                <span className="hero-chevrons" aria-hidden>
-                  <span>❯</span>
-                  <span>❯</span>
+              <button className="btn-pill" onClick={onJoinWaitlist}>
+                <span>Join Waitlist</span>
+                <span className="btn-pill_ico">
+                  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 2 11 13" />
+                    <path d="M22 2 15 22l-4-9-9-4 20-7z" />
+                  </svg>
                 </span>
-                Scroll Down
-              </span>
-              <span>To Start The Journey</span>
+              </button>
+
+              <div className="hero-scroll">
+                <span className="hero-scroll_rule"></span>
+                <div className="hero-scroll_bar">
+                  <div className="hero-scroll_left">
+                    <span className="hero-scroll_chev"></span>
+                    <span className="hero-scroll_label">Scroll Down</span>
+                  </div>
+                  <span className="hero-scroll_right">To Start The Journey</span>
+                </div>
+              </div>
             </div>
+
           </div>
-        </div>
-
-        {/* CTA pill */}
-        <div className="hero-cta">
-          <button className="hero-cta_text" onClick={onJoinWaitlist}>Join Waitlist</button>
-          <button className="hero-cta_icon" onClick={onJoinWaitlist} aria-label="Join Waitlist">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-            </svg>
-          </button>
-        </div>
-
-        {/* post-zoom screen — shown once we've flown through the window */}
-        <div className="sky-hero">
-          <KaivoWordmark height={32} color="#ffffff" />
-          <h1 className="sky-hero_title">
-            Conversational Travel
-            <br />
-            Booking Agent
-          </h1>
-          <p className="sky-hero_sub">AI-Powered. Book A Flight In 60 Seconds.</p>
-          <button className="sky-hero_cta" onClick={onJoinWaitlist}>
-            Join Waitlist
-          </button>
         </div>
       </section>
-    </div>
+    </>
   );
 }

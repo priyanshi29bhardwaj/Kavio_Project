@@ -14,12 +14,11 @@ const PAINS = [
 ] as const;
 
 const EXPANSION = [
-  { label: "Flights",           active: true  },
-  { label: "Trains",            active: false },
-  { label: "Hotels",            active: false },
-  { label: "Full Trips",        active: false },
-  { label: "Repeat Purchases",  active: false },
-  { label: "Life Admin",        active: false },
+  { label: "Flights",     active: true  },
+  { label: "Hotels",      active: false },
+  { label: "Trains",      active: false },
+  { label: "Car Rentals", active: false },
+  { label: "Full Trips",  active: false },
 ] as const;
 
 export function DelegationSection() {

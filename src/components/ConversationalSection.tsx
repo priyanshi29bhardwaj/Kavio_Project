@@ -255,16 +255,6 @@ export function ConversationalSection() {
         pointerEvents: "none",
       }} />
 
-      {/* Watermark "06" */}
-      <div aria-hidden style={{
-        position: "absolute", right: "-1%", top: "50%",
-        transform: "translateY(-46%)",
-        fontFamily: "'Space Grotesk', sans-serif", fontWeight: 900,
-        fontSize: "clamp(140px, 20vw, 300px)",
-        color: "rgba(126,206,202,0.04)",
-        lineHeight: 1, pointerEvents: "none", userSelect: "none",
-        letterSpacing: "-0.05em",
-      }}>06</div>
 
       {/* ── Content wrapper ──────────────────────────────────────────────────── */}
       <div

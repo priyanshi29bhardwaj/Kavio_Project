@@ -298,8 +298,6 @@ function App() {
       {/* ─── Frame 2: sky descent + about overlap parallax ─────────────────── */}
       <SkyAboutSection onJoinWaitlist={() => setIsModalOpen(true)} />
 
-      {/* ─── Frame 3: fleet blueprint scanning wipe ────────────────────────── */}
-      <FleetSection />
 
       {/* ─── Solid website (sky stops here) ─────────────────────────────────
           This wrapper sits above the fixed sky at z:2 with a solid background,

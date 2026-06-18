@@ -83,31 +83,38 @@ export function DemoSection() {
     const wrapper    = wrapperRef.current;
     if (!scrollArea || !section || !wrapper) return;
 
-    // fade the sticky panel in as the scroll area enters the viewport —
-    // no mask, no rotateX, no GSAP pin — just opacity on one element
+    // The panel is already pinned full-screen (and invisible) over the sky by
+    // the time we reach here, thanks to the overlap. We crossfade it in IN PLACE
+    // — anchored to the tail of the sky-about so it tracks the descending sky —
+    // so the cabin materialises around you rather than sliding up as a block.
     gsap.set(section, { opacity: 0 });
     const stFade = ScrollTrigger.create({
-      trigger: scrollArea,
-      start: "top 90%",
-      end: "top 25%",
+      trigger: ".sky-about",
+      start: "bottom 78%",
+      end: "bottom 28%",
       scrub: true,
       onUpdate: (self) => {
         section.style.opacity = String(self.progress);
       },
     });
 
-    // gentle scale zoom-in through the section — CSS sticky handles the pin,
-    // so no GSAP pin conflict with Lenis
+    // Descent into the seat — as the sky finishes falling, the cabin ceiling
+    // sweeps down over you (yPercent settles from above) and the view eases onto
+    // the seat-back screen, one continuous fall through the roof into the seat.
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: scrollArea,
-        start: "top top",
-        end: "bottom bottom",
+        trigger: ".sky-about",
+        start: "bottom 78%",
+        end: "bottom top",
         scrub: true,
       },
       defaults: { ease: "none" },
     });
-    tl.fromTo(wrapper, { scale: 1.18 }, { scale: 1 });
+    tl.fromTo(
+      wrapper,
+      { scale: 1.22, yPercent: -10 },
+      { scale: 1, yPercent: 0 }
+    );
 
     return () => {
       stFade.kill();
@@ -188,8 +195,11 @@ export function DemoSection() {
 
   /* ── Desktop ── */
   return (
-    /* outer scroll container — drives the scrub, CSS sticky does the pinning */
-    <div ref={scrollAreaRef} style={{ position: "relative", height: "220vh" }}>
+    /* outer scroll container — drives the scrub, CSS sticky does the pinning.
+       marginTop pulls it up to overlap the tail of the sky-about so the sticky
+       panel is already pinned full-screen (still invisible) before it crossfades
+       in — the cabin never slides up as a block, it arrives in place. */
+    <div ref={scrollAreaRef} style={{ position: "relative", height: "260vh", marginTop: "-100vh" }}>
       <section
         ref={sectionRef}
         style={{ position: "sticky", top: 0, height: "100vh", width: "100%", overflow: "hidden" }}

@@ -163,16 +163,6 @@ export function ProductSection() {
         position: "relative",
       }}>
 
-        {/* Watermark */}
-        <div aria-hidden style={{
-          position: "absolute", right: "-1%", top: "50%",
-          transform: "translateY(-46%)",
-          fontFamily: "'Space Grotesk', sans-serif", fontWeight: 900,
-          fontSize: "clamp(130px, 19vw, 290px)",
-          color: "rgba(27,74,90,0.025)",
-          lineHeight: 1, pointerEvents: "none", userSelect: "none",
-          letterSpacing: "-0.05em",
-        }}>05</div>
 
         {/* Badge */}
         <div ref={badgeRef} style={{

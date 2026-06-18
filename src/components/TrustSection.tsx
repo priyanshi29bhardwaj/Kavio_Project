@@ -6,24 +6,24 @@ gsap.registerPlugin(ScrollTrigger);
 
 const ROWS = [
   {
-    label:  "What was chosen",
-    value:  "Window seat · Row 14A",
-    detail: "BA127 · LHR → CDG · 06:45",
+    problem: "HIDDEN FEES",
+    bad:  "Travellers' #1 booking frustration.",
+    good: "One all-in price, upfront. Final before you commit.",
   },
   {
-    label:  "Why it was chosen",
-    value:  "Matched your preferences",
-    detail: "Window preferred · Budget under £40",
+    problem: "FAKE URGENCY",
+    bad:  '"Only 1 room left" — fined as false scarcity.',
+    good: "No countdowns. One recommendation, your decision.",
   },
   {
-    label:  "What it costs",
-    value:  "£38 seat upgrade",
-    detail: "Total with fare: £312 · No hidden fees",
+    problem: "PAY-TO-RANK RESULTS",
+    bad:  "Rankings sold to the highest commission.",
+    good: "Kaivo earns when you book well, not when you click.",
   },
   {
-    label:  "What happens next",
-    value:  "Seat locked · Confirmation sent",
-    detail: "Boarding pass updated automatically",
+    problem: "DATA HARVESTING",
+    bad:  "Your searches sold, then used to raise your prices.",
+    good: "Your data finds you better options — never higher prices.",
   },
 ] as const;
 
@@ -113,16 +113,6 @@ export function TrustSection() {
         zIndex: 0,
       }} />
 
-      {/* Watermark "07" */}
-      <div aria-hidden style={{
-        position: "absolute", right: "-1%", top: "50%",
-        transform: "translateY(-46%)",
-        fontFamily: "'Space Grotesk', sans-serif", fontWeight: 900,
-        fontSize: "clamp(140px, 20vw, 300px)",
-        color: "rgba(27,74,90,0.032)",
-        lineHeight: 1, pointerEvents: "none", userSelect: "none",
-        letterSpacing: "-0.05em",
-      }}>07</div>
 
       {/* ── Content ─────────────────────────────────────────────────────────── */}
       <div
@@ -268,134 +258,88 @@ export function TrustSection() {
             <div style={{
               background: "#1B4A5A",
               padding: "18px 22px",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
             }}>
-              {/* Pulse dot */}
-              <div style={{ position: "relative", flexShrink: 0 }}>
-                <div style={{
-                  width: "8px", height: "8px", borderRadius: "50%",
-                  background: "#E8622A",
-                }} />
+              <div style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700, fontSize: "11px", letterSpacing: "0.28em",
+                color: "#7ECECA", textTransform: "uppercase",
+                marginBottom: "6px",
+              }}>
+                Why Travel Lost Your Trust
               </div>
-              <div>
-                <div style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 700, fontSize: "13px", letterSpacing: "0.28em",
-                  color: "#E8622A", textTransform: "uppercase",
-                  marginBottom: "4px",
-                }}>
-                  Awaiting Your Approval
-                </div>
-                <div style={{
-                  fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 600, fontSize: "15px",
-                  color: "rgba(255,255,255,0.92)",
-                }}>
-                  Kaivo has made a selection for you to review
-                </div>
+              <div style={{
+                fontFamily: "'Urbanist', sans-serif",
+                fontWeight: 700, fontSize: "clamp(15px, 1.6vw, 18px)",
+                color: "white", lineHeight: 1.3,
+              }}>
+                And how Kaivo wins it back
               </div>
             </div>
 
-            {/* Decision rows */}
+            {/* Problem / solution rows */}
             {ROWS.map((row, i) => (
               <div
                 key={i}
                 ref={(el) => { rowRefs.current[i] = el; }}
                 style={{
-                  padding: "16px 22px",
+                  padding: "14px 22px",
                   borderBottom: i < ROWS.length - 1
                     ? "1px solid rgba(27,74,90,0.07)"
                     : "none",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "3px",
                   opacity: 0,
                 }}
               >
+                {/* Problem label */}
                 <div style={{
                   fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 700, fontSize: "8px", letterSpacing: "0.32em",
-                  color: "rgba(27,74,90,0.68)", textTransform: "uppercase",
+                  fontWeight: 800, fontSize: "10px", letterSpacing: "0.26em",
+                  color: "#1B4A5A", textTransform: "uppercase",
+                  marginBottom: "6px",
                 }}>
-                  {row.label}
+                  {row.problem}
                 </div>
-                <div style={{
-                  fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 700, fontSize: "clamp(14px, 1.5vw, 17px)",
-                  color: "#1B4A5A", lineHeight: 1.2,
-                }}>
-                  {row.value}
+                {/* Bad */}
+                <div style={{ display: "flex", gap: "8px", marginBottom: "4px", alignItems: "flex-start" }}>
+                  <span style={{ color: "#E8622A", fontWeight: 800, fontSize: "13px", lineHeight: 1.4, flexShrink: 0 }}>✗</span>
+                  <span style={{
+                    fontFamily: "'Urbanist', sans-serif",
+                    fontWeight: 600, fontSize: "clamp(12px, 1.1vw, 14px)",
+                    color: "rgba(27,74,90,0.65)", lineHeight: 1.45,
+                  }}>
+                    {row.bad}
+                  </span>
                 </div>
-                <div style={{
-                  fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 600, fontSize: "clamp(12px, 1.05vw, 14px)",
-                  color: "rgba(27,74,90,0.72)",
-                }}>
-                  {row.detail}
+                {/* Good */}
+                <div style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                  <span style={{ color: "#C8E44A", fontWeight: 800, fontSize: "13px", lineHeight: 1.4, flexShrink: 0 }}>✓</span>
+                  <span style={{
+                    fontFamily: "'Urbanist', sans-serif",
+                    fontWeight: 700, fontSize: "clamp(12px, 1.1vw, 14px)",
+                    color: "#1B4A5A", lineHeight: 1.45,
+                  }}>
+                    {row.good}
+                  </span>
                 </div>
               </div>
             ))}
 
-            {/* Perforated divider */}
-            <div style={{
-              margin: "0 22px",
-              borderTop: "1.5px dashed rgba(27,74,90,0.12)",
-            }} />
-
-            {/* Approve / Review buttons */}
+            {/* Footer callout */}
             <div
               ref={btnRef}
               style={{
-                padding: "18px 22px",
-                display: "flex",
-                gap: "12px",
+                padding: "16px 22px",
+                background: "rgba(27,74,90,0.04)",
+                borderTop: "1.5px dashed rgba(27,74,90,0.12)",
                 opacity: 0,
               }}
             >
-              <button style={{
-                flex: 1,
-                background: "#E8622A",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                padding: "13px 0",
+              <div style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700, fontSize: "11px", letterSpacing: "0.28em",
-                textTransform: "uppercase",
-                cursor: "pointer",
-                transition: "opacity 0.2s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-              >
-                Approve
-              </button>
-              <button style={{
-                flex: "0 0 auto",
-                background: "transparent",
-                color: "#1B4A5A",
-                border: "1.5px solid rgba(27,74,90,0.2)",
-                borderRadius: "8px",
-                padding: "13px 24px",
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 600, fontSize: "11px", letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "#1B4A5A";
-                e.currentTarget.style.background = "rgba(27,74,90,0.04)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "rgba(27,74,90,0.2)";
-                e.currentTarget.style.background = "transparent";
-              }}
-              >
-                Review
-              </button>
+                fontWeight: 800, fontSize: "11px", letterSpacing: "0.26em",
+                color: "#1B4A5A", textTransform: "uppercase",
+              }}>
+                This is why Kaivo asks first
+              </div>
             </div>
 
           </div>{/* end card */}

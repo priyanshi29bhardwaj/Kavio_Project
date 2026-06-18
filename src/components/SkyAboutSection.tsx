@@ -11,38 +11,52 @@ interface SkyAboutSectionProps {
 
 export function SkyAboutSection({ onJoinWaitlist }: SkyAboutSectionProps) {
   const rootRef = useRef<HTMLElement>(null);
+  const textRef = useRef<HTMLParagraphElement>(null);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // descent target lives in the sibling hero section
-      const skyImg = document.querySelector(".sky-stage_img");
+      const el = textRef.current;
+      if (!el) return;
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: rootRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: true,
+      // Split into word spans for the progressive highlight
+      const words = el.textContent!.trim().split(/\s+/);
+      el.innerHTML = words.map(w => `<span class="about-word">${w}</span>`).join(" ");
+      const spans = el.querySelectorAll<HTMLElement>(".about-word");
+
+      let prevLit = -1;
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top 78%",
+        end: "bottom 88%",
+        scrub: 0.5,
+        onUpdate: (self) => {
+          const lit = Math.round(self.progress * spans.length);
+          if (lit === prevLit) return;
+          if (lit > prevLit) {
+            for (let i = prevLit < 0 ? 0 : prevLit; i < lit; i++) spans[i]?.classList.add("is-on");
+          } else {
+            for (let i = lit; i < prevLit; i++) spans[i]?.classList.remove("is-on");
+          }
+          prevLit = lit;
         },
-        defaults: { ease: "none" },
       });
 
-      // descent: clouds drift up + push in so it feels like losing altitude.
-      // force3D keeps it on the GPU; modest scale (1.28) keeps per-frame
-      // texture sampling cheap so it stays smooth.
-      if (skyImg) {
-        tl.fromTo(
-          skyImg,
-          { yPercent: 0, scale: 1 },
-          { yPercent: -34, scale: 1.28, duration: 1, force3D: true },
-          0
-        );
-      }
+      // Gentle parallax on the inner content as it rises through the frame
+      gsap.fromTo(
+        ".about-s_inner",
+        { y: "6vh" },
+        {
+          y: "-14vh", ease: "none",
+          scrollTrigger: { trigger: rootRef.current, start: "top bottom", end: "bottom top", scrub: true },
+        }
+      );
 
-      tl
-        .fromTo(".about-s_text", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0.05)
-        .to(".about-s_text", { opacity: 0, duration: 0.1 }, 0.52)
-        .fromTo(".about-s_cta", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.12 }, 0.64);
+      // Fade the copy out once it has been read, leaving pure descending sky
+      // before the cabin rises in — guarantees no collision with the next frame
+      gsap.to(".about-s_inner", {
+        opacity: 0, ease: "none",
+        scrollTrigger: { trigger: rootRef.current, start: "bottom 95%", end: "bottom 72%", scrub: true },
+      });
     }, rootRef);
 
     return () => ctx.revert();
@@ -50,23 +64,22 @@ export function SkyAboutSection({ onJoinWaitlist }: SkyAboutSectionProps) {
 
   return (
     <section className="sky-about" ref={rootRef}>
-      <div className="about-s">
-        <p className="about-s_text">
-          Your perfect flight, matched by AI.<br />
-          Found and booked in under 60 seconds.<br />
-          No endless searching.<br />
-          No second-guessing.<br />
-          No admin overload.<br />
-          Just better travel decisions, handled for you.
+      <div className="about-tint" />
+      <div className="about-s_inner">
+        <p className="about-text" ref={textRef}>
+          Your perfect flight, matched by AI. Found and booked in under 60 seconds.
+          No endless searching. No second-guessing. No admin overload.
+          Just better travel decisions — handled for you. Stop doing. Start delegating.
         </p>
-
-        <div className="about-s_cta">
-          <h3 className="about-s_cta_tag">
-            Stop doing.<br />
-            Start delegating.
-          </h3>
-          <button className="about-s_cta_btn" onClick={onJoinWaitlist}>
-            Join waitlist
+        <div className="about-cta">
+          <button className="btn-pill about-pill" onClick={onJoinWaitlist}>
+            <span>Join Waitlist</span>
+            <span className="btn-pill_ico">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 2 11 13" />
+                <path d="M22 2 15 22l-4-9-9-4 20-7z" />
+              </svg>
+            </span>
           </button>
         </div>
       </div>
