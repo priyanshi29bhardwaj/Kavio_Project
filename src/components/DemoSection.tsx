@@ -98,9 +98,12 @@ export function DemoSection() {
       },
     });
 
-    // Descent into the seat — as the sky finishes falling, the cabin ceiling
-    // sweeps down over you (yPercent settles from above) and the view eases onto
-    // the seat-back screen, one continuous fall through the roof into the seat.
+    // Descent into the seat — as the sky finishes falling, the camera drops
+    // through the cabin roof onto the seat. We START zoomed into the TOP of the
+    // cabin image (scaled up and pushed DOWN, so the overhead/ceiling area fills
+    // the frame) and settle to a neutral full-seat view. Because the image rises
+    // in the frame as it settles, the view reads as a continuous downward fall
+    // from the roof onto the seat-back screen.
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: ".sky-about",
@@ -112,7 +115,7 @@ export function DemoSection() {
     });
     tl.fromTo(
       wrapper,
-      { scale: 1.22, yPercent: -10 },
+      { scale: 1.32, yPercent: 14 },
       { scale: 1, yPercent: 0 }
     );
 
@@ -204,7 +207,12 @@ export function DemoSection() {
         ref={sectionRef}
         style={{ position: "sticky", top: 0, height: "100vh", width: "100%", overflow: "hidden" }}
       >
-        {/* cabin background — no willChange, no rotateX */}
+        {/* cabin background + screen video together.
+            The video lives INSIDE this wrapper so it inherits the descent
+            transform (scale + translate) and stays locked to the IFE screen
+            bezel at every scroll position — previously it was a sibling at a
+            fixed size, so it drifted out of the screen and only snapped into
+            place once the cabin scale settled at 1. */}
         <div
           ref={wrapperRef}
           style={{
@@ -213,42 +221,52 @@ export function DemoSection() {
             backgroundSize: "cover",
             backgroundPosition: "center center",
           }}
-        />
-
-        {/* video inside IFE screen */}
-        <video
-          ref={videoRef}
-          src="/kavio_ui_ux.mp4"
-          muted playsInline loop preload="auto"
-          style={{
-            position: "absolute",
-            left: rect.left, top: rect.top,
-            width: rect.width, height: rect.height,
-            objectFit: "fill", borderRadius: "10px",
-            zIndex: 2, opacity: 0, pointerEvents: "none",
-          }}
-        />
-
-        {videoVisible && (
-          <button
-            onClick={toggleFullscreen}
-            title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+        >
+          {/* video inside IFE screen */}
+          <video
+            ref={videoRef}
+            src="/kavio_ui_ux.mp4"
+            muted playsInline loop preload="auto"
             style={{
               position: "absolute",
-              left: rect.left + rect.width - 38,
-              top: rect.top + 8,
-              zIndex: 10, width: "28px", height: "28px", borderRadius: "6px",
-              background: "rgba(0,0,0,0.45)", border: "1px solid rgba(255,255,255,0.18)",
-              backdropFilter: "blur(6px)", display: "flex", alignItems: "center",
-              justifyContent: "center", cursor: "pointer", padding: 0,
-              transition: "background 0.2s ease, transform 0.15s ease",
+              left: rect.left, top: rect.top,
+              width: rect.width, height: rect.height,
+              objectFit: "fill", borderRadius: "10px",
+              zIndex: 2, opacity: 0, pointerEvents: "none",
             }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.7)"; (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.45)"; (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)"; }}
-          >
-            {isFullscreen ? <CompressIcon /> : <ExpandIcon />}
-          </button>
-        )}
+          />
+
+          {videoVisible && (
+            <button
+              onClick={toggleFullscreen}
+              title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+              style={{
+                position: "absolute",
+                left: rect.left + rect.width - 38,
+                top: rect.top + 8,
+                zIndex: 10, width: "28px", height: "28px", borderRadius: "6px",
+                background: "rgba(0,0,0,0.45)", border: "1px solid rgba(255,255,255,0.18)",
+                backdropFilter: "blur(6px)", display: "flex", alignItems: "center",
+                justifyContent: "center", cursor: "pointer", padding: 0,
+                transition: "background 0.2s ease, transform 0.15s ease",
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.7)"; (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.45)"; (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)"; }}
+            >
+              {isFullscreen ? <CompressIcon /> : <ExpandIcon />}
+            </button>
+          )}
+        </div>
+
+        {/* warm cloud→cabin colour blend at the top. Carries the sunset tone of
+            the descending clouds down onto the cabin roof so the crossfade reads
+            as a smooth colour melt instead of a hard seam. Static (sibling of the
+            scaling wrapper) so it stays pinned to the viewport top. */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: "34vh",
+          background: "linear-gradient(to bottom, rgba(234, 201, 173, 0.7) 0%, rgba(234, 201, 173, 0.32) 38%, transparent 100%)",
+          zIndex: 6, pointerEvents: "none",
+        }} />
 
         <div style={{
           position: "absolute", bottom: 0, left: 0, right: 0, height: "260px",

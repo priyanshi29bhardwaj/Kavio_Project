@@ -56,7 +56,7 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
       // scrub progress=0 the FROM state (scale:1) is always explicitly applied.
       // In a production Vite build there is only one effect mount (no Strict-Mode
       // double-invoke), so the FROM values must be locked in at tween creation.
-      gsap.timeline({
+      const zoomTl = gsap.timeline({
         scrollTrigger: {
           trigger: rootRef.current,
           start: "top top",
@@ -123,25 +123,30 @@ export function NewHeroSection({ shutterOpen, onJoinWaitlist }: NewHeroSectionPr
         requestAnimationFrame(refresh);
       }
 
-      // hide titles + FG on any scroll; restore when back at top
+      // Title/FG fade is fine as a one-shot (gated by `hidden`). The cabin reset
+      // must NOT be one-shot: the production freeze happened because a trailing,
+      // stale scrub frame re-applied a mid-zoom scale AFTER the single reset ran,
+      // and nothing corrected it again — the cabin stayed frozen on the homepage.
       let hidden = false;
       const onScroll = () => {
         const y = window.scrollY;
-        if (y > 20 && !hidden) {
-          hidden = true;
-          gsap.to([titleRef.current, heroFgRef.current], { opacity: 0, duration: 0.25, ease: "power2.in", overwrite: true });
-        } else if (y < 5 && hidden) {
-          hidden = false;
-          gsap.to([titleRef.current, heroFgRef.current], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
-          gsap.to(handleImgRef.current, { opacity: 1, duration: 0.3, ease: "power2.out", overwrite: true });
-          // Belt-and-suspenders snap to the clean top state. With the per-frame
-          // ScrollTrigger.update() now wired in App.tsx, the scrub resolves the
-          // cabin to scale 1 on its own — but we also force it here for an instant
-          // (non-eased) reset. Crucially NO overwrite: that would KILL the scrub
-          // tween and stop the zoom from working on the next scroll-down.
-          gsap.set(cabinRef.current,      { scale: 1 });
-          gsap.set(handleClipRef.current, { scale: 1 });
-          gsap.set(skyVideoRef.current,   { scale: 1 });
+        if (y > 20) {
+          if (!hidden) {
+            hidden = true;
+            gsap.to([titleRef.current, heroFgRef.current], { opacity: 0, duration: 0.25, ease: "power2.in", overwrite: true });
+          }
+        } else if (y < 5) {
+          if (hidden) {
+            hidden = false;
+            gsap.to([titleRef.current, heroFgRef.current], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
+          }
+          // IDEMPOTENT hard-reset, fires on every scroll frame near the very top.
+          // zoomTl.progress(0) snaps the cabin + handle-clip + sky back to scale 1
+          // AND restores the knob opacity in one call — on the exact timeline the
+          // scrub drives, so the scrub can't fight it (at scrollY≈0 the scrub's own
+          // target is also progress 0). Re-running it every top frame guarantees a
+          // stale/trailing scrub frame can never leave the hero stuck mid-zoom.
+          zoomTl.progress(0);
         }
       };
       window.addEventListener("scroll", onScroll, { passive: true });

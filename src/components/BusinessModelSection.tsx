@@ -342,6 +342,12 @@ export function BusinessModelSection() {
               rgba(160,120,50,0.07) 27px, rgba(160,120,50,0.07) 28px
             );
           }
+          .invoice-lines {
+            background-image: repeating-linear-gradient(
+              transparent, transparent 27px,
+              rgba(27,74,90,0.07) 27px, rgba(27,74,90,0.07) 28px
+            );
+          }
           .receipt-tear {
             height: 18px;
             background:
@@ -407,7 +413,7 @@ export function BusinessModelSection() {
           }}>
             {/* Receipt header */}
             <div style={{
-              background: "#B83A2A",
+              background: "#1B4A5A",
               padding: "16px 22px 14px",
               textAlign: "center",
             }}>
@@ -417,19 +423,15 @@ export function BusinessModelSection() {
                 color: "rgba(255,255,255,0.92)", textTransform: "uppercase",
                 marginBottom: "5px",
               }}>Traditional Platforms</div>
-              <div style={{
-                fontFamily: "'Courier New', Courier, monospace",
-                fontSize: "9px", letterSpacing: "0.28em",
-                color: "rgba(255,255,255,0.45)",
-              }}>* * * R E C E I P T * * *</div>
             </div>
 
             {/* Paper body */}
             <div className="receipt-lines" style={{ flex: 1, padding: "20px 22px 0" }}>
               <div style={{
                 fontFamily: "'Courier New', Courier, monospace",
+                fontWeight: "bold",
                 fontSize: "clamp(10px, 1.0vw, 12px)",
-                color: "rgba(60,38,16,0.58)",
+                color: "rgba(60,38,16,0.68)",
                 lineHeight: 1.7,
                 marginBottom: "16px",
                 letterSpacing: "0.01em",
@@ -438,7 +440,7 @@ export function BusinessModelSection() {
               </div>
 
               {/* Dashed rule */}
-              <div style={{ borderTop: "1.5px dashed rgba(120,80,30,0.22)", marginBottom: "16px" }} />
+              <div style={{ borderTop: "1.5px dashed rgba(27,74,90,0.22)", marginBottom: "16px" }} />
 
               {/* Line items */}
               {["Ads", "Sponsored placements", "Click optimization"].map((item, i) => (
@@ -451,40 +453,41 @@ export function BusinessModelSection() {
                 }}>
                   <span style={{
                     fontFamily: "'Courier New', Courier, monospace",
+                    fontWeight: "bold",
                     fontSize: "clamp(12px, 1.15vw, 14px)",
-                    color: "rgba(40,22,8,0.78)",
+                    color: "rgba(27,74,90,0.85)",
                     letterSpacing: "0.02em",
                   }}>{item}</span>
                   <span style={{
                     fontFamily: "'Courier New', Courier, monospace",
                     fontSize: "13px", fontWeight: "bold",
-                    color: "#B83A2A", flexShrink: 0,
+                    color: "#1B4A5A", flexShrink: 0,
                   }}>✗</span>
                 </div>
               ))}
 
               {/* Double dashed rule (subtotal) */}
-              <div style={{ borderTop: "1.5px dashed rgba(120,80,30,0.22)", margin: "16px 0 5px" }} />
-              <div style={{ borderTop: "1.5px dashed rgba(120,80,30,0.22)", marginBottom: "16px" }} />
+              <div style={{ borderTop: "1.5px dashed rgba(27,74,90,0.22)", margin: "16px 0 5px" }} />
+              <div style={{ borderTop: "1.5px dashed rgba(27,74,90,0.22)", marginBottom: "16px" }} />
 
               {/* Problem callout — receipt total block */}
               <div style={{
-                background: "rgba(184,58,42,0.07)",
-                border: "1px dashed rgba(184,58,42,0.32)",
-                borderRadius: "2px",
-                padding: "14px 16px",
+                background: "#1B4A5A",
+                border: "none",
+                borderRadius: "3px",
+                padding: "16px 18px",
                 marginBottom: "0",
               }}>
                 <div style={{
                   fontFamily: "'Courier New', Courier, monospace",
                   fontWeight: "bold", fontSize: "9px", letterSpacing: "0.28em",
-                  color: "#B83A2A", textTransform: "uppercase",
+                  color: "rgba(126,206,202,0.85)", textTransform: "uppercase",
                   marginBottom: "8px",
-                }}>** WHICH CREATES A PROBLEM: **</div>
+                }}>⚠ WHICH CREATES A PROBLEM:</div>
                 <div style={{
                   fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
                   fontSize: "clamp(14px, 1.3vw, 17px)",
-                  color: "#B83A2A", lineHeight: 1.4,
+                  color: "#ffffff", lineHeight: 1.4,
                 }}>
                   They win when you keep searching.
                 </div>
@@ -525,15 +528,10 @@ export function BusinessModelSection() {
                 color: "#7ECECA", textTransform: "uppercase",
                 marginBottom: "5px",
               }}>Kaivo</div>
-              <div style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: "9px", letterSpacing: "0.30em",
-                color: "rgba(255,255,255,0.32)",
-              }}>INVOICE · CLEAR TERMS</div>
             </div>
 
             {/* Invoice body */}
-            <div style={{ flex: 1, padding: "20px 22px 0" }}>
+            <div className="invoice-lines" style={{ flex: 1, padding: "20px 22px 0" }}>
               <div style={{
                 fontFamily: "'Urbanist', sans-serif", fontWeight: 800,
                 fontSize: "clamp(15px, 1.45vw, 19px)",

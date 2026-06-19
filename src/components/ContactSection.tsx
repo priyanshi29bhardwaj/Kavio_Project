@@ -11,8 +11,9 @@ const CONTACTS = [
     code: "PAR",
     desc: "Airlines, rail, travel infrastructure, and ecosystem integrations.",
     email: "partner@kaivo.com",
-    bAngle: -50,   // degrees from top, clockwise
-    bR: 0.52,      // fraction of radar radius
+    bAngle: -50,
+    bR: 0.52,
+    color: "#C8E44A",   // lime
   },
   {
     category: "Investors",
@@ -21,6 +22,7 @@ const CONTACTS = [
     email: "invest@kaivo.com",
     bAngle: 42,
     bR: 0.68,
+    color: "#7ECECA",   // aqua
   },
   {
     category: "Press & Media",
@@ -29,6 +31,7 @@ const CONTACTS = [
     email: "press@kaivo.com",
     bAngle: 130,
     bR: 0.48,
+    color: "#E8622A",   // orange
   },
   {
     category: "Careers",
@@ -37,6 +40,7 @@ const CONTACTS = [
     email: "careers@kaivo.com",
     bAngle: -130,
     bR: 0.62,
+    color: "rgba(255,255,255,0.85)",  // white
   },
 ] as const;
 
@@ -50,34 +54,61 @@ function blipXY(angle: number, r: number) {
 }
 
 // ── Radar SVG ─────────────────────────────────────────────────────────────────
-function RadarDisplay({ blipRefs }: { blipRefs: React.MutableRefObject<(SVGCircleElement | null)[]> }) {
+function RadarDisplay({ blipRefs, cardRefs }: {
+  blipRefs: React.MutableRefObject<(SVGCircleElement | null)[]>;
+  cardRefs: React.MutableRefObject<(HTMLAnchorElement | null)[]>;
+}) {
   const sweepRef = useRef<SVGGElement>(null);
 
   useEffect(() => {
-    // continuous sweep rotation
-    gsap.to(sweepRef.current, {
-      rotation: 360,
-      svgOrigin: `${CX} ${CY}`,
-      duration: 5,
-      repeat: -1,
-      ease: "none",
-    });
+    // Everything lives in a gsap.context so cleanup can kill it cleanly.
+    // Without this, React StrictMode (dev) double-mounts and leaks a SECOND set
+    // of these loops — two sweep tweens fight over `rotation` (the hand stutters
+    // and never completes a clean circle) and a stale bulge timeline targets the
+    // old detached card node (so the visible card stops pulsing after the first
+    // mount). Reverting on cleanup guarantees exactly one synced set.
+    const ctx = gsap.context(() => {
+      // continuous sweep rotation — one full circle every 5s, forever
+      gsap.to(sweepRef.current, {
+        rotation: 360,
+        svgOrigin: `${CX} ${CY}`,
+        duration: 5,
+        repeat: -1,
+        ease: "none",
+      });
 
-    // blip ping: each blip glows when sweep crosses its angle
-    CONTACTS.forEach((c, i) => {
-      const normalAngle = ((c.bAngle % 360) + 360) % 360; // 0-360 from top
-      const delay = (normalAngle / 360) * 5;
-      gsap.timeline({ repeat: -1, delay })
-        .to(blipRefs.current[i], {
+      // blip ping + card bulge: when the sweep crosses a blip's angle, the blip
+      // flares AND its matching contact card bulges. Each contact gets its own
+      // repeat:-1 timeline whose period is exactly 5s, started at the delay that
+      // matches its angle — so it stays phase-locked to the 5s sweep and keeps
+      // firing on every revolution (not just once).
+      CONTACTS.forEach((c, i) => {
+        const normalAngle = ((c.bAngle % 360) + 360) % 360;
+        const delay = (normalAngle / 360) * 5;
+        const tl = gsap.timeline({ repeat: -1, delay });
+
+        // blip flare (fade tail padded so the whole loop is exactly 5s)
+        tl.to(blipRefs.current[i], {
           attr: { r: 7, opacity: 1 },
           duration: 0.12, ease: "power2.out",
-        })
-        .to(blipRefs.current[i], {
-          attr: { r: 3.5, opacity: 0.55 },
-          duration: 4.5, ease: "power2.in",
-        });
+        }, 0)
+          .to(blipRefs.current[i], {
+            attr: { r: 3.5, opacity: 0.75 },
+            duration: 4.88, ease: "power2.in",
+          }, 0.12);
+
+        // card bulge in parallel — pops up, then eases back to rest well before
+        // the sweep comes round again
+        const card = cardRefs.current[i];
+        if (card) {
+          tl.to(card, { scale: 1.06, duration: 0.2, ease: "power2.out" }, 0)
+            .to(card, { scale: 1, duration: 0.9, ease: "power2.inOut" }, 0.2);
+        }
+      });
     });
-  }, [blipRefs]);
+
+    return () => ctx.revert();
+  }, [blipRefs, cardRefs]);
 
   // tick marks every 30°
   const ticks = Array.from({ length: 12 }, (_, i) => {
@@ -190,24 +221,57 @@ function RadarDisplay({ blipRefs }: { blipRefs: React.MutableRefObject<(SVGCircl
         stroke="rgba(126,206,202,0.50)" strokeWidth="1.2" />
       <circle cx={CX} cy={CY} r={2.5} fill="#7ECECA" opacity="0.8" />
 
+      {/* ── Connector lines: blip → right edge (toward the cards) ── */}
+      {CONTACTS.map((c, i) => {
+        const { x, y } = blipXY(c.bAngle, c.bR);
+        // Only draw for blips on the right half (x > CX) so the line flows
+        // naturally toward the cards; left-half blips get a bent elbow instead.
+        const goesRight = x >= CX;
+        return goesRight ? (
+          <line key={`conn-${i}`}
+            x1={x} y1={y} x2={320} y2={y}
+            stroke={c.color} strokeWidth="0.8" opacity="0.30"
+            strokeDasharray="3 4"
+          />
+        ) : (
+          // Elbow: go right from blip to CX+MAX_R, then straight to edge
+          <polyline key={`conn-${i}`}
+            points={`${x},${y} ${CX + MAX_R},${y} 320,${y}`}
+            fill="none"
+            stroke={c.color} strokeWidth="0.8" opacity="0.22"
+            strokeDasharray="3 4"
+          />
+        );
+      })}
+
       {/* ── Blip dots ── */}
       {CONTACTS.map((c, i) => {
         const { x, y } = blipXY(c.bAngle, c.bR);
+        // Flip the label to the left side for blips near the right edge so it
+        // never runs off the disk.
+        const labelLeft = x > CX + MAX_R * 0.55;
         return (
-          <g key={i} filter="url(#blipGlow)">
-            {/* Halo ring */}
-            <circle cx={x} cy={y} r={8}
-              fill="none" stroke="#7ECECA" strokeWidth="0.8" opacity={0.15} />
-            {/* Blip dot */}
-            <circle
-              ref={(el) => { blipRefs.current[i] = el; }}
-              cx={x} cy={y} r={3.5}
-              fill="#7ECECA" opacity={0.55}
-            />
-            {/* IATA code label */}
-            <text x={x + 10} y={y + 1}
-              fontFamily="'Space Grotesk', sans-serif" fontSize="7.5" fontWeight="700"
-              fill="rgba(126,206,202,0.80)" dominantBaseline="central"
+          <g key={i}>
+            {/* glowing blip + halo (inside the blur filter) */}
+            <g filter="url(#blipGlow)">
+              <circle cx={x} cy={y} r={8}
+                fill="none" stroke={c.color} strokeWidth="0.8" opacity={0.20} />
+              <circle
+                ref={(el) => { blipRefs.current[i] = el; }}
+                cx={x} cy={y} r={3.5}
+                fill={c.color} opacity={0.75}
+              />
+            </g>
+            {/* IATA code label — rendered OUTSIDE the glow filter so it stays
+                crisp, with a dark paint-order halo so it reads clearly against
+                the radar rings and disk */}
+            <text
+              x={labelLeft ? x - 10 : x + 10} y={y + 1}
+              textAnchor={labelLeft ? "end" : "start"}
+              fontFamily="'Space Grotesk', sans-serif" fontSize="9.5" fontWeight="800"
+              fill={c.color} dominantBaseline="central"
+              stroke="#04060c" strokeWidth="2.6" paintOrder="stroke"
+              style={{ letterSpacing: "0.08em" }}
             >{c.code}</text>
           </g>
         );
@@ -217,20 +281,33 @@ function RadarDisplay({ blipRefs }: { blipRefs: React.MutableRefObject<(SVGCircl
 }
 
 // ── Contact card ──────────────────────────────────────────────────────────────
-function ContactCard({ category, code, desc, email, index }: {
-  category: string; code: string; desc: string; email: string; index: number;
+function ContactCard({ category, code, desc, email, color, index, cardRefs }: {
+  category: string; code: string; desc: string; email: string; color: string;
+  index: number; cardRefs: React.MutableRefObject<(HTMLAnchorElement | null)[]>;
 }) {
-  const icons = ["⟷", "↗", "◎", "⌖"];
+  // Parse color to rgba for hover tint (works for hex and rgba strings)
+  const isHex = color.startsWith("#");
+  const borderBase = isHex
+    ? `${color}30`   // hex + alpha suffix (30 ≈ 19% opacity)
+    : color.replace(/[\d.]+\)$/, "0.18)");
+  const borderHover = isHex ? `${color}80` : color.replace(/[\d.]+\)$/, "0.50)");
+
   return (
     <a
+      ref={(el) => { cardRefs.current[index] = el; }}
       href={`mailto:${email}`}
-      style={{ textDecoration: "none" }}
+      style={{
+        textDecoration: "none",
+        display: "block",
+        transformOrigin: "center center",
+        willChange: "transform",
+      }}
     >
       <div
         className="contact-card"
         style={{
-          background: "rgba(126,206,202,0.04)",
-          border: "1px solid rgba(126,206,202,0.18)",
+          background: "rgba(255,255,255,0.03)",
+          border: `1px solid ${borderBase}`,
           borderRadius: "10px",
           padding: "22px 22px 20px",
           cursor: "pointer",
@@ -239,29 +316,28 @@ function ContactCard({ category, code, desc, email, index }: {
         }}
         onMouseEnter={(e) => {
           const el = e.currentTarget as HTMLDivElement;
-          el.style.background = "rgba(126,206,202,0.09)";
-          el.style.borderColor = "rgba(126,206,202,0.45)";
+          el.style.background = "rgba(255,255,255,0.06)";
+          el.style.borderColor = borderHover;
           el.style.transform = "translateY(-3px)";
         }}
         onMouseLeave={(e) => {
           const el = e.currentTarget as HTMLDivElement;
-          el.style.background = "rgba(126,206,202,0.04)";
-          el.style.borderColor = "rgba(126,206,202,0.18)";
+          el.style.background = "rgba(255,255,255,0.03)";
+          el.style.borderColor = borderBase;
           el.style.transform = "translateY(0)";
         }}
       >
-        {/* Top row: code badge + icon */}
+        {/* Top row: code badge (color-matched to radar blip) */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
           <span style={{
             fontFamily: "'Space Grotesk', sans-serif",
             fontWeight: 800, fontSize: "10px", letterSpacing: "0.30em",
-            color: "#7ECECA", textTransform: "uppercase",
-            background: "rgba(126,206,202,0.10)",
-            border: "1px solid rgba(126,206,202,0.25)",
+            color: color, textTransform: "uppercase",
+            background: isHex ? `${color}18` : color.replace(/[\d.]+\)$/, "0.10)"),
+            border: `1px solid ${borderBase}`,
             borderRadius: "4px",
             padding: "3px 8px",
           }}>{code}</span>
-          <span style={{ fontSize: "15px", opacity: 0.5 }}>{icons[index]}</span>
         </div>
 
         {/* Category */}
@@ -303,6 +379,7 @@ export function ContactSection() {
   const radarRef    = useRef<HTMLDivElement>(null);
   const cardsRef    = useRef<HTMLDivElement>(null);
   const blipRefs    = useRef<(SVGCircleElement | null)[]>([]);
+  const cardRefs    = useRef<(HTMLAnchorElement | null)[]>([]);
   const scanLineRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -459,7 +536,7 @@ export function ContactSection() {
             flexShrink: 0,
             display: "flex", flexDirection: "column", alignItems: "center", gap: "14px",
           }}>
-            <RadarDisplay blipRefs={blipRefs} />
+            <RadarDisplay blipRefs={blipRefs} cardRefs={cardRefs} />
             {/* Live indicator */}
             <div style={{
               display: "flex", alignItems: "center", gap: "7px",
@@ -490,7 +567,7 @@ export function ContactSection() {
             }}
           >
             {CONTACTS.map((c, i) => (
-              <ContactCard key={c.category} {...c} index={i} />
+              <ContactCard key={c.category} {...c} index={i} cardRefs={cardRefs} />
             ))}
           </div>
         </div>

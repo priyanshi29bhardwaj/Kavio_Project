@@ -333,12 +333,18 @@
   inset: 0;
   pointer-events: none;
   z-index: -1;
+  /* Tint stays identical through the text zone (0–55%), then fades fully back
+     to transparent BEFORE the section's bottom edge. Previously it ended at
+     0.5 opacity right at 100%, leaving a hard dark line at the section border
+     that bled across the seat during the cloud→cabin crossfade. Returning to 0
+     by 84% removes that band entirely. */
   background: linear-gradient(
     180deg,
     rgba(20, 10, 4, 0) 0%,
     rgba(20, 10, 4, 0.18) 22%,
-    rgba(20, 10, 4, 0.42) 60%,
-    rgba(20, 10, 4, 0.5) 100%
+    rgba(20, 10, 4, 0.42) 55%,
+    rgba(20, 10, 4, 0.30) 70%,
+    rgba(20, 10, 4, 0) 84%
   );
 }
 
