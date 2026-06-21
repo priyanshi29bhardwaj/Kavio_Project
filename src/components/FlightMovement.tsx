@@ -74,7 +74,7 @@ export default function FlightMovement(props: FlightMovementProps) {
   const breakpoint = useBreakpoint();
   const isMobile = breakpoint === "mobile";
   const isTablet = breakpoint === "tablet";
-  const isCompact = isMobile || isTablet;
+ 
 
   /*
    * SCROLL LENGTH FIX
