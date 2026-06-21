@@ -22,7 +22,8 @@ import { ContactSection }       from "./components/ContactSection";
 import { JoinWaitlistModal } from "./components/JoinWaitlistModal";
 import { KaivoWordmark } from "./components/KaivoLogo";
 import { PlaneIcon } from "./components/PlaneIcon";
-
+import FlightMovement from "./components/FlightMovement";
+import GlobeAnimation from "./components/GlobeAnimation";
 gsap.registerPlugin(ScrollTrigger);
 ScrollTrigger.config({ ignoreMobileResize: true });
 
@@ -313,6 +314,7 @@ function App() {
 
       {/* ─── Frame 2: sky descent + about overlap parallax ─────────────────── */}
       <SkyAboutSection onJoinWaitlist={() => setIsModalOpen(true)} />
+      <FlightMovement exteriorJetSrc="/jet-full.png" structureSrc="/jet-structure.png" brand="Kaivo"   scrollLengthVh={5} />
 
 
       {/* ─── Solid website (sky stops here) ─────────────────────────────────
@@ -332,6 +334,9 @@ function App() {
         <DelegationSection />
         <TeamSection />
         <FoundersCTASection onJoinWaitlist={() => setIsModalOpen(true)} />
+        <div style={{ height: "100vh", position: "relative" }}>
+             <GlobeAnimation />
+        </div>
         <div id="contact" />
         <ContactSection />
 
