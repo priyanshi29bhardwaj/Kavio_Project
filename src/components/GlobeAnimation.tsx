@@ -41,13 +41,7 @@ const KAIVO_COLORS = {
   potato: 0xe2725b,
 };
 
-const OFFICE_CITIES = [
-  { city: "New York",  tag: "Americas HQ" },
-  { city: "London",    tag: "EMEA HQ"     },
-  { city: "Dubai",     tag: "Gulf Hub"    },
-  { city: "Singapore", tag: "APAC Hub"    },
-  { city: "Hyderabad", tag: "Tech Centre" },
-];
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Continent dot seeds [lat, lon]
